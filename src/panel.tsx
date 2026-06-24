@@ -18,8 +18,12 @@ export class ReactDashboardStudioPanel extends HTMLElement {
     hassStore.setHass(hass);
   }
 
+  // HA toggles this when the layout is narrow (mobile / collapsed sidebar).
+  set narrow(v: boolean) {
+    hassStore.setNarrow(!!v);
+  }
+
   // HA also assigns these; accepted and currently ignored.
-  set narrow(_v: boolean) {}
   set route(_v: unknown) {}
   set panel(_v: unknown) {}
 

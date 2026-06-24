@@ -1,4 +1,4 @@
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { hassStore } from './store';
 import type { HassEntity } from './types';
 import type { KnownEntityId } from './entities.generated';
@@ -51,6 +51,30 @@ export function useHassReady(): boolean {
     hassStore.subscribe,
     () => hassStore.getHass() !== null,
   );
+}
+
+/**
+ * True on phone-sized layouts. Combines Home Assistant's own `narrow` flag
+ * (which also accounts for the docked sidebar) with a width media query, so the
+ * editor stays hidden on mobile even when HA hasn't set `narrow` yet.
+ */
+export function useIsMobile(breakpoint = 860): boolean {
+  const haNarrow = useSyncExternalStore(hassStore.subscribe, hassStore.getNarrow);
+
+  const query = `(max-width: ${breakpoint}px)`;
+  const [matches, setMatches] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const onChange = () => setMatches(mql.matches);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, [query]);
+
+  return haNarrow || matches;
 }
 
 /**

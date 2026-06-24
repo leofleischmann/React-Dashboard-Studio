@@ -17,6 +17,7 @@ const EMPTY_ENTITIES: HassEntity[] = [];
  */
 class HassStore {
   private hass: AppHass | null = null;
+  private narrow = false;
   private listeners = new Set<Listener>();
   private domainIndex = new Map<string, HassEntity[]>();
 
@@ -46,6 +47,15 @@ class HassStore {
   };
 
   getHass = (): AppHass | null => this.hass;
+
+  /** HA tells the panel whether it is rendered in a narrow (mobile) layout. */
+  setNarrow = (narrow: boolean): void => {
+    if (this.narrow === narrow) return;
+    this.narrow = narrow;
+    for (const listener of this.listeners) listener();
+  };
+
+  getNarrow = (): boolean => this.narrow;
 
   subscribe = (listener: Listener): (() => void) => {
     this.listeners.add(listener);

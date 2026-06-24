@@ -30,6 +30,10 @@ und dein Code wird **in Home Assistant gespeichert**.
    ```
 5. **Strg/⌘ + S** speichert in HA. **„◀ Ansicht"** zeigt das Dashboard im Vollbild.
 
+> **Mobil:** Auf dem Handy ist das Studio reine **Anzeige** – der Code-Editor
+> (Desktop-Werkzeug) ist ausgeblendet. Über das **☰-Symbol** oben links blendest
+> du die Home-Assistant-Seitenleiste jederzeit wieder ein.
+
 ### Mehrere Dateien (modulare Codebasis)
 
 Im Datei-Panel legst du beliebig viele Dateien an (z. B. `components/Karte.tsx`) und
@@ -59,7 +63,7 @@ landet am Cursor:
 | Modul | Inhalt |
 | --- | --- |
 | `@ha` | `useEntity`, `useEntityState`, `useEntitiesByDomain`, `useHassReady`, `callService`, `states` |
-| `@ha/ui` | `Card`, `Stat`, `Section`, `RoomCard`, `DeviceCard`, `BatteryRow` |
+| `@ha/ui` | `Card`, `Stat`, `Section`, `RoomCard`, `DeviceCard`, `BatteryRow`, `LightTile` |
 | `@ha/format` | `num`, `euro`, `isAvailable`, `stateNumber`, `weatherIcon`, `greeting`, `batteryColor` |
 | `react` | das volle React (Hooks, `useState`, …) |
 

@@ -144,6 +144,44 @@ export function DeviceCard({
   );
 }
 
+const BULB_ICON = (
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M12 2a7 7 0 0 0-4 12.74V16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.26A7 7 0 0 0 12 2Zm-3 17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"
+    />
+  </svg>
+);
+
+/**
+ * A tappable tile for a single light. Glows when on and shows the brightness
+ * if the light reports one. Toggles the light on click.
+ */
+export function LightTile({ entityId, name }: { entityId: string; name?: string }) {
+  const light = useEntity(entityId);
+  const on = light?.state === 'on';
+  const label = name ?? light?.attributes.friendly_name ?? entityId;
+  const brightnessRaw = light?.attributes.brightness;
+  const brightness =
+    typeof brightnessRaw === 'number'
+      ? Math.max(1, Math.round((brightnessRaw / 255) * 100))
+      : undefined;
+
+  return (
+    <button
+      className={`rd-light ${on ? 'is-on' : ''}`}
+      onClick={() => callService('light', 'toggle', { entity_id: entityId })}
+      aria-pressed={on}
+    >
+      <span className="rd-light__icon">{BULB_ICON}</span>
+      <span className="rd-light__name">{label}</span>
+      <span className="rd-light__state">
+        {on ? (brightness !== undefined ? `${brightness} %` : 'an') : 'aus'}
+      </span>
+    </button>
+  );
+}
+
 /** A single battery row with a colored bar. */
 export function BatteryRow({ name, entityId }: { name: string; entityId: string }) {
   const battery = useEntity(entityId);

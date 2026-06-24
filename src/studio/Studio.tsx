@@ -8,7 +8,7 @@ import {
   type ComponentType,
 } from 'react';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { useHassReady } from '../hass/hooks';
+import { useHassReady, useIsMobile } from '../hass/hooks';
 import { clearCompileCache, compileProject } from './compile';
 import { loadProject, saveProject } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
@@ -27,8 +27,21 @@ type Mode = 'view' | 'edit';
 
 const serialize = (p: Project) => JSON.stringify({ e: p.entry, f: p.files });
 
+/**
+ * Ask Home Assistant to toggle its sidebar. Custom panels render without HA's
+ * own header, so we re-create the hamburger that opens the sidebar (which is
+ * otherwise unreachable, especially on mobile). The event bubbles out of our
+ * shadow/light DOM up to <home-assistant>, which handles it.
+ */
+function toggleHaSidebar(target: EventTarget): void {
+  target.dispatchEvent(
+    new CustomEvent('hass-toggle-menu', { bubbles: true, composed: true }),
+  );
+}
+
 export default function Studio() {
   const ready = useHassReady();
+  const mobile = useIsMobile();
 
   const [project, setProject] = useState<Project>(DEFAULT_PROJECT);
   const [savedProject, setSavedProject] = useState<Project>(DEFAULT_PROJECT);
@@ -91,6 +104,12 @@ export default function Studio() {
 
     return () => clearTimeout(handle);
   }, [project, mode, loaded]);
+
+  // The code editor is desktop-only. If we end up on a mobile layout (e.g. the
+  // window was resized, or HA reports narrow), drop back to the live view.
+  useEffect(() => {
+    if (mobile && mode === 'edit') setMode('view');
+  }, [mobile, mode]);
 
   const dirty = serialize(project) !== serialize(savedProject);
 
@@ -176,12 +195,28 @@ export default function Studio() {
     );
   }
 
-  return (
-    <div className="rd-studio">
-      <div className="rd-studio__bar">
-        <span className="rd-studio__title">React Dashboard Studio</span>
+  const editing = mode === 'edit';
 
-        {mode === 'edit' && (
+  return (
+    <div className={`rd-studio ${editing ? 'is-editing' : 'is-viewing'}`}>
+      <div className="rd-studio__bar">
+        <button
+          className="rd-studio__menu"
+          title="Seitenleiste ein-/ausblenden"
+          aria-label="Seitenleiste ein-/ausblenden"
+          onClick={(e) => toggleHaSidebar(e.currentTarget)}
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"
+            />
+          </svg>
+        </button>
+
+        <span className="rd-studio__title">Dashboard Studio</span>
+
+        {editing && (
           <>
             <button
               className="rd-studio__btn is-primary"
@@ -208,12 +243,31 @@ export default function Studio() {
 
         <span className="rd-studio__spacer" />
 
-        <button
-          className="rd-studio__btn"
-          onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')}
-        >
-          {mode === 'edit' ? '◀ Ansicht' : '✎ Bearbeiten'}
-        </button>
+        {editing ? (
+          <button
+            className="rd-studio__btn"
+            onClick={() => setMode('view')}
+          >
+            ◀ Ansicht
+          </button>
+        ) : (
+          // Desktop only: a discreet, ghost-styled entry point into the editor.
+          !mobile && (
+            <button
+              className="rd-studio__edit"
+              title="Dashboard bearbeiten"
+              onClick={() => setMode('edit')}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Z"
+                />
+              </svg>
+              <span>Bearbeiten</span>
+            </button>
+          )
+        )}
       </div>
 
       {mode === 'view' ? (
