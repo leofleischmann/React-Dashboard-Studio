@@ -1,5 +1,8 @@
 # React Dashboard Studio für Home Assistant
 
+![Home Assistant Custom Panel](https://img.shields.io/badge/Home%20Assistant-Custom%20Panel-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
+![HACS Dashboard](https://img.shields.io/badge/HACS-Dashboard-9D4EDD?style=for-the-badge)
+
 Ein **Custom Panel** für Home Assistant, in dem du dein Dashboard **direkt in HA
 mit React programmierst** – wie der normale Dashboard-Editor, nur mit voller
 Code-Freiheit (JSX, eigenes CSS, deine Komponenten). Installierbar über **HACS**.
@@ -85,7 +88,7 @@ landet am Cursor:
        sidebar_title: Dashboard Studio
        sidebar_icon: mdi:react
        url_path: react-dashboard-studio
-       module_url: /hacsfiles/<repo-name>/dashboard.js
+       module_url: /hacsfiles/react-dashboard-studio/dashboard.js
    ```
 
 Dein Dashboard-Code wird pro HA-Benutzer über `frontend/user_data` gespeichert.

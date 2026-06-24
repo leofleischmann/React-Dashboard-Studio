@@ -10,4 +10,4 @@ panel_custom:
     sidebar_title: Dashboard Studio
     sidebar_icon: mdi:react
     url_path: react-dashboard-studio
-    module_url: /hacsfiles/<repo-name>/dashboard.js
+    module_url: /hacsfiles/react-dashboard-studio/dashboard.js
