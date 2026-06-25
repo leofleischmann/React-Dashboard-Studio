@@ -8,6 +8,8 @@ type Listener = () => void;
 interface CacheBucket<T> {
   data: T;
   inflight: Promise<T> | null;
+  /** true after the first fetch attempt completed (success or failure) */
+  loaded: boolean;
   /** listener -> refresh interval (ms) requested by that subscriber */
   listeners: Map<Listener, number>;
   timer: ReturnType<typeof setInterval> | null;
@@ -45,6 +47,7 @@ function createSharedRestCache<T>(
       bucket = {
         data: empty,
         inflight: null,
+        loaded: false,
         listeners: new Map(),
         timer: null,
         entityIds,
@@ -72,6 +75,7 @@ function createSharedRestCache<T>(
       })
       .catch(() => empty)
       .finally(() => {
+        bucket.loaded = true;
         bucket.inflight = null;
         notify(bucket);
       });
@@ -110,7 +114,9 @@ function createSharedRestCache<T>(
     const bucket = getOrCreateBucket(key, ids, param);
 
     bucket.listeners.set(listener, refreshMs);
-    void load(bucket);
+    if (!bucket.loaded && !bucket.inflight) {
+      void load(bucket);
+    }
     syncTimer(key, bucket);
 
     return () => {

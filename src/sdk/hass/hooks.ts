@@ -351,6 +351,10 @@ export function getAppHass() {
   return hassStore.getHass();
 }
 
+function entityIdsFromKey(idsKey: string): string[] {
+  return idsKey ? idsKey.split('\0') : [];
+}
+
 /** Reactive recorder history for chart widgets. Refreshes on an interval. */
 export function useEntityHistory(
   entityIds: string[],
@@ -361,16 +365,16 @@ export function useEntityHistory(
   const idsKey = normalizeIds(entityIds);
 
   const getSnapshot = useCallback(() => {
-    if (!ready || entityIds.length === 0) return {};
-    return getEntityHistorySnapshot(entityIds, hours);
-  }, [ready, idsKey, hours, entityIds]);
+    if (!ready || !idsKey) return {};
+    return getEntityHistorySnapshot(entityIdsFromKey(idsKey), hours);
+  }, [ready, idsKey, hours]);
 
   const subscribe = useCallback(
     (listener: () => void) => {
-      if (!ready || entityIds.length === 0) return () => {};
-      return subscribeEntityHistory(entityIds, hours, refreshMs, listener);
+      if (!ready || !idsKey) return () => {};
+      return subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener);
     },
-    [ready, idsKey, hours, refreshMs, entityIds],
+    [ready, idsKey, hours, refreshMs],
   );
 
   return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
@@ -386,16 +390,16 @@ export function useEntityStatistics(
   const idsKey = normalizeIds(entityIds);
 
   const getSnapshot = useCallback(() => {
-    if (!ready || entityIds.length === 0) return {};
-    return getEntityStatisticsSnapshot(entityIds, days);
-  }, [ready, idsKey, days, entityIds]);
+    if (!ready || !idsKey) return {};
+    return getEntityStatisticsSnapshot(entityIdsFromKey(idsKey), days);
+  }, [ready, idsKey, days]);
 
   const subscribe = useCallback(
     (listener: () => void) => {
-      if (!ready || entityIds.length === 0) return () => {};
-      return subscribeEntityStatistics(entityIds, days, refreshMs, listener);
+      if (!ready || !idsKey) return () => {};
+      return subscribeEntityStatistics(entityIdsFromKey(idsKey), days, refreshMs, listener);
     },
-    [ready, idsKey, days, refreshMs, entityIds],
+    [ready, idsKey, days, refreshMs],
   );
 
   return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
