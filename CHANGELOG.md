@@ -17,7 +17,7 @@ Alle wesentlichen Änderungen an Home Assistant Dashboard Studio. HACS-Updates z
 
 ### Sonstiges
 
-- **Start-Dashboard:** SDK-Referenz mit Tabs Start / Widgets / Layout (Erstinstallation)
+- **Start-Dashboard:** Vollständiges SDK-Showcase (Tabs: Overview, Widgets, Charts, Hooks, Layout, Format) — Erstinstallation
 - **Architektur:** `default-dashboard/` als echte TSX-Quelle (Build-Embed), SDK unter `src/sdk/`, zentrale `WIDGET_CATALOG` + `WidgetCatalogGrid` in `@ha/ui`
 - Dev: Vite-Proxy für HA-REST (`/__ha-api`) — History & Charts ohne CORS in der lokalen Vorschau
 - HACS-Releases nutzen diese Datei als Release-Notes

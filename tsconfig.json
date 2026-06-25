@@ -4,19 +4,24 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
-
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
+    "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ha": ["src/sdk/hass/hooks.ts"],
+      "@ha/ui": ["src/sdk/ui/index.ts"],
+      "@ha/layout": ["src/sdk/ui/layout.tsx"],
+      "@ha/format": ["src/sdk/format.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "default-dashboard"]
 }
