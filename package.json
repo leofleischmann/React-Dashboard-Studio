@@ -9,7 +9,6 @@
     "build": "tsc --noEmit && vite build && node scripts/copy-dashboard.mjs",
     "check:default": "node scripts/check-default-project.mjs",
     "check:dashboard": "node scripts/validate-dashboard.mjs",
-    "preview": "vite preview",
     "gen:types": "node scripts/gen-entity-types.mjs",
     "sync": "node scripts/sync.mjs",
     "sync:pull": "node scripts/sync.mjs pull",
