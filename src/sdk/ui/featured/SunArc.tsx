@@ -1,4 +1,4 @@
-import { useId, useMemo } from 'react';
+import { useEffect, useId, useMemo } from 'react';
 import { useSun, useTime } from '../../hass/hooks';
 import { num } from '../../format';
 import './SunArc.css';
@@ -54,6 +54,55 @@ function skyTone(elevation: number | undefined, isDay: boolean): SkyTone {
   return 'day';
 }
 
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+const MS_PER_DAY = 86_400_000;
+
+/**
+ * Today's sunrise/sunset from HA `next_*` attributes.
+ * While the sun is up, `next_rising` is tomorrow and `next_setting` is this evening.
+ */
+function daylightWindow(
+  now: Date,
+  rising: Date | undefined,
+  setting: Date | undefined,
+  isDay: boolean,
+): { rise: Date; set: Date } | null {
+  if (!rising || !setting) return null;
+
+  const nowMs = now.getTime();
+  let riseMs = rising.getTime();
+  let setMs = setting.getTime();
+
+  if (!isDay) return null;
+
+  if (riseMs > nowMs) riseMs -= MS_PER_DAY;
+  if (setMs < nowMs) setMs += MS_PER_DAY;
+  if (setMs <= riseMs) return null;
+
+  return { rise: new Date(riseMs), set: new Date(setMs) };
+}
+
+/** 0 = sunrise (east), 0.5 ≈ noon, 1 = sunset (west) — from time, not azimuth. */
+function arcProgress(
+  now: Date,
+  rising: Date | undefined,
+  setting: Date | undefined,
+  isDay: boolean,
+  azimuth: number,
+): number {
+  const window = daylightWindow(now, rising, setting, isDay);
+  if (window) {
+    const span = window.set.getTime() - window.rise.getTime();
+    if (span > 0) {
+      return clamp01((now.getTime() - window.rise.getTime()) / span);
+    }
+  }
+  return clamp01((azimuth - 90) / 180);
+}
+
 function isGoldenHour(elevation: number | undefined, isDay: boolean): boolean {
   if (!isDay) return false;
   const elev = elevation ?? 0;
@@ -87,8 +136,8 @@ function MoonDisc({ phase, r }: { phase: number; r: number }) {
 }
 
 /**
- * Sun path arc for `sun.sun` — sky gradient, stars at night, moon phase,
- * azimuth for position along the semicircle track; elevation drives sky tone and labels.
+ * Sun path arc for `sun.sun` — position along the track follows daylight progress
+ * (sunrise → sunset), not azimuth; elevation drives sky tone and labels.
  */
 export function SunArc({
   entityId = 'sun.sun',
@@ -115,17 +164,39 @@ export function SunArc({
   const cy = H - 28;
   const r = (W - pad * 2) / 2;
 
-  const az = sun.azimuth ?? 180;
-  const t = Math.min(1, Math.max(0, (az - 90) / 180));
+  const isDay = sun.isDay ?? true;
+  const elevation = sun.elevation ?? 0;
+  const azimuth = sun.azimuth ?? 180;
+
+  const t = useMemo(
+    () => arcProgress(now, sun.rising, sun.setting, isDay, azimuth),
+    [now, sun.rising, sun.setting, isDay, azimuth],
+  );
+
   const arcSign = hemisphere === 'south' ? -1 : 1;
   const sx = cx - r * Math.cos(Math.PI * t);
   const sy = cy - arcSign * r * Math.sin(Math.PI * t);
 
-  const isDay = sun.isDay ?? true;
-  const elevation = sun.elevation ?? 0;
   const tone = skyTone(elevation, isDay);
   const golden = isGoldenHour(elevation, isDay);
   const phase = moonPhase(now);
+
+  useEffect(() => {
+    const window = daylightWindow(now, sun.rising, sun.setting, isDay);
+    const tAzimuth = clamp01((azimuth - 90) / 180);
+    console.log('[Debug SunArc]:', {
+      elevation,
+      azimuth,
+      isDay,
+      arcT: t.toFixed(3),
+      arcTAzimuth: tAzimuth.toFixed(3),
+      arcTTime: window
+        ? clamp01((now.getTime() - window.rise.getTime()) / (window.set.getTime() - window.rise.getTime())).toFixed(3)
+        : null,
+      rising: sun.rising?.toISOString(),
+      setting: sun.setting?.toISOString(),
+    });
+  }, [elevation, azimuth, isDay, t, now, sun.rising, sun.setting]);
 
   const arc =
     hemisphere === 'south'
