@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 
-from homeassistant.components import panel_custom
-from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.loader import async_get_integration
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .const import DOMAIN, PANEL_ICON, PANEL_TAG, PANEL_TITLE, PANEL_URL_PATH
+from .const import DOMAIN, SIGNAL_WORKSPACE_UPDATED
+from .panels import async_sync_sidebar_panels, async_unregister_all_panels
 from .store import DashboardStore
 from . import websocket_api
 
@@ -24,42 +22,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await store.async_load()
     hass.data.setdefault(DOMAIN, {})["store"] = store
     websocket_api.async_setup(hass)
-    await _async_register_panel(hass)
+
+    workspace = await store.async_get_workspace()
+    await async_sync_sidebar_panels(hass, workspace)
+
+    def _on_workspace_updated(workspace: dict | None) -> None:
+        hass.async_create_task(async_sync_sidebar_panels(hass, workspace))
+
+    unsub = async_dispatcher_connect(hass, SIGNAL_WORKSPACE_UPDATED, _on_workspace_updated)
+    hass.data[DOMAIN]["workspace_listener"] = unsub
+
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload the config entry."""
-    hass.data.get(DOMAIN, {}).pop("store", None)
+    domain_data = hass.data.get(DOMAIN, {})
+    unsub = domain_data.pop("workspace_listener", None)
+    if unsub:
+        unsub()
+    await async_unregister_all_panels(hass)
+    domain_data.pop("store", None)
     return True
-
-
-async def _async_register_panel(hass: HomeAssistant) -> None:
-    """Register the sidebar panel (once per HA instance)."""
-    if hass.data.get(DOMAIN, {}).get("panel_registered"):
-        return
-
-    panel_dir = Path(__file__).parent
-    static_url = f"/{DOMAIN}"
-
-    await hass.http.async_register_static_paths(
-        [StaticPathConfig(static_url, str(panel_dir), cache_headers=False)]
-    )
-
-    # Versioned bundle filename busts browser/service-worker cache on HACS updates
-    # without a ?v= query (that would make studio-editor.js load a second React copy).
-    integration = await async_get_integration(hass, DOMAIN)
-    module_url = f"{static_url}/dashboard.v{integration.version}.js"
-
-    await panel_custom.async_register_panel(
-        hass,
-        webcomponent_name=PANEL_TAG,
-        frontend_url_path=PANEL_URL_PATH,
-        sidebar_title=PANEL_TITLE,
-        sidebar_icon=PANEL_ICON,
-        module_url=module_url,
-        require_admin=False,
-    )
-
-    hass.data.setdefault(DOMAIN, {})["panel_registered"] = True
-    _LOGGER.debug("Home Assistant Dashboard Studio panel registered at /%s", PANEL_URL_PATH)

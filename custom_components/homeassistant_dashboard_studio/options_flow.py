@@ -11,7 +11,7 @@ from homeassistant.config_entries import OptionsFlow  # pyright: ignore[reportMi
 from homeassistant.helpers import config_validation as cv  # pyright: ignore[reportMissingImports]
 
 from .const import CONF_CONFIRM_RESET
-from .user_data import async_reset_dashboard_project
+from .reset import async_reset_dashboard_workspace
 
 
 class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
@@ -20,7 +20,7 @@ class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> data_entry_flow.FlowResult:
-        """Confirm and reset the global dashboard project."""
+        """Confirm and reset the global dashboard workspace."""
         if user_input is not None:
             if not user_input.get(CONF_CONFIRM_RESET):
                 return self.async_show_form(
@@ -29,7 +29,7 @@ class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
                     errors={"base": "not_confirmed"},
                 )
 
-            await async_reset_dashboard_project(self.hass)
+            await async_reset_dashboard_workspace(self.hass)
             return self.async_create_entry(title="", data={"reset": True})
 
         return self.async_show_form(step_id="init", data_schema=self._schema())

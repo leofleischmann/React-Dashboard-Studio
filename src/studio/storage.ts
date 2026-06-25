@@ -61,11 +61,16 @@ export type LoadedStudioState = {
   project: Project;
 };
 
-export async function loadStudioState(): Promise<LoadedStudioState> {
+export async function loadStudioState(boundProjectId?: string): Promise<LoadedStudioState> {
   const workspace = await loadWorkspace();
   if (workspace) {
-    const activeId = workspace.activeId;
+    const panelId = boundProjectId?.trim();
+    const activeId =
+      panelId && workspace.projects[panelId]
+        ? panelId
+        : workspace.activeId;
     const p = workspace.projects[activeId];
+    console.log('[Debug storage]: loadStudioState', { boundProjectId: panelId, activeId });
     return {
       workspace,
       activeId,

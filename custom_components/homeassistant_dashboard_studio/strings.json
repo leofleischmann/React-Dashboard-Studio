@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Home Assistant Dashboard Studio",
-        "description": "Installiert das Dashboard-Studio als Sidebar-Panel. Nach der Einrichtung erscheint **Dashboard Studio** in der Seitenleiste — kein Eintrag in configuration.yaml nötig."
+        "description": "Registriert Dashboard-Studio-Panels in der Sidebar. Jedes gespeicherte Dashboard erhält einen eigenen Eintrag — kein Eintrag in configuration.yaml nötig."
       }
     },
     "abort": {
@@ -15,9 +15,9 @@
     "step": {
       "init": {
         "title": "Standard-Dashboard wiederherstellen",
-        "description": "Löscht das **global gespeicherte** Dashboard (für alle Haushaltsmitglieder sichtbar) und lädt beim nächsten Öffnen des Panels wieder das Standard-Showcase aus der Integration.\n\n**Hinweis:** Nicht gespeicherte Änderungen im Editor gehen verloren. Das Panel nach dem Zurücksetzen einmal neu laden (F5).",
+        "description": "Löscht den **global gespeicherten** Workspace (alle Dashboards, für alle Haushaltsmitglieder sichtbar). In der Sidebar bleibt ein Standard-Dashboard mit dem mitgelieferten Beispiel.\n\n**Hinweis:** Nicht gespeicherte Editor-Änderungen gehen verloren. Nach dem Zurücksetzen die Seite neu laden (F5).",
         "data": {
-          "confirm_reset": "Ja, gespeichertes Dashboard löschen und Standard wiederherstellen"
+          "confirm_reset": "Ja, gespeicherte Dashboards löschen und Standard wiederherstellen"
         }
       }
     },

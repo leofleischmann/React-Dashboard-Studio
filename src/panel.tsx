@@ -2,9 +2,16 @@ import type { Root } from 'react-dom/client';
 import { hassStore } from './sdk/hass/store';
 import type { AppHass } from './sdk/hass/types';
 import { mountStudio } from './mount';
+import { panelStore } from './studio/panelStore';
 
 // MUST match PANEL_TAG in custom_components/homeassistant_dashboard_studio/const.py
 const TAG = 'homeassistant-dashboard-studio-panel';
+
+type HaPanelConfig = {
+  config?: {
+    project_id?: string;
+  };
+};
 
 /**
  * The custom element Home Assistant instantiates for the panel.
@@ -27,9 +34,14 @@ export class ReactDashboardStudioPanel extends HTMLElement {
     hassStore.setNarrow(!!v);
   }
 
-  // HA also assigns these; accepted and currently ignored.
   set route(_v: unknown) {}
-  set panel(_v: unknown) {}
+
+  set panel(v: HaPanelConfig | undefined) {
+    const id = v?.config?.project_id;
+    if (typeof id === 'string' && id.length > 0) {
+      panelStore.setProjectId(id);
+    }
+  }
 
   connectedCallback(): void {
     if (!this.root) {
