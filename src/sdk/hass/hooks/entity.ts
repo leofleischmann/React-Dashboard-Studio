@@ -10,7 +10,7 @@ import {
   type LabelEntry,
 } from '../registryStore';
 import { useHassReady } from './ready';
-import { stableArraySnapshot } from './shared';
+import { stableArraySnapshot, stableEntitySnapshot } from './shared';
 import { useTime } from './app';
 
 const MISSING_STATES = new Set(['unavailable', 'unknown']);
@@ -27,16 +27,13 @@ function entityWithFallback(
 ): HassEntity | undefined {
   if (!fallback) return entity;
   if (entity && !MISSING_STATES.has(entity.state)) return entity;
-  const now = new Date().toISOString();
+  const stamp = entity?.last_updated ?? entity?.last_changed ?? '';
   return {
     entity_id: entityId,
-    state:
-      entity && !MISSING_STATES.has(entity.state)
-        ? entity.state
-        : fallback,
+    state: fallback,
     attributes: entity?.attributes ?? {},
-    last_changed: entity?.last_changed ?? now,
-    last_updated: entity?.last_updated ?? now,
+    last_changed: entity?.last_changed ?? stamp,
+    last_updated: entity?.last_updated ?? stamp,
     context: entity?.context ?? { id: '', parent_id: null, user_id: null },
   };
 }
@@ -65,10 +62,19 @@ export function useEntity(
   entityId: KnownEntityId,
   options?: EntityHookOptions,
 ): HassEntity | undefined {
-  const getSnapshot = useCallback(
-    () => entityWithFallback(hassStore.getEntity(entityId), entityId, options?.fallback),
-    [entityId, options?.fallback],
-  );
+  const fallback = options?.fallback;
+  const cacheRef = useRef<{ entity: HassEntity | undefined; key: string }>({
+    entity: undefined,
+    key: '',
+  });
+
+  const getSnapshot = useCallback(() => {
+    const raw = hassStore.getEntity(entityId);
+    const next = entityWithFallback(raw, entityId, fallback);
+    if (!fallback || next === raw) return next;
+    return stableEntitySnapshot(cacheRef, next);
+  }, [entityId, fallback]);
+
   const subscribe = useCallback(
     (listener: () => void) => hassStore.subscribeEntity(entityId, listener),
     [entityId],
@@ -81,11 +87,17 @@ export function useEntityState(
   entityId: KnownEntityId,
   options?: EntityHookOptions,
 ): string | undefined {
-  const getSnapshot = useCallback(
-    () =>
-      stateWithFallback(hassStore.getEntity(entityId)?.state, options?.fallback),
-    [entityId, options?.fallback],
-  );
+  const fallback = options?.fallback;
+  const cacheRef = useRef<string | undefined>(undefined);
+
+  const getSnapshot = useCallback(() => {
+    const next = stateWithFallback(hassStore.getEntity(entityId)?.state, fallback);
+    const prev = cacheRef.current;
+    if (Object.is(prev, next)) return prev;
+    cacheRef.current = next;
+    return next;
+  }, [entityId, fallback]);
+
   const subscribe = useCallback(
     (listener: () => void) => hassStore.subscribeEntity(entityId, listener),
     [entityId],
