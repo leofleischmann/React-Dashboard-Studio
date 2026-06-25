@@ -65,19 +65,25 @@ export function ResponsiveGrid({
 }
 
 /** Bottom tab bar for multi-page dashboards. */
-export function Tabs<T extends string>({
+export function Tabs<const T extends string>({
   tabs,
   value,
   onChange,
   ariaLabel = 'Navigation',
+  variant = 'bar',
 }: {
-  tabs: TabItem<T>[];
+  tabs: readonly TabItem<T>[];
   value: T;
   onChange: (id: T) => void;
   ariaLabel?: string;
+  /** `bar` = bottom nav (default), `segment` = inline pill tabs inside page content */
+  variant?: 'bar' | 'segment';
 }) {
   return (
-    <nav className="rd-tabs" aria-label={ariaLabel}>
+    <nav
+      className={`rd-tabs ${variant === 'segment' ? 'rd-tabs--segment' : ''}`.trim()}
+      aria-label={ariaLabel}
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -124,31 +130,45 @@ function readHashRoute<T extends string>(
   return (validRoutes.includes(raw as T) ? raw : defaultRoute) as T;
 }
 
+function readHashSegment<T extends string>(validRoutes: readonly T[]): T | null {
+  if (typeof window === 'undefined') return null;
+  const raw = window.location.hash.replace(/^#\/?/, '').split('?')[0];
+  return validRoutes.includes(raw as T) ? (raw as T) : null;
+}
+
 /** Hash-based routing for deep links, e.g. `#/energie`. */
 export function useHashRoute<T extends string>(
   defaultRoute: T,
   validRoutes: readonly T[],
 ): [T, (route: T) => void] {
+  const routesKey = validRoutes.join('\0');
   const [route, setRoute] = useState<T>(() =>
     readHashRoute(defaultRoute, validRoutes),
   );
 
   useEffect(() => {
     const onHashChange = () => {
-      setRoute(readHashRoute(defaultRoute, validRoutes));
+      const next = readHashSegment(validRoutes);
+      if (next) setRoute(next);
+      // Unbekannte Hash-Segmente ignorieren — z. B. alte Sub-Routen (#stack) dürfen
+      // die aktuelle Hauptseite nicht zurück auf defaultRoute setzen.
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, [defaultRoute, validRoutes]);
+  }, [routesKey]);
 
   const navigate = useCallback(
     (next: T) => {
       if (typeof window === 'undefined') return;
       const prefix = window.location.hash.startsWith('#/') ? '#/' : '#/';
-      window.location.hash = `${prefix}${next}`;
-      setRoute(next);
+      const target = `${prefix}${next}`;
+      if (window.location.hash !== target) {
+        window.location.hash = target;
+      } else {
+        setRoute(next);
+      }
     },
-    [],
+    [routesKey],
   );
 
   return [route, navigate];

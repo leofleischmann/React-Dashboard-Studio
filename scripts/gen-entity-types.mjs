@@ -51,7 +51,15 @@ function writeEntityTypeFiles(root, states) {
   "compilerOptions": {
     "strict": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "allowImportingTsExtensions": false,
+    "baseUrl": "..",
+    "paths": {
+      "@ha": ["src/sdk/hass/hooks.ts"],
+      "@ha/ui": ["src/sdk/ui/index.ts"],
+      "@ha/layout": ["src/sdk/ui/layout.tsx"],
+      "@ha/format": ["src/sdk/format.ts"]
+    }
   },
   "include": ["./**/*.ts", "./**/*.tsx", "ha-entities.d.ts", "../src/vite-env.d.ts"]
 }
