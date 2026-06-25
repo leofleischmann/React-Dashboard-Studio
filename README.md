@@ -60,14 +60,15 @@ Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → ers
 
 | Befehl | Wann |
 | --- | --- |
-| `npm run dev` | Nur **Live-Vorschau** (kein Browser-Editor) — Code in VS Code unter `./dashboard/` |
-| `npm run sync:watch` | Optional parallel: jede Speicherung in VS Code wird zu HA hochladen |
-| `npm run sync:pull` / `sync:push` | Einmalig laden bzw. hochladen (`pull` generiert auch `ENTITIES.md`) |
-| `npm run gen:types` | Manuell: Entity-Liste für VS Code (läuft automatisch bei `sync:pull`) |
+| `npm run dev` | Nur **Live-Vorschau** + **⚡ Entities** (Snippet kopieren) · Code in VS Code |
+| `npm run sync:watch` | Optional parallel: Push (mit Compile-Check) bei jedem Speichern |
+| `npm run sync:pull` / `sync:push` | Laden / Hochladen · `pull` prüft lokal + warnt bei Konflikten |
+| `npm run check:dashboard` | `./dashboard/` manuell auf Compile-Fehler prüfen |
+| `npm run gen:types` | Manuell: Entity-Liste (läuft automatisch bei `sync:pull`) |
 
 **Typischer Ablauf:** Terminal 1 → `npm run dev` (Vorschau) · VS Code → `./dashboard/` · Terminal 2 optional → `npm run sync:watch` (Push inkl. Löschen entfernter Dateien in HA).
 
-Oben **📁 dashboard/** = lokaler Modus. Der Dev-Server zeigt **keinen Editor** — bearbeiten nur in VS Code.
+Oben **📁 dashboard/** = lokaler Modus. **⚡ Entities** öffnet den Browser zum Kopieren von Snippets. `sync:pull` validiert `./dashboard/` vor dem Laden und warnt, wenn lokale Änderungen noch nicht gepusht wurden.
 
 ---
 

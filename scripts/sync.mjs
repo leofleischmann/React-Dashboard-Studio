@@ -6,10 +6,13 @@
 //
 // Config: .env.local (same as `npm run dev`).
 
+import { createInterface } from 'node:readline/promises';
+import { stdin, stdout } from 'node:process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WebSocket from 'ws';
+import { validateDashboardProject } from './compile-check.mjs';
 import {
   ENTRY_DEFAULT,
   filterDashboardFiles,
@@ -20,6 +23,11 @@ import {
   writeLocalFiles,
 } from './dashboard-local.mjs';
 import { generateEntityTypes } from './gen-entity-types.mjs';
+import {
+  filesHash,
+  readSyncState,
+  writeSyncState,
+} from './sync-state.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STORAGE_KEY = 'homeassistant_dashboard_studio';
@@ -48,6 +56,18 @@ if (!HASS_URL || !TOKEN) {
   process.exit(1);
 }
 const WS_URL = HASS_URL.replace(/^http/, 'ws') + '/api/websocket';
+
+async function confirm(question) {
+  if (process.env.SYNC_FORCE === '1') return true;
+  if (!stdin.isTTY) {
+    console.error('Abgebrochen (kein interaktives Terminal). Setze SYNC_FORCE=1 zum Erzwingen.');
+    return false;
+  }
+  const rl = createInterface({ input: stdin, output: stdout });
+  const answer = await rl.question(`${question} [j/N] `);
+  rl.close();
+  return /^j|y|yes|ja$/i.test(answer.trim());
+}
 
 function connect() {
   return new Promise((resolve, reject) => {
@@ -102,24 +122,97 @@ function connect() {
   });
 }
 
+async function validateLocalDashboardOrConfirm() {
+  const files = listLocalFiles();
+  if (Object.keys(files).length === 0) return;
+
+  console.log('🔍 Lokales dashboard/ prüfen …');
+  const entry = readEntry();
+  try {
+    const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
+    console.log(`✓ dashboard/ kompiliert (${count} Datei(en)).`);
+  } catch (err) {
+    console.error(`✗ ${err.message}`);
+    const ok = await confirm('Trotzdem von HA laden (pull)?');
+    if (!ok) {
+      throw new Error('Pull abgebrochen — bitte dashboard/ reparieren oder SYNC_FORCE=1.');
+    }
+  }
+}
+
+async function warnPullConflict(localFiles, localEntry, remoteFiles, remoteEntry) {
+  if (Object.keys(localFiles).length === 0) return true;
+
+  const meta = readSyncState();
+  const localHash = filesHash(localFiles, localEntry);
+  const remoteHash = filesHash(remoteFiles, remoteEntry);
+
+  let reason = null;
+  if (meta?.filesHash && localHash !== meta.filesHash) {
+    reason = 'Lokale Änderungen seit dem letzten Sync (nicht gepusht).';
+  } else if (!meta?.filesHash && localHash !== remoteHash) {
+    reason = 'Lokales dashboard/ weicht von HA ab (noch nie synchronisiert).';
+  }
+
+  if (!reason) return true;
+
+  console.warn(`\n⚠️  ${reason}`);
+  if (meta?.syncedAt) {
+    console.warn(`   Letzter Sync: ${meta.syncedAt} (${meta.direction ?? '?'})`);
+  }
+  console.warn('   Pull überschreibt ./dashboard/ mit dem Stand aus HA.\n');
+
+  return confirm('Wirklich überschreiben?');
+}
+
 async function pull(conn) {
+  await validateLocalDashboardOrConfirm();
+
+  const localFiles = listLocalFiles();
+  const localEntry = readEntry();
+
   const res = await conn.call({ type: 'frontend/get_user_data', key: STORAGE_KEY });
   const value = res?.value;
   if (!value?.files || Object.keys(value.files).length === 0) {
     console.log('In HA ist noch kein Dashboard gespeichert – nichts zu laden.');
     return;
   }
-  const files = filterDashboardFiles(value.files);
-  if (Object.keys(files).length === 0) {
+
+  const remoteFiles = filterDashboardFiles(value.files);
+  if (Object.keys(remoteFiles).length === 0) {
     console.log('In HA sind keine Dashboard-Code-Dateien gespeichert – nichts zu laden.');
     return;
   }
-  writeLocalFiles(files);
-  const removed = pruneLocalOrphans(Object.keys(files));
-  writeEntry(value.entry || ENTRY_DEFAULT);
+
+  const remoteEntry = value.entry || ENTRY_DEFAULT;
+
+  console.log('🔍 HA-Dashboard prüfen …');
+  try {
+    validateDashboardProject({
+      files: remoteFiles,
+      entry: remoteEntry,
+      label: 'HA-Dashboard',
+    });
+    console.log(`✓ HA-Dashboard kompiliert (${Object.keys(remoteFiles).length} Datei(en)).`);
+  } catch (err) {
+    console.error(`✗ ${err.message}`);
+    const ok = await confirm('Fehlerhaftes HA-Dashboard trotzdem laden?');
+    if (!ok) throw new Error('Pull abgebrochen — HA-Dashboard hat Compile-Fehler.');
+  }
+
+  if (!(await warnPullConflict(localFiles, localEntry, remoteFiles, remoteEntry))) {
+    console.log('Pull abgebrochen. Tipp: npm run sync:push zum Hochladen.');
+    return;
+  }
+
+  writeLocalFiles(remoteFiles);
+  const removed = pruneLocalOrphans(Object.keys(remoteFiles));
+  writeEntry(remoteEntry);
+  writeSyncState({ files: remoteFiles, entry: remoteEntry, direction: 'pull' });
+
   console.log(
-    `⬇️  ${Object.keys(files).length} Datei(en) nach dashboard/ geladen ` +
-      `(Einstieg: ${value.entry || ENTRY_DEFAULT}).`,
+    `⬇️  ${Object.keys(remoteFiles).length} Datei(en) nach dashboard/ geladen ` +
+      `(Einstieg: ${remoteEntry}).`,
   );
   if (removed.length > 0) {
     console.log(`   🗑  ${removed.length} veraltete lokale Datei(en) entfernt: ${removed.join(', ')}`);
@@ -138,8 +231,12 @@ async function push(conn) {
   if (Object.keys(files).length === 0) {
     throw new Error('Keine Code-Dateien in dashboard/ gefunden – erst "pull" oder Dateien anlegen.');
   }
+
+  console.log('🔍 Lokales dashboard/ prüfen …');
   let entry = readEntry();
   if (!files[entry]) entry = files[ENTRY_DEFAULT] ? ENTRY_DEFAULT : Object.keys(files).sort()[0];
+  const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
+  console.log(`✓ dashboard/ kompiliert (${count} Datei(en)).`);
 
   const res = await conn.call({ type: 'frontend/get_user_data', key: STORAGE_KEY });
   const remoteCode = filterDashboardFiles(res?.value?.files ?? {});
@@ -150,6 +247,8 @@ async function push(conn) {
     key: STORAGE_KEY,
     value: { files, entry },
   });
+  writeSyncState({ files, entry, direction: 'push' });
+
   const stamp = new Date().toLocaleTimeString();
   console.log(
     `⬆️  [${stamp}] ${Object.keys(files).length} Datei(en) zu HA gepusht ` +
