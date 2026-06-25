@@ -21,7 +21,15 @@ type WidgetName =
   | 'TimerCard'
   | 'CounterCard'
   | 'SceneButton'
-  | 'ScriptButton';
+  | 'ScriptButton'
+  | 'HumidifierCard'
+  | 'WaterHeaterCard'
+  | 'ValveCard'
+  | 'SirenCard'
+  | 'UpdateCard'
+  | 'DeviceTrackerChip'
+  | 'InputBooleanTile'
+  | 'CalendarCard';
 
 const WIDGET_BY_DOMAIN: Record<string, WidgetName> = {
   sensor: 'Gauge',
@@ -34,13 +42,13 @@ const WIDGET_BY_DOMAIN: Record<string, WidgetName> = {
   media_player: 'MediaPlayerCard',
   weather: 'WeatherCard',
   person: 'PersonChip',
-  device_tracker: 'PersonChip',
+  device_tracker: 'DeviceTrackerChip',
   input_number: 'NumberSlider',
   script: 'ScriptButton',
   scene: 'SceneButton',
   button: 'ActionButton',
   automation: 'ActionButton',
-  input_boolean: 'EntityRow',
+  input_boolean: 'InputBooleanTile',
   lock: 'LockCard',
   vacuum: 'VacuumCard',
   input_select: 'SelectCard',
@@ -49,17 +57,25 @@ const WIDGET_BY_DOMAIN: Record<string, WidgetName> = {
   camera: 'CameraTile',
   timer: 'TimerCard',
   counter: 'CounterCard',
+  humidifier: 'HumidifierCard',
+  water_heater: 'WaterHeaterCard',
+  valve: 'ValveCard',
+  siren: 'SirenCard',
+  update: 'UpdateCard',
+  calendar: 'CalendarCard',
 };
 
 export function widgetForDomain(domain: string): WidgetName {
   return WIDGET_BY_DOMAIN[domain] ?? 'EntityRow';
 }
 
-/** JSX one-liner for the Entity-Inserter „Widget“ mode. */
 export function entityWidgetSnippet(entityId: string): string {
   const widget = widgetForDomain(entityDomain(entityId));
   return `<${widget} entityId="${entityId}" />`;
 }
 
 export const WIDGET_IMPORTS =
-  "import { EntityRow, Gauge, BinaryBadge, LightTile, ClimateCard, CoverCard, MediaPlayerCard, WeatherCard, PersonChip, NumberSlider, ActionButton, SelectCard, LockCard, VacuumCard, FanCard, AlarmPanel, CameraTile, TimerCard, CounterCard, SceneButton, ScriptButton } from '@ha/ui';";
+  "import { EntityRow, Gauge, SparkChart, LightTile, ClimateCard, SelectCard, LockCard, HumidifierCard, CalendarCard, InputBooleanTile } from '@ha/ui';";
+
+export const LAYOUT_IMPORTS =
+  "import { PageShell, Tabs, Stack, Row, ResponsiveGrid, useHashRoute } from '@ha/layout';";

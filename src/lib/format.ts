@@ -1,4 +1,6 @@
 import type { HassEntity } from '../hass/types';
+import { registryStore } from '../hass/registryStore';
+import { hassStore } from '../hass/store';
 
 const UNAVAILABLE = new Set(['unavailable', 'unknown', 'none', '']);
 
@@ -120,15 +122,28 @@ export function deviceClassIcon(deviceClass?: string): string {
   return DEVICE_CLASS_ICONS[deviceClass] ?? '📟';
 }
 
-/** Friendly display name with entity_id fallback. */
+/** Friendly display name — registry name, then state friendly_name, then entity_id. */
 export function entityDisplayName(
   entity?: HassEntity,
   fallback = '–',
 ): string {
   if (!entity) return fallback;
+  const regName = registryStore.getEntityEntry(entity.entity_id)?.name;
+  if (regName?.trim()) return regName;
   const name = entity.attributes.friendly_name;
   if (typeof name === 'string' && name.trim()) return name;
   return entity.entity_id;
+}
+
+/** Display name by entity id (uses registry when loaded). */
+export function entityDisplayNameForId(
+  entityId: string,
+  fallback = entityId,
+): string {
+  const regName = registryStore.getEntityEntry(entityId)?.name;
+  if (regName?.trim()) return regName;
+  const entity = hassStore.getEntity(entityId);
+  return entityDisplayName(entity, fallback);
 }
 
 const STATE_LABELS: Record<string, string> = {

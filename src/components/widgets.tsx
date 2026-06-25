@@ -670,4 +670,14 @@ export {
   CounterCard,
   SceneButton,
   ScriptButton,
+  HumidifierCard,
+  WaterHeaterCard,
+  ValveCard,
+  SirenCard,
+  UpdateCard,
+  DeviceTrackerChip,
+  InputBooleanTile,
+  CalendarCard,
 } from './domainWidgets';
+
+export { SparkChart, HistoryChart, type ChartSeries } from './charts';

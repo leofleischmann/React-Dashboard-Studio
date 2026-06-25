@@ -53,3 +53,40 @@ export async function fetchEntityHistory(
   const data = await callApi('GET', path);
   return parseRestHistory(data);
 }
+
+/** Sum positive deltas between history points (energy/consumption sensors). */
+export function aggregateHistoryDelta(points: HistoryPoint[]): number {
+  if (points.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < points.length; i += 1) {
+    const delta = points[i].v - points[i - 1].v;
+    if (delta > 0) total += delta;
+  }
+  return total;
+}
+
+/** Daily consumption sums keyed by YYYY-MM-DD (positive deltas only). */
+export function aggregateHistoryByDay(
+  points: HistoryPoint[],
+): Record<string, number> {
+  if (points.length < 2) return {};
+
+  const out: Record<string, number> = {};
+  for (let i = 1; i < points.length; i += 1) {
+    const delta = points[i].v - points[i - 1].v;
+    if (delta <= 0) continue;
+    const day = new Date(points[i].t).toISOString().slice(0, 10);
+    out[day] = (out[day] ?? 0) + delta;
+  }
+  return out;
+}
+
+/** Total or per-day aggregation helper for energy history. */
+export function aggregateHistory(
+  points: HistoryPoint[],
+  mode: 'total' | 'daily' = 'total',
+): number | Record<string, number> {
+  return mode === 'daily'
+    ? aggregateHistoryByDay(points)
+    : aggregateHistoryDelta(points);
+}

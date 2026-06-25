@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { callService, useEntity } from '../hass/hooks';
+import { callService, useCalendarEvents, useEntity } from '../hass/hooks';
 import { entityDomain } from '../lib/entityActions';
 import {
   duration,
@@ -9,6 +9,7 @@ import {
   pct,
   stateColor,
   stateLabel,
+  temp,
 } from '../lib/format';
 
 function cameraProxyUrl(entityId: string, cacheBust: number): string {
@@ -461,5 +462,283 @@ export function ScriptButton({
       <span className="rd-script-btn__icon">📜</span>
       <span className="rd-script-btn__name">{name}</span>
     </button>
+  );
+}
+
+/** Humidifier — toggle and target humidity. */
+export function HumidifierCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const unit = useEntity(entityId);
+  const name = label ?? entityDisplayName(unit, entityId);
+  const on = unit?.state === 'on';
+  const target = unit?.attributes.humidity as number | undefined;
+  const current = unit?.attributes.current_humidity as number | undefined;
+  const usable = isAvailable(unit);
+
+  return (
+    <div className="rd-card rd-humidifier">
+      <div className="rd-humidifier__head">
+        <span className="rd-humidifier__name">{name}</span>
+        <button
+          type="button"
+          className={`rd-switch ${on ? 'is-on' : ''}`}
+          disabled={!usable}
+          onClick={() => callService('humidifier', 'toggle', { entity_id: entityId })}
+        >
+          <span className="rd-switch__knob" />
+        </button>
+      </div>
+      <div className="rd-humidifier__metrics">
+        <span>Ist: {pct(current !== undefined ? String(current) : undefined)}</span>
+        <span>Soll: {pct(target !== undefined ? String(target) : undefined)}</span>
+      </div>
+    </div>
+  );
+}
+
+/** Water heater — temperature and mode. */
+export function WaterHeaterCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const heater = useEntity(entityId);
+  const name = label ?? entityDisplayName(heater, entityId);
+  const current = heater?.attributes.current_temperature;
+  const target = heater?.attributes.temperature;
+  const mode = heater?.attributes.operation_mode ?? heater?.state;
+  const usable = isAvailable(heater);
+
+  return (
+    <div className="rd-card rd-water-heater">
+      <span className="rd-water-heater__name">{name}</span>
+      <div className="rd-water-heater__temps">
+        <strong>{temp(current !== undefined ? String(current) : undefined)}</strong>
+        <span>→ {temp(target !== undefined ? String(target) : undefined)}</span>
+      </div>
+      <span className="rd-water-heater__mode">{stateLabel(String(mode), 'water_heater')}</span>
+      <button
+        type="button"
+        className="rd-pill"
+        disabled={!usable}
+        onClick={() => callService('water_heater', 'toggle', { entity_id: entityId })}
+      >
+        Umschalten
+      </button>
+    </div>
+  );
+}
+
+/** Valve — open / close. */
+export function ValveCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const valve = useEntity(entityId);
+  const name = label ?? entityDisplayName(valve, entityId);
+  const usable = isAvailable(valve);
+
+  return (
+    <div className="rd-card rd-valve">
+      <div className="rd-valve__head">
+        <span className="rd-valve__name">{name}</span>
+        <span style={{ color: stateColor(valve?.state) }}>
+          {stateLabel(valve?.state, 'valve')}
+        </span>
+      </div>
+      <div className="rd-valve__actions">
+        <button
+          type="button"
+          className="rd-valve__btn"
+          disabled={!usable}
+          onClick={() => callService('valve', 'open_valve', { entity_id: entityId })}
+        >
+          Öffnen
+        </button>
+        <button
+          type="button"
+          className="rd-valve__btn"
+          disabled={!usable}
+          onClick={() => callService('valve', 'close_valve', { entity_id: entityId })}
+        >
+          Schließen
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Siren — toggle alarm. */
+export function SirenCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const siren = useEntity(entityId);
+  const name = label ?? entityDisplayName(siren, entityId);
+  const on = siren?.state === 'on';
+  const usable = isAvailable(siren);
+
+  return (
+    <div className={`rd-card rd-siren ${on ? 'is-on' : ''}`}>
+      <span className="rd-siren__name">{name}</span>
+      <button
+        type="button"
+        className={`rd-pill ${on ? 'is-on' : ''}`}
+        disabled={!usable}
+        onClick={() => callService('siren', 'toggle', { entity_id: entityId })}
+      >
+        {on ? '🔔 An' : '🔕 Aus'}
+      </button>
+    </div>
+  );
+}
+
+/** Firmware update entity. */
+export function UpdateCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const update = useEntity(entityId);
+  const name = label ?? entityDisplayName(update, entityId);
+  const state = update?.state ?? '–';
+  const version = update?.attributes.installed_version as string | undefined;
+  const latest = update?.attributes.latest_version as string | undefined;
+  const usable = isAvailable(update);
+  const available = state === 'on' || state === 'available';
+
+  return (
+    <div className={`rd-card rd-update ${available ? 'has-update' : ''}`}>
+      <span className="rd-update__name">{name}</span>
+      <div className="rd-update__versions">
+        <span>{version ?? '–'}</span>
+        {latest && available && <span>→ {latest}</span>}
+      </div>
+      <span className="rd-update__state" style={{ color: stateColor(state) }}>
+        {available ? 'Update verfügbar' : stateLabel(state, 'update')}
+      </span>
+      {available && (
+        <button
+          type="button"
+          className="rd-pill"
+          disabled={!usable}
+          onClick={() => callService('update', 'install', { entity_id: entityId })}
+        >
+          Installieren
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Device tracker chip — home / away. */
+export function DeviceTrackerChip({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const tracker = useEntity(entityId);
+  const name = label ?? entityDisplayName(tracker, entityId);
+  const home = tracker?.state === 'home';
+
+  return (
+    <div className={`rd-card rd-tracker-chip ${home ? 'is-home' : ''}`}>
+      <span className="rd-tracker-chip__avatar">{home ? '📍' : '🛰'}</span>
+      <div className="rd-tracker-chip__text">
+        <span className="rd-tracker-chip__name">{name}</span>
+        <span className="rd-tracker-chip__state">
+          {home ? 'Zuhause' : stateLabel(tracker?.state, 'device_tracker')}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** Input boolean as a tappable tile. */
+export function InputBooleanTile({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const input = useEntity(entityId);
+  const name = label ?? entityDisplayName(input, entityId);
+  const on = input?.state === 'on';
+  const usable = isAvailable(input);
+
+  return (
+    <button
+      type="button"
+      className={`rd-card rd-bool-tile ${on ? 'is-on' : ''}`}
+      disabled={!usable}
+      onClick={() =>
+        callService('input_boolean', 'toggle', { entity_id: entityId })
+      }
+    >
+      <span className="rd-bool-tile__name">{name}</span>
+      <span className="rd-bool-tile__state">{on ? 'An' : 'Aus'}</span>
+    </button>
+  );
+}
+
+/** Calendar — upcoming events list. */
+export function CalendarCard({
+  entityId,
+  label,
+  daysAhead = 7,
+  maxEvents = 5,
+}: {
+  entityId: string;
+  label?: string;
+  daysAhead?: number;
+  maxEvents?: number;
+}) {
+  const calendar = useEntity(entityId);
+  const name = label ?? entityDisplayName(calendar, entityId);
+  const events = useCalendarEvents(entityId, daysAhead);
+  const shown = events.slice(0, maxEvents);
+
+  return (
+    <div className="rd-card rd-calendar">
+      <span className="rd-calendar__name">{name}</span>
+      {shown.length === 0 ? (
+        <p className="rd-calendar__empty">Keine Termine</p>
+      ) : (
+        <ul className="rd-calendar__list">
+          {shown.map((ev) => (
+            <li key={`${ev.summary}-${ev.start.toISOString()}`}>
+              <strong>{ev.summary}</strong>
+              <span>
+                {ev.start.toLocaleString('de-DE', {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

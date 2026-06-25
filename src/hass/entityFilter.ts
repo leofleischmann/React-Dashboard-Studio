@@ -10,6 +10,8 @@ export type EntityFilter = {
   deviceClass?: string | string[];
   /** Requires entity registry (loaded automatically). */
   areaId?: string;
+  /** Requires label registry (loaded automatically). */
+  labelId?: string;
   /** Exact state match, e.g. "on". */
   state?: string;
 };
@@ -45,6 +47,10 @@ export function filterEntities(
     ? new Set(registryStore.getEntitiesInArea(filter.areaId))
     : null;
 
+  const labelEntities = filter.labelId
+    ? new Set(registryStore.getEntitiesWithLabel(filter.labelId))
+    : null;
+
   return entities.filter((entity) => {
     if (domains && !domains.includes(domainOf(entity.entity_id))) return false;
     if (filter.pattern && !matchesPattern(entity, filter.pattern)) return false;
@@ -54,6 +60,7 @@ export function filterEntities(
     }
     if (filter.state && entity.state !== filter.state) return false;
     if (areaEntities && !areaEntities.has(entity.entity_id)) return false;
+    if (labelEntities && !labelEntities.has(entity.entity_id)) return false;
     return true;
   });
 }

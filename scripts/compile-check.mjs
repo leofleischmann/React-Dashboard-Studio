@@ -7,6 +7,7 @@ const REGISTRY = new Set([
   'react/jsx-runtime',
   '@ha',
   '@ha/ui',
+  '@ha/layout',
   '@ha/format',
 ]);
 

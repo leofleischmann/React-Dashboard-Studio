@@ -1357,3 +1357,158 @@
 .rd-script-btn__name {
   font-weight: 600;
 }
+
+/* ── History / spark charts ─────────────────────────────── */
+.rd-chart { margin-top: auto; }
+.rd-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  color: var(--rd-text-2);
+}
+.rd-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rd-chart__legend-item i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.rd-chart__svg {
+  width: 100%;
+  height: 88px;
+  display: block;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+}
+.rd-chart__empty {
+  margin: 0;
+  padding: 28px 8px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--rd-text-2);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.rd-stack { display: flex; flex-direction: column; }
+.rd-row { display: flex; flex-wrap: wrap; }
+.rd-responsive-grid { display: grid; }
+.rd-page-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.rd-page-shell__main {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 88px;
+}
+.rd-tabs {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
+  background: color-mix(in srgb, var(--rd-card-bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--rd-border);
+  z-index: 10;
+}
+.rd-tabs__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--rd-text-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+}
+.rd-tabs__item.is-active {
+  background: color-mix(in srgb, var(--rd-accent) 12%, transparent);
+  color: var(--rd-accent);
+}
+.rd-tabs__icon { font-size: 1.15rem; line-height: 1; }
+
+/* ── Humidifier / water heater / valve / siren / update ─── */
+.rd-humidifier, .rd-water-heater, .rd-valve, .rd-siren, .rd-update {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-humidifier__head, .rd-valve__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-humidifier__metrics, .rd-water-heater__temps {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-water-heater__mode { font-size: 0.82rem; color: var(--rd-text-2); }
+.rd-valve__actions, .rd-siren { gap: 8px; }
+.rd-valve__btn {
+  flex: 1;
+  font: inherit;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-siren.is-on { border-color: color-mix(in srgb, var(--rd-warn) 45%, var(--rd-border)); }
+.rd-update.has-update { border-color: color-mix(in srgb, var(--rd-accent) 45%, var(--rd-border)); }
+.rd-update__versions { font-size: 0.82rem; color: var(--rd-text-2); }
+
+/* ── Tracker / boolean tile / calendar ───────────────────── */
+.rd-tracker-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-tracker-chip.is-home .rd-tracker-chip__state { color: var(--rd-ok); }
+.rd-bool-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.rd-bool-tile.is-on { border-color: color-mix(in srgb, var(--rd-ok) 40%, var(--rd-border)); }
+.rd-calendar { display: flex; flex-direction: column; gap: 10px; }
+.rd-calendar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-calendar__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+}
+.rd-calendar__list span { color: var(--rd-text-2); font-size: 0.75rem; }
+.rd-calendar__empty { margin: 0; color: var(--rd-text-2); font-size: 0.85rem; }

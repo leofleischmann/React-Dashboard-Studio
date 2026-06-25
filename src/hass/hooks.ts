@@ -5,11 +5,28 @@ import type { KnownEntityId } from './entityId';
 import {
   fetchEntityHistory,
   type HistoryPoint,
+  aggregateHistory,
+  aggregateHistoryByDay,
+  aggregateHistoryDelta,
 } from './history';
+import { fetchEntityStatistics, type EntityStatistics } from './statistics';
+import { fetchCalendarEvents, type CalendarEvent } from './calendar';
 import { filterEntities, type EntityFilter } from './entityFilter';
-import { registryStore } from './registryStore';
+import {
+  registryStore,
+  type EntityRegistryEntry,
+  type AreaEntry,
+} from './registryStore';
+import { useTheme, useDarkMode, applyThemeVars } from './theme';
 
 export type { EntityFilter } from './entityFilter';
+export type { EntityStatistics } from './statistics';
+export type { CalendarEvent } from './calendar';
+export type { EntityRegistryEntry, AreaEntry } from './registryStore';
+export { aggregateHistory, aggregateHistoryByDay, aggregateHistoryDelta };
+export { fetchEntityHistory, fetchEntityStatistics, fetchCalendarEvents };
+export type { HistoryPoint } from './history';
+export { useTheme, useDarkMode, applyThemeVars };
 
 export type HassServiceTarget = {
   entity_id?: string | string[];
@@ -59,7 +76,7 @@ export function useEntityAttribute<T = unknown>(
  * Area filter loads the HA entity registry once over WebSocket.
  */
 export function useEntities(filter: EntityFilter = {}): HassEntity[] {
-  const needsRegistry = Boolean(filter.areaId);
+  const needsRegistry = Boolean(filter.areaId || filter.labelId);
   const filterKey = JSON.stringify(filter);
   const cacheRef = useRef<HassEntity[]>([]);
   const ready = useHassReady();
@@ -99,6 +116,63 @@ export function useEntities(filter: EntityFilter = {}): HassEntity[] {
 /** Entities assigned to a Home Assistant area (via entity registry). */
 export function useAreaEntities(areaId: string): HassEntity[] {
   return useEntities({ areaId });
+}
+
+/** Entities with a Home Assistant label. */
+export function useEntitiesByLabel(labelId: string): HassEntity[] {
+  return useEntities({ labelId });
+}
+
+/** All areas from the HA area registry. */
+export function useAreas(): AreaEntry[] {
+  const ready = useHassReady();
+
+  useEffect(() => {
+    if (ready) registryStore.ensureLoaded();
+  }, [ready]);
+
+  const getSnapshot = useCallback(() => registryStore.getAreas(), []);
+
+  const subscribe = useCallback((listener: () => void) => {
+    const unsub = registryStore.subscribe(listener);
+    return unsub;
+  }, []);
+
+  return useSyncExternalStore(subscribe, getSnapshot, () => []);
+}
+
+/** Name of a HA area by id. */
+export function useAreaName(areaId: string): string | undefined {
+  const ready = useHassReady();
+
+  useEffect(() => {
+    if (ready && areaId) registryStore.ensureLoaded();
+  }, [ready, areaId]);
+
+  const getSnapshot = useCallback(
+    () => registryStore.getAreaName(areaId),
+    [areaId],
+  );
+
+  return useSyncExternalStore(registryStore.subscribe, getSnapshot);
+}
+
+/** Entity registry metadata for one entity. */
+export function useEntityRegistry(
+  entityId: KnownEntityId,
+): EntityRegistryEntry | undefined {
+  const ready = useHassReady();
+
+  useEffect(() => {
+    if (ready) registryStore.ensureLoaded();
+  }, [ready]);
+
+  const getSnapshot = useCallback(
+    () => registryStore.getEntityEntry(entityId),
+    [entityId],
+  );
+
+  return useSyncExternalStore(registryStore.subscribe, getSnapshot);
 }
 
 /** Current time, re-renders on an interval (default: every minute). */
@@ -244,11 +318,6 @@ export function getAppHass() {
   return hassStore.getHass();
 }
 
-export {
-  fetchEntityHistory,
-  type HistoryPoint,
-} from './history';
-
 /** Reactive recorder history for chart widgets. Refreshes on an interval. */
 export function useEntityHistory(
   entityIds: string[],
@@ -282,4 +351,73 @@ export function useEntityHistory(
   }, [ready, idsKey, hours, refreshMs]);
 
   return data;
+}
+
+/** Reactive statistics (min/max/mean) over 7 or 30 days. */
+export function useEntityStatistics(
+  entityIds: string[],
+  options: { days?: 7 | 30; refreshMs?: number } = {},
+): Record<string, EntityStatistics> {
+  const { days = 7, refreshMs = 300_000 } = options;
+  const ready = useHassReady();
+  const idsKey = entityIds.join('\0');
+  const [data, setData] = useState<Record<string, EntityStatistics>>({});
+
+  useEffect(() => {
+    if (!ready || entityIds.length === 0) return;
+
+    let cancelled = false;
+    const load = () => {
+      fetchEntityStatistics(entityIds, days)
+        .then((next) => {
+          if (!cancelled) setData(next);
+        })
+        .catch(() => {
+          /* statistics unavailable */
+        });
+    };
+
+    load();
+    const timer = setInterval(load, refreshMs);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [ready, idsKey, days, refreshMs]);
+
+  return data;
+}
+
+/** Upcoming events for a calendar entity. */
+export function useCalendarEvents(
+  entityId: string,
+  daysAhead = 7,
+  refreshMs = 300_000,
+): CalendarEvent[] {
+  const ready = useHassReady();
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  useEffect(() => {
+    if (!ready || !entityId) return;
+
+    let cancelled = false;
+    const load = () => {
+      fetchCalendarEvents(entityId, daysAhead)
+        .then((next) => {
+          if (!cancelled) setEvents(next);
+        })
+        .catch(() => {
+          /* calendar unavailable */
+        });
+    };
+
+    load();
+    const timer = setInterval(load, refreshMs);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [ready, entityId, daysAhead, refreshMs]);
+
+  return events;
 }
