@@ -34,6 +34,7 @@ import {
 import {
   fetchLogbook,
   logbookCacheMarker,
+  EMPTY_LOGBOOK_ENTRIES,
   type LogbookEntry,
 } from './logbook';
 import {
@@ -548,7 +549,7 @@ export function useCalendarEvents(
   return events;
 }
 
-const EMPTY_LOGBOOK: LogbookEntry[] = [];
+const EMPTY_LOGBOOK = EMPTY_LOGBOOK_ENTRIES;
 
 export interface UseLogbookOptions {
   /** Single entity filter. */
@@ -585,10 +586,17 @@ export function useLogbook(options: UseLogbookOptions = {}): UseLogbookResult {
 
   const marker = logbookCacheMarker({ entityId, domain, hours, limit });
   const queryKey = `${marker}\0${hours}\0${limit}`;
+  const entriesCacheRef = useRef<LogbookEntry[]>(EMPTY_LOGBOOK);
 
   const getSnapshot = useCallback(() => {
     if (!ready) return EMPTY_LOGBOOK;
-    return getLogbookSnapshot(marker, hours, limit);
+    const next = getLogbookSnapshot(marker, hours, limit);
+    const prev = entriesCacheRef.current;
+    if (prev === next || (prev.length === next.length && prev.every((e, i) => e === next[i]))) {
+      return prev;
+    }
+    entriesCacheRef.current = next;
+    return next;
   }, [ready, marker, hours, limit]);
 
   const subscribe = useCallback(

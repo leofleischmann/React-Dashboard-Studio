@@ -1,6 +1,5 @@
 import { createSharedRestCache } from './restCache';
-import type { LogbookEntry } from './logbook';
-import { fetchLogbookForCache } from './logbook';
+import { EMPTY_LOGBOOK_ENTRIES, fetchLogbookForCache, type LogbookEntry } from './logbook';
 
 const logbookCache = createSharedRestCache(fetchLogbookForCache, {});
 
@@ -21,7 +20,7 @@ export function getLogbookSnapshot(
   limit: number,
 ): LogbookEntry[] {
   const param = hours * 1000 + limit;
-  return logbookCache.getSnapshot([marker], param)[marker] ?? [];
+  return logbookCache.getSnapshot([marker], param)[marker] ?? EMPTY_LOGBOOK_ENTRIES;
 }
 
 export function isLogbookPending(

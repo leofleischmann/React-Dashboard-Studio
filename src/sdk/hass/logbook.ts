@@ -109,3 +109,6 @@ export async function fetchLogbookForCache(
   const entries = await fetchLogbook(query);
   return { [marker]: entries };
 }
+
+/** Stable empty list for useSyncExternalStore snapshots. */
+export const EMPTY_LOGBOOK_ENTRIES: LogbookEntry[] = [];
