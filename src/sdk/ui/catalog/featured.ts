@@ -1,23 +1,6 @@
-import type { HassEntity } from '../../hass/types';
 import type { WidgetCatalogEntry } from './types';
-import { LiveClockDemo } from './demos';
-import { EnergyScene3D } from '../featured/EnergyScene3D';
+import { EnergyScene3DDemo, LiveClockDemo, pickNumericSensorEntity } from './demos';
 import { SunArc } from '../featured/SunArc';
-
-function pickPowerSensor(entities: readonly HassEntity[]): string | undefined {
-  const sensors = entities.filter((e) => e.entity_id.startsWith('sensor.'));
-  const power = sensors.find(
-    (e) =>
-      e.attributes.device_class === 'power' &&
-      !Number.isNaN(Number.parseFloat(e.state)),
-  );
-  if (power) return power.entity_id;
-  const byUnit = sensors.find((e) => {
-    const u = String(e.attributes.unit_of_measurement ?? '').toLowerCase();
-    return (u === 'w' || u === 'kw') && !Number.isNaN(Number.parseFloat(e.state));
-  });
-  return byUnit?.entity_id;
-}
 
 /** Featured widgets — rich visualizations (implementations live in `featured/`). */
 export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
@@ -32,12 +15,12 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
   },
   {
     name: 'EnergyScene3D',
-    label: 'Energie-Orb',
+    label: 'Wert-Orb',
     category: 'featured',
-    domains: ['sensor'],
-    pickExample: pickPowerSensor,
-    snippet: (id) => `<EnergyScene3D entityId="${id}" />`,
-    Demo: EnergyScene3D,
+    domains: ['sensor', 'number', 'input_number'],
+    pickExample: pickNumericSensorEntity,
+    snippet: (id) => `<EnergyScene3D entityId="${id}" min={0} max={100} />`,
+    Demo: EnergyScene3DDemo,
   },
   {
     name: 'LiveClock',

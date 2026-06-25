@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { useEntity, useEntityHistory, useEntityHistoryPending } from '../../hass/hooks';
 import type { HassEntity } from '../../hass/types';
 import { entityDisplayName, num } from '../../format';
 import { CameraTile } from '../cards/domain';
+import { EnergyScene3D, suggestOrbRange } from '../featured/EnergyScene3D';
 import { LiveClock } from '../featured/LiveClock';
 import { SparkChart } from '../charts';
 import { Stat } from '../primitives';
@@ -56,4 +58,10 @@ export function CameraDemo({ entityId }: { entityId: string }) {
 
 export function LiveClockDemo(_props: { entityId: string }) {
   return <LiveClock />;
+}
+
+export function EnergyScene3DDemo({ entityId }: { entityId: string }) {
+  const entity = useEntity(entityId);
+  const { min, max } = useMemo(() => suggestOrbRange(entity), [entity]);
+  return <EnergyScene3D entityId={entityId} min={min} max={max} />;
 }
