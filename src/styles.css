@@ -619,19 +619,53 @@
 .rd-sunarc {
   padding: 10px 12px 12px;
   border-radius: var(--rd-radius);
-  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
   border: 1px solid var(--rd-border);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
 }
 .rd-sunarc__svg { width: 100%; height: auto; display: block; }
-.rd-sunarc__horizon { stroke: var(--rd-border); stroke-width: 1.5; }
-.rd-sunarc__body { filter: drop-shadow(0 0 5px currentColor); }
+.rd-sunarc__horizon {
+  stroke: color-mix(in srgb, var(--rd-text) 28%, transparent);
+  stroke-width: 1.5;
+}
+.rd-sunarc--night .rd-sunarc__horizon {
+  stroke: color-mix(in srgb, #a8b4ff 35%, transparent);
+}
+.rd-sunarc__celestial {
+  transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rd-sunarc__celestial { transition: none; }
+}
+.rd-sunarc__body { filter: drop-shadow(0 0 6px currentColor); }
 .rd-sunarc__body.is-day { fill: #ffcf5c; color: #ffcf5c; }
-.rd-sunarc__body.is-night { fill: #cdd6ff; color: #cdd6ff; }
+.rd-sunarc__star {
+  fill: #fff;
+  opacity: 0.75;
+}
+.rd-sunarc__glow-haze {
+  fill: #ff9f43;
+  opacity: 0.18;
+  filter: blur(8px);
+}
+.rd-sunarc__rays { opacity: 0.55; }
+.rd-sunarc__ray {
+  stroke: #ffcf5c;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.rd-sunarc__moon-body {
+  fill: #e8eeff;
+  filter: drop-shadow(0 0 5px #cdd6ff);
+}
+.rd-sunarc__moon-shadow {
+  fill: color-mix(in srgb, var(--rd-card-bg) 55%, #0a0e1f);
+}
 .rd-sunarc__labels {
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 .rd-sunarc__labels > div {
   display: flex;
@@ -643,6 +677,14 @@
 .rd-sunarc__labels small { color: var(--rd-text-2); font-size: 0.64rem; }
 .rd-sunarc__elev strong { color: var(--rd-accent); }
 .rd-sunarc__ico { color: var(--rd-text-2); font-size: 0.8rem; }
+.rd-sunarc__remaining {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--rd-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.rd-sunarc--golden .rd-sunarc__remaining { color: #e8a54b; }
 
 /* ── KPI tiles ───────────────────────────────────────────── */
 .rd-kpis {

@@ -1,11 +1,15 @@
-import { useTime } from '@ha';
+import { useTime } from '../../hass/hooks';
 
-/** Isolated clock — re-renders every second without re-rendering its siblings. */
+/** Large clock + date — isolated tick via useTime(1000). */
 export function LiveClock() {
   const now = useTime(1000);
   const time = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   const sec = now.toLocaleTimeString('de-DE', { second: '2-digit' });
-  const date = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+  const date = now.toLocaleDateString('de-DE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
 
   return (
     <div className="rd-clock">

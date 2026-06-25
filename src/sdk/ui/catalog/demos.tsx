@@ -2,6 +2,7 @@ import { useEntity, useEntityHistory, useEntityHistoryPending } from '../../hass
 import type { HassEntity } from '../../hass/types';
 import { entityDisplayName, num } from '../../format';
 import { CameraTile } from '../cards/domain';
+import { LiveClock } from '../featured/LiveClock';
 import { SparkChart } from '../charts';
 import { Stat } from '../primitives';
 
@@ -51,4 +52,8 @@ export function SparkDemo({ entityId }: { entityId: string }) {
 
 export function CameraDemo({ entityId }: { entityId: string }) {
   return <CameraTile entityId={entityId} refreshSec={30} />;
+}
+
+export function LiveClockDemo(_props: { entityId: string }) {
+  return <LiveClock />;
 }

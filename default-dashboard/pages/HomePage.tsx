@@ -21,10 +21,9 @@ import {
   stateLabel,
   weatherIcon,
 } from '@ha/format';
-import { LightTile, SparkChart, SunArc } from '@ha/ui';
+import { LightTile, SparkChart, SunArc, LiveClock } from '@ha/ui';
 import type { ShowcasePage } from '../types';
 import { homeContext } from '../lib/pickers';
-import { LiveClock } from '../components/LiveClock';
 
 /* ── small presentational helpers ──────────────────────────────────────── */
 
