@@ -9,6 +9,9 @@
 .rd-widget-catalog-card .rd-circular-stack {
   margin-inline: auto;
 }
+.rd-widget-catalog-card .rd-chart-preview {
+  overflow: visible;
+}
 .rd-widget-catalog-card__head {
   display: flex;
   flex-direction: column;

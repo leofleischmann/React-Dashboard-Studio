@@ -10,7 +10,7 @@ import {
   type HistoryPoint,
 } from '@ha';
 import { entityDisplayName, num } from '@ha/format';
-import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';
+import { Card, Section, SparkChart, Stat } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
 import { PageHead } from '../components/PageHead';
 import { energySensor, numericSensors } from '../lib/pickers';
@@ -94,7 +94,7 @@ export function ChartsPage() {
   return (
     <>
       <PageHead icon="📈" module="@ha · @ha/ui" title="Charts, Verlauf & Statistik">
-        SparkChart, HistoryChart, useEntityHistory, useEntityStatistics und die
+        SparkChart, useEntityHistory, useEntityStatistics und die
         aggregateHistory-Helfer — Echtzeit-Verläufe direkt aus deinem Recorder.
       </PageHead>
 
@@ -110,9 +110,9 @@ export function ChartsPage() {
             </div>
           </Section>
 
-          <Section title="HistoryChart · Einzelverlauf mit Achse">
+          <Section title="SparkChart · Einzelverlauf mit Achse">
             <div className="rd-glass rd-chart-panel">
-              <HistoryChart
+              <SparkChart
                 loading={historyLoading}
                 series={[
                   {

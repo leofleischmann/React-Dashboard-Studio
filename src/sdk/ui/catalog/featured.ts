@@ -2,7 +2,6 @@ import type { WidgetCatalogEntry } from './types';
 import {
   LiveClockDemo,
   MinitimelineDemo,
-  HistoryChartDemo,
   pickNumericSensorEntity,
   ValueOrb3DDemo,
   WeatherForecastRowDemo,
@@ -56,15 +55,5 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
       entities.find((e) => e.entity_id.startsWith('light.'))?.entity_id,
     snippet: (id) => `<Minitimeline entityId="${id}" limit={8} hours={24} />`,
     Demo: MinitimelineDemo,
-  },
-  {
-    name: 'HistoryChart',
-    label: 'Verlaufs-Chart',
-    category: 'featured',
-    domains: ['sensor'],
-    pickExample: pickNumericSensorEntity,
-    snippet: (id) =>
-      `<HistoryChart series={[{ label: '${id}', color: '#6ea8fe', points: history['${id}'] ?? [] }]} height={120} showLegend axes={{ xLabel: 'Zeit', yLabel: 'Wert' }} />`,
-    Demo: HistoryChartDemo,
   },
 ];

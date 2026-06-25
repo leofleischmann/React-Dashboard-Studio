@@ -564,6 +564,3 @@ export function SparkChart({
     </div>
   );
 }
-
-/** Alias for {@link SparkChart} — history-focused naming. */
-export const HistoryChart = SparkChart;

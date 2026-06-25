@@ -585,14 +585,16 @@
 }
 .rd-widget-gallery__preview {
   min-height: 72px;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 8px;
   background: #12141c;
   padding: 6px;
-  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.rd-widget-gallery__preview .rd-chart--interactive {
+  pointer-events: auto;
 }
 .rd-widget-gallery__preview .rd-card,
 .rd-widget-gallery__preview .rd-gauge,

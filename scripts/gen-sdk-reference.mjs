@@ -151,9 +151,7 @@ export function generateSdkReference(options = {}) {
 
   const layoutMod = modules.find((m) => m.id === '@ha/layout');
   const uiMod = modules.find((m) => m.id === '@ha/ui');
-  const charts = (uiMod?.exports.values ?? []).filter((n) =>
-    ['SparkChart', 'HistoryChart'].includes(n),
-  );
+  const charts = (uiMod?.exports.values ?? []).filter((n) => n === 'SparkChart');
 
   const exampleId = 'sensor.temperatur';
   const manifest = {

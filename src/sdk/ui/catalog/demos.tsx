@@ -7,7 +7,7 @@ import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
 import { WeatherForecastRow } from '../featured/WeatherForecastRow';
 import { Minitimeline } from '../featured/Minitimeline';
-import { HistoryChart, SparkChart } from '../charts';
+import { SparkChart } from '../charts';
 import { CircularProgress } from '../CircularProgress';
 import { Stat } from '../primitives';
 
@@ -40,21 +40,29 @@ export function StatDemo({ entityId }: { entityId: string }) {
 export function SparkDemo({ entityId }: { entityId: string }) {
   const history = useEntityHistory([entityId], { hours: 24 });
   const loading = useEntityHistoryPending([entityId], { hours: 24 });
+  const entity = useEntity(entityId);
+  const unit = entity?.attributes.unit_of_measurement as string | undefined;
+
   return (
-    <SparkChart
-      loading={loading}
-      height={56}
-      showLegend={false}
-      showTooltip={false}
-      emptyLabel="Kein numerischer Verlauf für diese Entity"
-      series={[
-        {
-          label: entityId.split('.')[1] ?? 'Verlauf',
-          color: '#6ea8fe',
-          points: history[entityId] ?? [],
-        },
-      ]}
-    />
+    <div className="rd-chart-preview">
+      <SparkChart
+        loading={loading}
+        height={72}
+        showLegend={false}
+        emptyLabel="Kein numerischer Verlauf für diese Entity"
+        series={[
+          {
+            label: entityDisplayName(entity, entityId),
+            color: '#6ea8fe',
+            points: history[entityId] ?? [],
+          },
+        ]}
+        axes={{
+          showTicks: false,
+          yLabel: unit,
+        }}
+      />
+    </div>
   );
 }
 
@@ -78,35 +86,6 @@ export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {
 
 export function MinitimelineDemo({ entityId }: { entityId: string }) {
   return <Minitimeline entityId={entityId} limit={5} hours={24} />;
-}
-
-export function HistoryChartDemo({ entityId }: { entityId: string }) {
-  const history = useEntityHistory([entityId], { hours: 48 });
-  const loading = useEntityHistoryPending([entityId], { hours: 48 });
-  const entity = useEntity(entityId);
-  const unit = entity?.attributes.unit_of_measurement as string | undefined;
-
-  return (
-    <div className="rd-chart-preview">
-      <HistoryChart
-        loading={loading}
-        height={64}
-        showLegend={false}
-        showTooltip={false}
-        series={[
-          {
-            label: entityDisplayName(entity, entityId),
-            color: '#6ea8fe',
-            points: history[entityId] ?? [],
-          },
-        ]}
-        axes={{
-          showTicks: false,
-          yLabel: unit,
-        }}
-      />
-    </div>
-  );
 }
 
 function pickBatteryEntity(entities: readonly HassEntity[]): string | undefined {

@@ -430,7 +430,7 @@ export function HooksPage() {
           </HookDemoCard>
 
           <HookDemoCard module="@ha" name="useEntityHistory(ids, { hours })" hint="→ Tab Charts">
-            <small>Recorder-Verläufe für SparkChart &amp; HistoryChart — siehe Charts.</small>
+            <small>Recorder-Verläufe für SparkChart — siehe Charts.</small>
           </HookDemoCard>
         </ResponsiveGrid>
       </Section>
