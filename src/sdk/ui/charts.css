@@ -19,28 +19,31 @@
   border-radius: 50%;
   display: inline-block;
 }
-.rd-chart__svg {
+.rd-chart__plot-wrap {
   width: 100%;
-  display: block;
+  overflow: hidden;
   border-radius: 10px;
+}
+.rd-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
   background: rgba(0, 0, 0, 0.06);
 }
 .rd-chart--axes .rd-chart__svg {
   background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
 }
 .rd-chart__grid-line {
-  stroke: color-mix(in srgb, var(--rd-text) 12%, transparent);
+  stroke: color-mix(in srgb, var(--rd-text) 10%, transparent);
   stroke-width: 1;
-  vector-effect: non-scaling-stroke;
 }
 .rd-chart__axis-line {
-  stroke: color-mix(in srgb, var(--rd-text) 28%, transparent);
+  stroke: color-mix(in srgb, var(--rd-text) 24%, transparent);
   stroke-width: 1;
-  vector-effect: non-scaling-stroke;
 }
 .rd-chart__tick {
   fill: var(--rd-text-2);
-  font-size: 9px;
+  font-size: 10px;
   font-family: inherit;
   font-variant-numeric: tabular-nums;
 }
