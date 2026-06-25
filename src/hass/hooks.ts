@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { hassStore } from './store';
 import type { HassEntity } from './types';
-import type { KnownEntityId } from './entities.generated';
+import type { KnownEntityId } from './entityId';
 
 /**
  * Reactive access to one entity. Re-renders the component ONLY when this

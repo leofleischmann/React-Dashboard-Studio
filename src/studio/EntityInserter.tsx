@@ -11,7 +11,10 @@ import {
 import { entityWidgetSnippet, widgetForDomain } from '../lib/entityWidgets';
 import type { HassEntity } from '../hass/types';
 
+import { WidgetGallery } from './WidgetGallery';
+
 type Mode = 'value' | 'action' | 'id' | 'widget';
+type WidgetView = 'list' | 'gallery';
 
 const LIST_LIMIT = 300;
 const ROW_HEIGHT = 52;
@@ -121,22 +124,33 @@ export function EntityInserter({
 }) {
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<Mode>('value');
+  const [widgetView, setWidgetView] = useState<WidgetView>('list');
   const [domain, setDomain] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedGalleryKey, setCopiedGalleryKey] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pickLabel = copyToClipboard ? 'Kopieren' : 'Einfügen';
 
   const handlePick = useCallback(
-    (snippet: string, entityId: string) => {
+    (snippet: string, key: string) => {
       if (copyToClipboard) {
         void navigator.clipboard.writeText(snippet).catch(() => {
           window.prompt('Snippet manuell kopieren:', snippet);
         });
-        setCopiedId(entityId);
+        if (key.includes('.')) {
+          setCopiedId(key);
+          setCopiedGalleryKey(null);
+        } else {
+          setCopiedGalleryKey(key);
+          setCopiedId(null);
+        }
         if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-        copyTimerRef.current = setTimeout(() => setCopiedId(null), 1600);
+        copyTimerRef.current = setTimeout(() => {
+          setCopiedId(null);
+          setCopiedGalleryKey(null);
+        }, 1600);
         return;
       }
       onInsert?.(snippet);
@@ -205,13 +219,44 @@ export function EntityInserter({
           <button
             key={m}
             className={`rd-inserter__mode ${mode === m ? 'is-active' : ''}`}
-            onClick={() => setMode(m)}
+            onClick={() => {
+              setMode(m);
+              if (m !== 'widget') setWidgetView('list');
+            }}
           >
             {label}
           </button>
         ))}
       </div>
 
+      {mode === 'widget' && (
+        <div className="rd-inserter__widget-views">
+          <button
+            type="button"
+            className={`rd-inserter__mode ${widgetView === 'list' ? 'is-active' : ''}`}
+            onClick={() => setWidgetView('list')}
+          >
+            Entities
+          </button>
+          <button
+            type="button"
+            className={`rd-inserter__mode ${widgetView === 'gallery' ? 'is-active' : ''}`}
+            onClick={() => setWidgetView('gallery')}
+          >
+            Galerie
+          </button>
+        </div>
+      )}
+
+      {mode === 'widget' && widgetView === 'gallery' ? (
+        <WidgetGallery
+          copyToClipboard={copyToClipboard}
+          copiedKey={copiedGalleryKey}
+          pickLabel={pickLabel}
+          onPick={handlePick}
+        />
+      ) : (
+        <>
       <div className="rd-inserter__domains">
         {DOMAIN_FILTERS.map(([value, label]) => (
           <button
@@ -292,6 +337,8 @@ export function EntityInserter({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

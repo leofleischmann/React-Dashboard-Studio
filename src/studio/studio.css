@@ -526,6 +526,98 @@
   border-color: var(--primary-color, #2f7bf6);
   color: #fff;
 }
+.rd-dev-banner {
+  padding: 10px 16px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  border-bottom: 1px solid rgba(224, 72, 61, 0.35);
+  background: rgba(224, 72, 61, 0.12);
+  color: #ffd4d0;
+}
+.rd-dev-banner.is-pending {
+  border-bottom-color: rgba(47, 170, 87, 0.35);
+  background: rgba(47, 170, 87, 0.1);
+  color: #c8f0d4;
+}
+.rd-inserter__widget-views {
+  display: flex;
+  gap: 6px;
+  padding: 0 12px 8px;
+  flex-wrap: wrap;
+}
+.rd-widget-gallery {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.rd-widget-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 8px;
+  padding: 0 12px 10px;
+  max-height: min(52vh, 420px);
+  overflow: auto;
+}
+.rd-widget-gallery__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #3a3a44;
+  border-radius: 10px;
+  background: #1a1d28;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rd-widget-gallery__card:hover {
+  border-color: #4a5570;
+  background: #222636;
+}
+.rd-widget-gallery__card.is-copied {
+  border-color: var(--rd-ok, #2faa57);
+  background: color-mix(in srgb, var(--rd-ok, #2faa57) 10%, #1a1d28);
+}
+.rd-widget-gallery__name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e6e7ee;
+}
+.rd-widget-gallery__preview {
+  min-height: 64px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #12141c;
+  padding: 4px;
+  pointer-events: none;
+}
+.rd-widget-gallery__preview .rd-card,
+.rd-widget-gallery__preview .rd-gauge,
+.rd-widget-gallery__preview .rd-entity-row {
+  margin: 0;
+  transform: scale(0.88);
+  transform-origin: top center;
+}
+.rd-widget-gallery__missing {
+  display: block;
+  padding: 18px 8px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #8a8fa3;
+}
+.rd-widget-gallery__snippet {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.62rem;
+  color: #9fd0ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rd-widget-gallery__copied {
+  font-size: 0.72rem;
+  color: var(--rd-ok, #2faa57);
+  font-weight: 600;
+}
 .rd-studio__editor {
   display: flex;
   flex-direction: column;

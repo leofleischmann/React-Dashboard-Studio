@@ -8,14 +8,16 @@
 
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, watch as watchFs } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WebSocket from 'ws';
 import { validateDashboardProject } from './compile-check.mjs';
 import {
   ENTRY_DEFAULT,
+  DASHBOARD_DIR,
   filterDashboardFiles,
+  isDashboardCodeFile,
   listLocalFiles,
   pruneLocalOrphans,
   readEntry,
@@ -261,18 +263,27 @@ async function push(conn) {
 
 async function watch(conn) {
   await push(conn);
+  mkdirSync(DASHBOARD_DIR, { recursive: true });
   console.log('👀 Beobachte dashboard/ … speichere eine Datei, um zu pushen (Strg+C beendet).');
-  let last = JSON.stringify(listLocalFiles());
-  setInterval(async () => {
-    const now = JSON.stringify(listLocalFiles());
-    if (now === last) return;
-    last = now;
-    try {
-      await push(conn);
-    } catch (err) {
-      console.error('Push fehlgeschlagen:', err.message);
-    }
-  }, 800);
+
+  let timer = null;
+  const schedulePush = () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try {
+        await push(conn);
+      } catch (err) {
+        console.error('Push fehlgeschlagen:', err.message);
+      }
+    }, 400);
+  };
+
+  watchFs(DASHBOARD_DIR, { recursive: true }, (_event, filename) => {
+    if (!filename) return;
+    const base = filename.replace(/\\/g, '/').split('/').pop() ?? '';
+    if (!isDashboardCodeFile(base)) return;
+    schedulePush();
+  });
 }
 
 const cmd = process.argv[2] || 'watch';
