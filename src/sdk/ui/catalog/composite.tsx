@@ -1,6 +1,6 @@
 import type { HassEntity } from '../../hass/types';
 import { entityDisplayName } from '../../format';
-import { BatteryRow, DeviceCard, RoomCard } from '../cards/composite';
+import { BatteryRow, DeviceCard, EnergyDeviceCard, RoomCard } from '../cards/composite';
 import { Grid, Stat } from '../primitives';
 import type { WidgetCatalogEntry } from './types';
 
@@ -35,6 +35,39 @@ function RoomCardDemo({ entityId }: { entityId: string }) {
   const key =
     entityId.match(/^sensor\.sensor_(.+)_temperature$/)?.[1] ?? 'raum';
   return <RoomCard name={`Raum (${key})`} sensorKey={key} />;
+}
+
+function pickEnergySet(entities: readonly HassEntity[]) {
+  const energy = entities.find(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      (e.attributes.device_class === 'energy' ||
+        e.attributes.unit_of_measurement === 'kWh'),
+  );
+  if (!energy) return undefined;
+  const power = entities.find(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      (e.attributes.device_class === 'power' ||
+        e.attributes.unit_of_measurement === 'W'),
+  );
+  const sw = entities.find((e) => e.entity_id.startsWith('switch.'));
+  return {
+    energyId: energy.entity_id,
+    powerId: power?.entity_id,
+    switchId: sw?.entity_id,
+    name: entityDisplayName(energy, energy.entity_id),
+  };
+}
+
+function EnergyDeviceCardDemo({ entityId }: { entityId: string }) {
+  return (
+    <EnergyDeviceCard
+      name="Energie"
+      energyId={entityId}
+      showWeekChart={false}
+    />
+  );
 }
 
 function DeviceCardDemo({ entityId }: { entityId: string }) {
@@ -77,6 +110,17 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     },
     snippet: '<RoomCard name="Wohnzimmer" sensorKey="wohnzimmer" lightId="light.…" />',
     Demo: RoomCardDemo,
+  },
+  {
+    name: 'EnergyDeviceCard',
+    label: 'Energie-Gerät',
+    category: 'composite',
+    domains: ['sensor'],
+    optionalEntity: true,
+    pickExample: (entities) => pickEnergySet(entities)?.energyId,
+    snippet:
+      '<EnergyDeviceCard name="…" energyId="sensor.…_energy" powerId="sensor.…_power" switchId="switch.…" />',
+    Demo: EnergyDeviceCardDemo,
   },
   {
     name: 'DeviceCard',

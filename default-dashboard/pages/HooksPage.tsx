@@ -16,6 +16,7 @@ import {
   useEntity,
   useEntityAge,
   useEntityAttribute,
+  useEnergy,
   useEntityRegistry,
   useEntityState,
   useEntityStatistics,
@@ -27,7 +28,7 @@ import {
   useTheme,
   useTime,
 } from '@ha';
-import { entityDisplayName, num, stateLabel } from '@ha/format';
+import { entityDisplayName, energy, num, stateLabel } from '@ha/format';
 import { Section } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
 import { PageHead } from '../components/PageHead';
@@ -81,6 +82,12 @@ export function HooksPage() {
 
   const statsId = numericSensors(entities, 1)[0]?.entity_id;
   const stats = useEntityStatistics(statsId ? [statsId] : [], { days: 7 });
+
+  const energySensors = useEntities({ domain: 'sensor', deviceClass: 'energy' });
+  const energyId = energySensors[0]?.entity_id ?? '';
+  const todayEnergy = useEnergy(energyId as never, { period: 'today' });
+  const weekEnergy = useEnergy(energyId as never, { period: 'week' });
+
   const calendar = useEntitiesByDomain('calendar')[0];
   const events = useCalendarEvents(calendar?.entity_id ?? '', 7);
 
@@ -310,8 +317,42 @@ export function HooksPage() {
         </ResponsiveGrid>
       </Section>
 
-      <Section title="Verlauf, Statistik & Kalender">
+      <Section title="Verlauf, Statistik & Energie">
         <ResponsiveGrid min={270}>
+          <HookDemoCard
+            module="@ha"
+            name="useEnergy(id, { period: 'today' })"
+            hint={energyId || 'sensor.*_energy'}
+          >
+            {!energyId ? (
+              <span className="rd-empty">Kein energy-Sensor</span>
+            ) : todayEnergy.loading ? (
+              <span className="rd-empty">Lade Verlauf…</span>
+            ) : (
+              <>
+                <strong>{energy(todayEnergy.kwh)}</strong>
+                <small>{todayEnergy.points.length} Recorder-Punkte</small>
+              </>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useEnergy(id, { period: 'week' })"
+            hint="7-Tage-Verbrauch"
+          >
+            {!energyId ? (
+              <span className="rd-empty">Kein energy-Sensor</span>
+            ) : weekEnergy.loading ? (
+              <span className="rd-empty">Lade Verlauf…</span>
+            ) : (
+              <>
+                <strong>{energy(weekEnergy.kwh)}</strong>
+                <small>{weekEnergy.daily.length} Tage mit Daten</small>
+              </>
+            )}
+          </HookDemoCard>
+
           <HookDemoCard module="@ha" name="useEntityStatistics(ids, { days: 7 })" hint={statsId}>
             {statsId && stats[statsId] ? (
               <>

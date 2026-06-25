@@ -191,6 +191,25 @@
   font-size: 0.82rem;
   color: var(--rd-text-2);
 }
+.rd-energy-device__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.rd-energy-device__stat {
+  font-size: 0.78rem;
+  color: var(--rd-text-2);
+}
+.rd-energy-device__stat strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rd-text-1);
+}
+.rd-energy-device__chart {
+  margin-top: 2px;
+}
 .rd-bar {
   height: 6px;
   border-radius: 999px;
