@@ -79,9 +79,14 @@ export function subscribeProjectReset(onReset: () => void): () => void {
 
   let active = true;
   let unsub: (() => void) | undefined;
+  let skipInitial = true;
   void connection
     .subscribeMessage<{ project: StoredProject | null }>(
       (msg) => {
+        if (skipInitial) {
+          skipInitial = false;
+          return;
+        }
         if (!parseStored(msg?.project)) {
           console.log('[Debug storage]: global project cleared — reset to default');
           onReset();
