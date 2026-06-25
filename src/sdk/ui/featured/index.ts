@@ -8,3 +8,4 @@ export {
   type ValueOrb3DProps,
   type OrbCurve,
 } from './ValueOrb3D';
+export { WeatherForecastRow, type WeatherForecastRowProps } from './WeatherForecastRow';

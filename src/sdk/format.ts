@@ -307,6 +307,23 @@ export function greeting(date = new Date()): string {
   return 'Gute Nacht';
 }
 
+/** Short day label for forecast rows: Heute, Morgen, Mo, … */
+export function forecastDayLabel(
+  date: Date,
+  now = new Date(),
+  locale = 'de-DE',
+): string {
+  const dayStart = (d: Date) => {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x.getTime();
+  };
+  const diffDays = Math.round((dayStart(date) - dayStart(now)) / 86_400_000);
+  if (diffDays === 0) return 'Heute';
+  if (diffDays === 1) return 'Morgen';
+  return date.toLocaleDateString(locale, { weekday: 'short' });
+}
+
 /** Map a HA weather condition to an emoji. */
 export function weatherIcon(condition?: string): string {
   switch (condition) {

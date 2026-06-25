@@ -5,6 +5,7 @@ import { entityDisplayName, num } from '../../format';
 import { CameraTile } from '../cards/domain';
 import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
+import { WeatherForecastRow } from '../featured/WeatherForecastRow';
 import { SparkChart } from '../charts';
 import { Stat } from '../primitives';
 
@@ -64,4 +65,8 @@ export function ValueOrb3DDemo({ entityId }: { entityId: string }) {
   const entity = useEntity(entityId);
   const { min, max } = useMemo(() => suggestOrbRange(entity), [entity]);
   return <ValueOrb3D entityId={entityId} min={min} max={max} />;
+}
+
+export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {
+  return <WeatherForecastRow entityId={entityId} days={5} />;
 }

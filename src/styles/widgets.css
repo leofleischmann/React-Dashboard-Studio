@@ -457,6 +457,40 @@
   margin-left: auto;
 }
 
+/* ── Weather forecast row ─────────────────────────────────── */
+.rd-weather-forecast {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.rd-weather-forecast__day {
+  flex: 1 0 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  min-width: 72px;
+}
+.rd-weather-forecast__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--rd-text-2);
+}
+.rd-weather-forecast__icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.rd-weather-forecast__temp {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.rd-weather-forecast__rain {
+  font-size: 0.72rem;
+  color: var(--rd-text-2);
+}
+
 /* ── Person chip ─────────────────────────────────────────── */
 .rd-person-chip {
   display: flex;

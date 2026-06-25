@@ -1,5 +1,10 @@
 import type { WidgetCatalogEntry } from './types';
-import { ValueOrb3DDemo, LiveClockDemo, pickNumericSensorEntity } from './demos';
+import {
+  LiveClockDemo,
+  pickNumericSensorEntity,
+  ValueOrb3DDemo,
+  WeatherForecastRowDemo,
+} from './demos';
 import { SunArc } from '../featured/SunArc';
 
 /** Featured widgets — rich visualizations (implementations live in `featured/`). */
@@ -30,5 +35,13 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     optionalEntity: true,
     snippet: '<LiveClock showSeconds locale="de-DE" />',
     Demo: LiveClockDemo,
+  },
+  {
+    name: 'WeatherForecastRow',
+    label: '5-Tage-Vorhersage',
+    category: 'featured',
+    domains: ['weather'],
+    snippet: (id) => `<WeatherForecastRow entityId="${id}" days={5} />`,
+    Demo: WeatherForecastRowDemo,
   },
 ];
