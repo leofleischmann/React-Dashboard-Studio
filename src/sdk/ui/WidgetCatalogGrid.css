@@ -3,8 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 200px;
+  overflow: visible;
 }
 .rd-widget-catalog-card__head {
   display: flex;
