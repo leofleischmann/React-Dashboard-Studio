@@ -26,7 +26,11 @@
 /* ── Sparkline (no axes) ─────────────────────────────────── */
 .rd-chart__spark {
   width: 100%;
-  overflow: hidden;
+  position: relative;
+  overflow: visible;
+}
+
+.rd-chart__spark .rd-chart__plot-surface {
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.06);
 }
@@ -87,19 +91,21 @@
 .rd-chart__plot {
   flex: 1;
   min-width: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.rd-chart__plot-surface {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   border-radius: 8px;
   background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
-  position: relative;
 }
 
 .rd-chart--interactive .rd-chart__plot,
 .rd-chart--interactive .rd-chart__spark {
   cursor: crosshair;
-}
-
-.rd-chart__spark {
-  position: relative;
 }
 
 .rd-chart__x-footer {
@@ -160,24 +166,32 @@
 }
 
 .rd-chart__tooltip {
-  position: absolute;
-  top: 4px;
-  z-index: 3;
-  transform: translateX(-50%);
   min-width: 120px;
-  max-width: min(220px, 90%);
+  max-width: min(240px, calc(100vw - 16px));
   padding: 6px 8px;
   border-radius: 8px;
   border: 1px solid var(--rd-border);
-  background: color-mix(in srgb, var(--rd-card-bg) 92%, transparent);
+  background: color-mix(in srgb, var(--rd-card-bg) 96%, transparent);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
   pointer-events: none;
 }
 
-.rd-chart__tooltip--flip {
-  transform: translateX(-100%);
-  margin-left: -8px;
+.rd-chart__tooltip--fixed {
+  position: fixed;
+  z-index: 10000;
+}
+
+.rd-chart__tooltip--align-center {
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.rd-chart__tooltip--align-end {
+  transform: translate(-100%, calc(-100% - 12px));
+}
+
+.rd-chart__tooltip--align-start {
+  transform: translate(0, calc(-100% - 12px));
 }
 
 .rd-chart__tooltip-time {

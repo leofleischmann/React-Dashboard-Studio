@@ -33,6 +33,8 @@ export type ChartAxes = {
 type HoverState = {
   t: number;
   xPct: number;
+  clientX: number;
+  clientY: number;
 };
 
 const DEFAULT_PLOT_H = 72;
@@ -307,6 +309,12 @@ function PlotSvg({
   );
 }
 
+function tooltipAlign(xPct: number): 'center' | 'start' | 'end' {
+  if (xPct > 70) return 'end';
+  if (xPct < 16) return 'start';
+  return 'center';
+}
+
 function ChartTooltip({
   hover,
   active,
@@ -320,12 +328,12 @@ function ChartTooltip({
   locale: string;
   formatY: (v: number) => string;
 }) {
-  const flip = hover.xPct > 72;
+  const align = tooltipAlign(hover.xPct);
 
   return (
     <div
-      className={`rd-chart__tooltip${flip ? ' rd-chart__tooltip--flip' : ''}`}
-      style={{ left: `${hover.xPct}%` }}
+      className={`rd-chart__tooltip rd-chart__tooltip--fixed rd-chart__tooltip--align-${align}`}
+      style={{ left: hover.clientX, top: hover.clientY }}
     >
       <time className="rd-chart__tooltip-time">
         {formatTooltipTime(hover.t, locale, timeSpan)}
@@ -370,7 +378,7 @@ function ChartPlotArea({
       onMouseMove={onPlotMove}
       onMouseLeave={onPlotLeave}
     >
-      {children}
+      <div className="rd-chart__plot-surface">{children}</div>
     </div>
   );
 }
@@ -428,7 +436,7 @@ export function SparkChart({
       const rect = e.currentTarget.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
       const t = timeRange[0] + ratio * timeSpan;
-      setHover({ t, xPct: ratio * 100 });
+      setHover({ t, xPct: ratio * 100, clientX: e.clientX, clientY: e.clientY });
     },
     [showTooltip, timeRange, timeSpan],
   );
@@ -517,7 +525,6 @@ export function SparkChart({
               onPlotLeave={onPlotLeave}
             >
               {plotSvg}
-              {tooltip}
             </ChartPlotArea>
           </div>
           {(showTicks || axes?.xLabel) && (
@@ -551,9 +558,9 @@ export function SparkChart({
           onPlotLeave={onPlotLeave}
         >
           {plotSvg}
-          {tooltip}
         </ChartPlotArea>
       )}
+      {tooltip}
     </div>
   );
 }
