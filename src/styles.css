@@ -1512,3 +1512,74 @@
 }
 .rd-calendar__list span { color: var(--rd-text-2); font-size: 0.75rem; }
 .rd-calendar__empty { margin: 0; color: var(--rd-text-2); font-size: 0.85rem; }
+
+/* ── SDK reference (default install dashboard) ───────────── */
+.rd-sdk-ref .rd-page-shell__main {
+  padding: 16px clamp(12px, 3vw, 28px) 88px;
+}
+.rd-sdk-start__hero {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: var(--rd-radius);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-color, #4f7cff) 18%, var(--rd-card-bg)),
+    var(--rd-card-bg)
+  );
+  border: 1px solid var(--rd-border);
+}
+.rd-sdk-start__hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+.rd-sdk-start__hero p {
+  margin: 0;
+  color: var(--rd-text-2);
+}
+.rd-sdk-start__hint {
+  margin-top: 8px !important;
+  font-size: 0.85rem;
+  color: var(--rd-warn);
+}
+.rd-sdk-modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.rd-sdk-module h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+.rd-sdk-module p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+  line-height: 1.45;
+}
+.rd-sdk-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--rd-text-2);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.rd-sdk-ref__lead {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  color: var(--rd-text-2);
+}
+.rd-sdk-ref-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-sdk-ref-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rd-sdk-ref-card__head code {
+  font-size: 0.68rem;
+  color: var(--rd-text-2);
+  word-break: break-all;
+}

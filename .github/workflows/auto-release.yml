@@ -67,7 +67,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          NOTES=$(node scripts/release-notes.mjs "${{ steps.version.outputs.version }}")
           gh release create "${{ steps.version.outputs.tag }}" \
             --target "${{ github.sha }}" \
-            --title "${{ steps.version.outputs.tag }}" \
-            --generate-notes
+            --title "Home Assistant Dashboard Studio ${{ steps.version.outputs.tag }}" \
+            --notes "$NOTES"

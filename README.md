@@ -39,7 +39,8 @@ export default function Dashboard() {
 | --- | --- |
 | **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
 | **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (Entities + **Galerie**), Domain-Filter |
-| **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
+| **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
+| **Erstinstallation** | SDK-Referenz-Dashboard (Tabs: Start, Widgets, Layout) — ersetzbar via ✎ Bearbeiten |
 | **Mobil** | Nur Anzeige, kein Editor |
 
 ---
@@ -70,7 +71,23 @@ Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → ers
 
 **Typischer Ablauf:** Terminal 1 → `npm run dev` (Vorschau) · VS Code → `./dashboard/` · Terminal 2 optional → `npm run sync:watch` (Push inkl. Löschen entfernter Dateien in HA).
 
-Oben **📁 dashboard/** = lokaler Modus. **⚡ Entities** öffnet den Browser zum Kopieren von Snippets. `sync:pull` validiert `./dashboard/` vor dem Laden und warnt, wenn lokale Änderungen noch nicht gepusht wurden.
+Oben **📁 dashboard/** = lokaler Modus (nur Entwicklung, Ordner ist **gitignored** — dein persönliches Projekt, nicht das HACS-Start-Dashboard). **⚡ Entities** öffnet den Browser zum Kopieren von Snippets. `sync:pull` validiert `./dashboard/` vor dem Laden und warnt, wenn lokale Änderungen noch nicht gepusht wurden.
+
+Release-Notes pro Version: [`CHANGELOG.md`](CHANGELOG.md) (erscheinen in HACS als GitHub-Release).
+
+---
+
+## API-Referenz (Kurz)
+
+| Modul | Inhalt |
+| --- | --- |
+| `@ha` | `useEntity`, `useEntityHistory`, `useEntityStatistics`, `useAreas`, `useTheme`, `callService`, … |
+| `@ha/ui` | `Stat`, `SparkChart`, `LightTile`, `ClimateCard`, `PageShell`-Widgets, Domain-Cards, … |
+| `@ha/layout` | `PageShell`, `Tabs`, `Stack`, `Row`, `ResponsiveGrid`, `useHashRoute` |
+| `@ha/format` | `num`, `temp`, `stateLabel`, `relativeTime`, `entityDisplayName`, … |
+| `react` | React inkl. Hooks |
+
+Details & Changelog: [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
@@ -82,15 +99,6 @@ Nur wenn du **diese Integration** (Editor, API, Widgets) weiterentwickelst — n
 npm run build   # → custom_components/homeassistant_dashboard_studio/dashboard.js
 ```
 
-Neue Exports in `hooks.ts` / `widgets.tsx` / `format.ts` und in [`runtime.ts`](src/studio/runtime.ts) registrieren.
+Neue Exports in `hooks.ts` / `widgets.tsx` / `layout.tsx` / `format.ts` und in [`runtime.ts`](src/studio/runtime.ts) registrieren.
 
 ---
-
-## API-Referenz
-
-| Modul | Inhalt |
-| --- | --- |
-| `@ha` | `useEntity`, `useEntityState`, `useEntitiesByDomain`, `useHassReady`, `callService`, `states` |
-| `@ha/ui` | `Card`, `Stat`, `Section`, `Grid`, `EntityRow`, `Gauge`, `ActionButton`, `ClimateCard`, `BinaryBadge`, `LightTile`, `MediaPlayerCard`, `CoverCard`, `WeatherCard`, `PersonChip`, `NumberSlider`, `RoomCard`, `DeviceCard`, `BatteryRow` |
-| `@ha/format` | `num`, `euro`, `isAvailable`, `stateNumber`, `weatherIcon`, `greeting`, `batteryColor` |
-| `react` | React inkl. Hooks |

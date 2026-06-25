@@ -9,7 +9,7 @@ import { validateDashboardProject } from './compile-check.mjs';
 const here = pathDirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 
-const projectSrc = readFileSync(join(root, 'src/studio/project.ts'), 'utf8');
+const projectSrc = readFileSync(join(root, 'src/studio/defaultProject.ts'), 'utf8');
 const projectJs = transform(projectSrc, {
   transforms: ['typescript', 'imports'],
   production: true,
@@ -17,7 +17,7 @@ const projectJs = transform(projectSrc, {
 const mod = { exports: {} };
 new Function('require', 'module', 'exports', projectJs)(
   (r) => {
-    throw new Error(`project.ts must have no runtime imports (got '${r}')`);
+    throw new Error(`defaultProject.ts must have no runtime imports (got '${r}')`);
   },
   mod,
   mod.exports,
