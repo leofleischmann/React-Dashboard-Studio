@@ -29,6 +29,16 @@ jobs:
 
       - run: npm run build
 
+      - name: Verify embedded default project is up to date
+        shell: bash
+        run: |
+          if ! git diff --quiet -- src/studio/defaultProject.generated.ts; then
+            echo "::error::defaultProject.generated.ts is stale."
+            echo "Run 'npm run embed:default' and commit the result."
+            git --no-pager diff --stat -- src/studio/defaultProject.generated.ts
+            exit 1
+          fi
+
       - name: Verify panel bundle
         shell: bash
         run: |

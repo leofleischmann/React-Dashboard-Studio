@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { hassStore } from '../hass/store';
-import { searchEntities } from '../hass/entitySearch';
+import { hassStore } from '../sdk/hass/store';
+import { searchEntities } from '../sdk/hass/entitySearch';
 import {
   entityActionSnippet,
   entityDomain,
   entityIdSnippet,
   entityValueSnippet,
-} from '../lib/entityActions';
+} from '../sdk/entityActions';
 import { entityWidgetSnippet, widgetForDomain } from '../lib/entityWidgets';
-import type { HassEntity } from '../hass/types';
+import type { HassEntity } from '../sdk/hass/types';
 
 import { WidgetGallery } from './WidgetGallery';
 

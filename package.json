@@ -6,7 +6,10 @@
   "description": "Home Assistant Dashboard Studio - pro-code Home Assistant dashboard as a custom panel, installable via HACS.",
   "scripts": {
     "dev": "vite",
+    "dev:default": "node scripts/dev-default.mjs",
+    "prebuild": "node scripts/embed-default-project.mjs",
     "build": "tsc --noEmit && vite build && node scripts/copy-dashboard.mjs",
+    "embed:default": "node scripts/embed-default-project.mjs",
     "check:default": "node scripts/check-default-project.mjs",
     "check:dashboard": "node scripts/validate-dashboard.mjs",
     "gen:types": "node scripts/gen-entity-types.mjs",

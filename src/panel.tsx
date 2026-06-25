@@ -1,6 +1,6 @@
 import type { Root } from 'react-dom/client';
-import { hassStore } from './hass/store';
-import type { AppHass } from './hass/types';
+import { hassStore } from './sdk/hass/store';
+import type { AppHass } from './sdk/hass/types';
 import { mountStudio } from './mount';
 
 // MUST match PANEL_TAG in custom_components/homeassistant_dashboard_studio/const.py

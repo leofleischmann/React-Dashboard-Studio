@@ -20,7 +20,7 @@ export function joinPath(base: string, rel: string): string {
   return parts.join('/');
 }
 
-export { DEFAULT_PROJECT } from './defaultProject';
+export { DEFAULT_PROJECT } from './defaultProject.generated';
 
 /** Minimal entry used after "delete all", so the Studio stays functional. */
 export const BLANK_DASHBOARD = `export default function Dashboard() {

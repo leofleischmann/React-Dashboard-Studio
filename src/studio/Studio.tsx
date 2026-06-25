@@ -9,11 +9,11 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { useHassReady, useIsMobile } from '../hass/hooks';
+import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
 import { clearCompileCache, compileProject } from './compile';
 import { loadProject, isLocalDashboardMode, saveProject } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
-import { availableModules } from './runtime';
+import { availableModules } from '../sdk/runtime';
 import { Preview } from './Preview';
 import { FilePanel } from './FilePanel';
 import { EntityInserter } from './EntityInserter';

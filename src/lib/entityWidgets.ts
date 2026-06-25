@@ -1,4 +1,4 @@
-import { entityDomain } from './entityActions';
+import { entityDomain } from '../sdk/entityActions';
 
 type WidgetName =
   | 'EntityRow'

@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { transform } from 'sucrase';
-import { registry } from './runtime';
+import { registry } from '../sdk/runtime';
 import { dirname, joinPath, type Project } from './project';
 
 const RESOLVE_EXTS = ['', '.tsx', '.ts', '.jsx', '.js', '/index.tsx', '/index.ts'];

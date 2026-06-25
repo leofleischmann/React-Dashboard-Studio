@@ -8,8 +8,8 @@ import {
   type HassEntities,
   type HassServiceTarget,
 } from 'home-assistant-js-websocket';
-import { hassStore } from './hass/store';
-import type { AppHass } from './hass/types';
+import { hassStore } from './sdk/hass/store';
+import type { AppHass } from './sdk/hass/types';
 import Studio from './studio/Studio';
 
 const hassUrl = import.meta.env.VITE_HASS_URL as string | undefined;

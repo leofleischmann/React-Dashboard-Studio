@@ -1,6 +1,6 @@
-import type { HassEntity } from '../hass/types';
-import { registryStore } from '../hass/registryStore';
-import { hassStore } from '../hass/store';
+import type { HassEntity } from './hass/types';
+import { registryStore } from './hass/registryStore';
+import { hassStore } from './hass/store';
 
 const UNAVAILABLE = new Set(['unavailable', 'unknown', 'none', '']);
 

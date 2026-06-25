@@ -12,32 +12,27 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  DEFAULT_DASHBOARD_DIR,
+  ENTRY_DEFAULT,
+  PERSONAL_DASHBOARD_DIR,
+  isDashboardCodeFile,
+  listProjectFiles,
+  readProjectFromDir,
+} from './project-files.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-export const DASHBOARD_DIR = join(ROOT, 'dashboard');
+/** Active dev project: personal dashboard/ or default-dashboard/ via VITE_DEV_PROJECT. */
+export const DASHBOARD_DIR =
+  process.env.VITE_DEV_PROJECT === 'default-dashboard'
+    ? DEFAULT_DASHBOARD_DIR
+    : PERSONAL_DASHBOARD_DIR;
+
 export const META_FILE = join(DASHBOARD_DIR, '.studio.json');
-export const ENTRY_DEFAULT = 'dashboard.tsx';
-export const CODE_RE = /\.(tsx?|jsx?)$/;
 
-/** Dashboard source only — excludes VS Code helpers like `ha-entities.d.ts`. */
-export function isDashboardCodeFile(name) {
-  return CODE_RE.test(name) && !name.endsWith('.d.ts');
-}
-
-export function listLocalFiles(dir = DASHBOARD_DIR, base = DASHBOARD_DIR) {
-  const out = {};
-  if (!existsSync(dir)) return out;
-  for (const name of readdirSync(dir)) {
-    if (name.startsWith('.')) continue;
-    const full = join(dir, name);
-    if (statSync(full).isDirectory()) Object.assign(out, listLocalFiles(full, base));
-    else if (isDashboardCodeFile(name)) {
-      const rel = relative(base, full).split(sep).join('/');
-      out[rel] = readFileSync(full, 'utf8');
-    }
-  }
-  return out;
+export function listLocalFiles(dir = DASHBOARD_DIR) {
+  return listProjectFiles(dir);
 }
 
 export function readEntry() {
@@ -100,13 +95,8 @@ export function pruneLocalOrphans(keepPaths) {
 }
 
 export function readLocalProject() {
-  const files = listLocalFiles();
-  if (Object.keys(files).length === 0) return null;
-  let entry = readEntry();
-  if (!files[entry]) {
-    entry = files[ENTRY_DEFAULT] ? ENTRY_DEFAULT : Object.keys(files).sort()[0];
-  }
-  return { files, entry };
+  const entry = readEntry();
+  return readProjectFromDir(DASHBOARD_DIR, entry);
 }
 
 export function writeLocalProject(project) {

@@ -57,9 +57,10 @@ function writeEntityTypeFiles(root, states) {
     "strict": false,
     "skipLibCheck": true,
     "paths": {
-      "@ha": ["../src/hass/hooks.ts"],
-      "@ha/ui": ["../src/components/widgets.tsx"],
-      "@ha/format": ["../src/lib/format.ts"]
+      "@ha": ["../src/sdk/hass/hooks.ts"],
+      "@ha/ui": ["../src/sdk/ui/index.ts"],
+      "@ha/layout": ["../src/sdk/ui/layout.tsx"],
+      "@ha/format": ["../src/sdk/format.ts"]
     }
   },
   "include": ["./**/*.ts", "./**/*.tsx", "ha-entities.d.ts"]

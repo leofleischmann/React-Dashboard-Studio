@@ -3,7 +3,7 @@ import {
   defaultEntityService,
   entityDomain,
   TOGGLE_DOMAINS,
-} from '../lib/entityActions';
+} from '../entityActions';
 import {
   batteryColor,
   euro,
@@ -11,7 +11,7 @@ import {
   num,
   stateNumber,
   weatherIcon,
-} from '../lib/format';
+} from '../format';
 
 /** Generic card container — the basic building block. */
 export function Card({

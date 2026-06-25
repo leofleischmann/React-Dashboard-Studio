@@ -40,7 +40,7 @@ export default function Dashboard() {
 | **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
 | **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (Entities + **Galerie**), Domain-Filter |
 | **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
-| **Erstinstallation** | SDK-Referenz-Dashboard (Tabs: Start, Widgets, Layout) — ersetzbar via ✎ Bearbeiten |
+| **Erstinstallation** | SDK-Referenz aus `default-dashboard/` (Tabs: Start, Widgets, Layout) — ersetzbar via ✎ Bearbeiten |
 | **Mobil** | Nur Anzeige, kein Editor |
 
 ---
@@ -67,6 +67,8 @@ Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → ers
 | `npm run sync:watch` | Optional parallel: Push (mit Compile-Check) bei jedem Speichern |
 | `npm run sync:pull` / `sync:push` | Laden / Hochladen · `pull` prüft lokal + warnt bei Konflikten |
 | `npm run check:dashboard` | `./dashboard/` manuell auf Compile-Fehler prüfen |
+| `npm run dev:default` | Live-Vorschau des **HACS-Start-Dashboards** (`default-dashboard/`) |
+| `npm run check:default` | `default-dashboard/` auf Compile-Fehler prüfen |
 | `npm run gen:types` | Manuell: Entity-Liste (läuft automatisch bei `sync:pull`) |
 
 **Typischer Ablauf:** Terminal 1 → `npm run dev` (Vorschau) · VS Code → `./dashboard/` · Terminal 2 optional → `npm run sync:watch` (Push inkl. Löschen entfernter Dateien in HA).
@@ -99,6 +101,6 @@ Nur wenn du **diese Integration** (Editor, API, Widgets) weiterentwickelst — n
 npm run build   # → custom_components/homeassistant_dashboard_studio/dashboard.js
 ```
 
-Neue Exports in `hooks.ts` / `widgets.tsx` / `layout.tsx` / `format.ts` und in [`runtime.ts`](src/studio/runtime.ts) registrieren.
+Neue Exports in `src/sdk/` (Hooks, UI, Layout, Format) und in [`src/sdk/runtime.ts`](src/sdk/runtime.ts) registrieren. Das Start-Dashboard liegt in [`default-dashboard/`](default-dashboard/) — nach Änderungen `npm run embed:default` (läuft automatisch bei `npm run build`).
 
 ---

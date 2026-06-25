@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "paths": {
+      "@ha": ["../src/sdk/hass/hooks.ts"],
+      "@ha/ui": ["../src/sdk/ui/index.ts"],
+      "@ha/layout": ["../src/sdk/ui/layout.tsx"],
+      "@ha/format": ["../src/sdk/format.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

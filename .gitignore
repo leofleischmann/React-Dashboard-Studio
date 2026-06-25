@@ -9,4 +9,4 @@ dist
 dashboard/
 
 # Optional local entity union from gen:types (dashboard/ha-entities.d.ts is enough)
-src/hass/entities.generated.ts
+src/sdk/hass/entities.generated.ts
