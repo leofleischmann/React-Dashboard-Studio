@@ -299,16 +299,41 @@
 }
 
 /* ── Energy ──────────────────────────────────────────────── */
-.rd-energy { display: flex; flex-direction: column; gap: 10px; }
-.rd-energy__now { display: flex; flex-direction: column; }
-.rd-energy__now strong {
-  font-size: 2.1rem;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
+.rd-energy__layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
 }
-.rd-energy__now strong small { font-size: 1rem; font-weight: 600; color: var(--rd-text-2); }
-.rd-energy__now span { font-size: 0.76rem; color: var(--rd-text-2); margin-top: 2px; }
+.rd-energy__main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.rd-energy__orb .rd-value-orb {
+  gap: 6px;
+  width: 132px;
+}
+.rd-energy__orb .rd-value-orb__canvas {
+  width: 132px;
+  height: 132px;
+  border-radius: 14px;
+}
+.rd-energy__orb .rd-value-orb__glass {
+  width: 92px;
+  height: 92px;
+}
+.rd-energy__orb .rd-value-orb__footer strong {
+  font-size: 0.92rem;
+}
+.rd-energy__orb .rd-value-orb__footer small {
+  max-width: 132px;
+  font-size: 0.62rem;
+}
+.rd-energy__orb .rd-value-orb__level {
+  font-size: 0.58rem;
+}
 .rd-energy__stats { display: flex; gap: 8px; }
 .rd-energy__stats span {
   flex: 1;
@@ -538,6 +563,12 @@
   .rd-hero__right { min-width: 0; }
   .rd-reveal { grid-template-columns: 1fr; }
   .rd-reveal__mods { grid-template-columns: 1fr; }
+  .rd-energy__layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .rd-energy__main { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
