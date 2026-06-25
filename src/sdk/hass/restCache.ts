@@ -131,7 +131,14 @@ function createSharedRestCache<T>(
     return buckets.get(key)?.data ?? empty;
   }
 
-  return { subscribe, getSnapshot };
+  function isPending(entityIds: readonly string[], param: number): boolean {
+    if (entityIds.length === 0) return false;
+    const key = bucketKey(normalizeIds(entityIds), param);
+    const bucket = buckets.get(key);
+    return bucket ? !bucket.loaded : false;
+  }
+
+  return { subscribe, getSnapshot, isPending };
 }
 
 export { createSharedRestCache, normalizeIds };

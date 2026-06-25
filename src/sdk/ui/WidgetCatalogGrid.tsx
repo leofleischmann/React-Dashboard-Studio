@@ -54,7 +54,9 @@ export function WidgetCatalogGrid() {
     <ResponsiveGrid min={260}>
       {WIDGET_CATALOG.map((entry) => {
         const Demo = entry.Demo;
-        const entityId = entry.domains.map((d) => examples.get(d)).find(Boolean);
+        const entityId =
+          entry.pickExample?.(entities) ??
+          entry.domains.map((d) => examples.get(d)).find(Boolean);
         return (
           <RefCard key={entry.name} entry={entry} entityId={entityId}>
             {(id) => <Demo entityId={id} />}

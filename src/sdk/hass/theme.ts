@@ -1,33 +1,51 @@
 import { useSyncExternalStore } from 'react';
 import { hassStore } from './store';
+import type { AppHass } from './types';
 
 export type ThemeVars = Record<string, string> & {
   primary: string;
   accent: string;
 };
 
+function activeThemeName(hass: AppHass | null): string {
+  if (!hass) return 'default';
+  if (typeof hass.themes?.theme === 'string') return hass.themes.theme;
+  const selected = hass.selectedTheme;
+  if (selected && typeof selected === 'object' && typeof selected.theme === 'string') {
+    return selected.theme;
+  }
+  if (typeof selected === 'string') return selected;
+  return 'default';
+}
+
+/** Effective dark mode — HA stores this on `hass.themes.darkMode`, not `hass.darkMode`. */
+export function readDarkMode(): boolean {
+  const hass = hassStore.getHass();
+  if (typeof hass?.themes?.darkMode === 'boolean') return hass.themes.darkMode;
+  if (typeof hass?.darkMode === 'boolean') return hass.darkMode;
+
+  const theme = activeThemeName(hass);
+  return theme.includes('dark') || theme === 'midnight' || theme === 'ios-dark';
+}
+
 function readTheme(): ThemeVars {
   const hass = hassStore.getHass();
-  const themeName = (hass?.selectedTheme as string | undefined) ?? 'default';
-  const themes = hass?.themes as
-    | Record<string, Record<string, string>>
-    | undefined;
-  const vars = themes?.[themeName] ?? {};
+  const themeName = activeThemeName(hass);
+  const themeVars = hass?.themes?.themes?.[themeName] ?? {};
 
   const primary =
-    vars['primary-color'] ??
+    themeVars['primary-color'] ??
     (typeof document !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue(
-          '--primary-color',
-        ) || '#03a9f4'
+      ? getComputedStyle(document.documentElement).getPropertyValue('--primary-color') ||
+        '#03a9f4'
       : '#03a9f4');
 
   const accent =
-    (vars['accent-color'] ?? vars['primary-color'] ?? primary.trim()) ||
+    (themeVars['accent-color'] ?? themeVars['primary-color'] ?? primary.trim()) ||
     '#03a9f4';
 
   return {
-    ...vars,
+    ...themeVars,
     primary: primary.trim() || '#03a9f4',
     accent: accent.trim() || primary.trim() || '#03a9f4',
   };
@@ -40,17 +58,7 @@ export function useTheme(): ThemeVars {
 
 /** Whether HA frontend is in dark mode. */
 export function useDarkMode(): boolean {
-  return useSyncExternalStore(
-    hassStore.subscribeHassMeta,
-    () => {
-      const hass = hassStore.getHass();
-      if (typeof hass?.darkMode === 'boolean') return hass.darkMode;
-      const theme = hass?.selectedTheme as string | undefined;
-      if (!theme) return false;
-      return theme.includes('dark') || theme === 'midnight' || theme === 'ios-dark';
-    },
-    () => false,
-  );
+  return useSyncExternalStore(hassStore.subscribeHassMeta, readDarkMode, () => false);
 }
 
 /** Inject HA theme CSS variables onto a container element. */

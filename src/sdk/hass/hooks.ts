@@ -13,6 +13,7 @@ import { fetchEntityStatistics, type EntityStatistics } from './statistics';
 import {
   getEntityHistorySnapshot,
   getEntityStatisticsSnapshot,
+  isEntityHistoryPending,
   subscribeEntityHistory,
   subscribeEntityStatistics,
 } from './cachedRest';
@@ -378,6 +379,31 @@ export function useEntityHistory(
   );
 
   return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
+}
+
+/** True until the first history fetch for this entity set completes. */
+export function useEntityHistoryPending(
+  entityIds: string[],
+  options: { hours?: number; refreshMs?: number } = {},
+): boolean {
+  const { hours = 24, refreshMs = 180_000 } = options;
+  const ready = useHassReady();
+  const idsKey = normalizeIds(entityIds);
+
+  const getSnapshot = useCallback(() => {
+    if (!ready || !idsKey) return false;
+    return isEntityHistoryPending(entityIdsFromKey(idsKey), hours);
+  }, [ready, idsKey, hours]);
+
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (!ready || !idsKey) return () => {};
+      return subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener);
+    },
+    [ready, idsKey, hours, refreshMs],
+  );
+
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
 
 /** Reactive statistics (min/max/mean) over 7 or 30 days. */

@@ -23,6 +23,13 @@ export function getEntityHistorySnapshot(
   return historyCache.getSnapshot(entityIds, hours);
 }
 
+export function isEntityHistoryPending(
+  entityIds: readonly string[],
+  hours: number,
+): boolean {
+  return historyCache.isPending(entityIds, hours);
+}
+
 export function subscribeEntityStatistics(
   entityIds: readonly string[],
   days: number,

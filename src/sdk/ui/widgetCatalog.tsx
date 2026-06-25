@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
-import { useEntity, useEntityHistory } from '../hass/hooks';
+import { useEntity, useEntityHistory, useEntityHistoryPending } from '../hass/hooks';
+import type { HassEntity } from '../hass/types';
 import { entityDisplayName, num } from '../format';
 import {
   ActionButton,
@@ -41,7 +42,24 @@ export type WidgetCatalogEntry = {
   domains: string[];
   snippet: string | ((entityId: string) => string);
   Demo: ComponentType<{ entityId: string }>;
+  /** Prefer a specific entity for the live demo (e.g. numeric sensors for charts). */
+  pickExample?: (entities: readonly HassEntity[]) => string | undefined;
 };
+
+/** First sensor with a parseable numeric state — for SparkChart demos. */
+export function pickNumericSensorEntity(
+  entities: readonly HassEntity[],
+): string | undefined {
+  const numeric = entities.filter(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      !Number.isNaN(Number.parseFloat(e.state)) &&
+      e.state !== 'unavailable' &&
+      e.state !== 'unknown',
+  );
+  const temp = numeric.filter((e) => e.attributes.device_class === 'temperature');
+  return (temp[0] ?? numeric[0])?.entity_id;
+}
 
 function StatDemo({ entityId }: { entityId: string }) {
   const e = useEntity(entityId);
@@ -56,8 +74,11 @@ function StatDemo({ entityId }: { entityId: string }) {
 
 function SparkDemo({ entityId }: { entityId: string }) {
   const history = useEntityHistory([entityId], { hours: 24 });
+  const loading = useEntityHistoryPending([entityId], { hours: 24 });
   return (
     <SparkChart
+      loading={loading}
+      emptyLabel="Kein numerischer Verlauf für diese Entity"
       series={[
         {
           label: entityId.split('.')[1] ?? 'Verlauf',
@@ -94,6 +115,7 @@ export const WIDGET_CATALOG: WidgetCatalogEntry[] = [
     name: 'SparkChart',
     label: 'SparkChart',
     domains: ['sensor'],
+    pickExample: pickNumericSensorEntity,
     snippet: '<SparkChart series={[…]} />',
     Demo: SparkDemo,
   },

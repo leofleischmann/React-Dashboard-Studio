@@ -45,12 +45,16 @@ export function SparkChart({
   series,
   height = 88,
   showLegend = true,
-  emptyLabel = 'Verlauf wird geladen…',
+  loading = false,
+  emptyLabel = 'Kein Verlauf',
+  loadingLabel = 'Verlauf wird geladen…',
 }: {
   series: ChartSeries[];
   height?: number;
   showLegend?: boolean;
+  loading?: boolean;
   emptyLabel?: string;
+  loadingLabel?: string;
 }) {
   const width = 320;
   const active = series.filter((s) => s.points.length >= 2);
@@ -58,7 +62,7 @@ export function SparkChart({
   if (active.length === 0) {
     return (
       <div className="rd-chart">
-        <p className="rd-chart__empty">{emptyLabel}</p>
+        <p className="rd-chart__empty">{loading ? loadingLabel : emptyLabel}</p>
       </div>
     );
   }

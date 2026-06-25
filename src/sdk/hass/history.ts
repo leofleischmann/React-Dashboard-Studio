@@ -9,7 +9,22 @@ type HistoryRow = {
   last_updated?: string;
 };
 
-function parseRestHistory(data: unknown): Record<string, HistoryPoint[]> {
+const DEFAULT_MAX_POINTS = 300;
+
+function downsample(points: HistoryPoint[], maxPoints: number): HistoryPoint[] {
+  if (points.length <= maxPoints) return points;
+  const out: HistoryPoint[] = [];
+  const step = (points.length - 1) / (maxPoints - 1);
+  for (let i = 0; i < maxPoints; i += 1) {
+    out.push(points[Math.round(i * step)]);
+  }
+  return out;
+}
+
+function parseRestHistory(
+  data: unknown,
+  maxPoints = DEFAULT_MAX_POINTS,
+): Record<string, HistoryPoint[]> {
   if (!Array.isArray(data)) return {};
   const out: Record<string, HistoryPoint[]> = {};
 
@@ -26,7 +41,9 @@ function parseRestHistory(data: unknown): Record<string, HistoryPoint[]> {
       if (!ts) continue;
       points.push({ t: new Date(ts).getTime(), v });
     }
-    if (points.length > 0) out[entityId] = points;
+    if (points.length > 0) {
+      out[entityId] = downsample(points, maxPoints);
+    }
   }
   return out;
 }
@@ -35,6 +52,7 @@ function parseRestHistory(data: unknown): Record<string, HistoryPoint[]> {
 export async function fetchEntityHistory(
   entityIds: string[],
   hours = 24,
+  maxPoints = DEFAULT_MAX_POINTS,
 ): Promise<Record<string, HistoryPoint[]>> {
   if (entityIds.length === 0) return {};
 
@@ -44,6 +62,8 @@ export async function fetchEntityHistory(
     filter_entity_id: entityIds.join(','),
     end_time: end.toISOString(),
     minimal_response: '1',
+    no_attributes: '1',
+    significant_changes_only: '1',
   });
   const path = `history/period/${start.toISOString()}?${q.toString()}`;
 
@@ -51,7 +71,7 @@ export async function fetchEntityHistory(
   if (typeof callApi !== 'function') return {};
 
   const data = await callApi('GET', path);
-  return parseRestHistory(data);
+  return parseRestHistory(data, maxPoints);
 }
 
 /** Sum positive deltas between history points (energy/consumption sensors). */

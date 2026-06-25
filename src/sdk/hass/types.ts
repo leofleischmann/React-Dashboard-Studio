@@ -32,8 +32,19 @@ export interface HassConnection {
   ) => Promise<() => void>;
 }
 
+/** Subset of HA `hass.themes` (see frontend `Themes` interface). */
+export interface HassThemes {
+  theme?: string;
+  darkMode?: boolean;
+  themes?: Record<string, Record<string, string>>;
+}
+
 export interface AppHass {
   states: Record<string, HassEntity>;
+  themes?: HassThemes;
+  /** @deprecated Prefer `themes.darkMode`. */
+  darkMode?: boolean;
+  selectedTheme?: string | { theme?: string; dark?: boolean };
   callService: (
     domain: string,
     service: string,

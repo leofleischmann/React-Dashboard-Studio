@@ -67,7 +67,14 @@ class HassStore {
 
   private themeSignature(hass: AppHass | null): string {
     if (!hass) return '';
-    return `${String(hass.selectedTheme ?? '')}\0${String(hass.darkMode ?? '')}`;
+    const themeName =
+      hass.themes?.theme ??
+      (typeof hass.selectedTheme === 'object'
+        ? hass.selectedTheme?.theme
+        : hass.selectedTheme) ??
+      '';
+    const dark = hass.themes?.darkMode ?? hass.darkMode ?? '';
+    return `${String(themeName)}\0${String(dark)}`;
   }
 
   private collectEntityChanges(

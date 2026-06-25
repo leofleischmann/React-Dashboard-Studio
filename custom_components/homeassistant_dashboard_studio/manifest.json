@@ -8,5 +8,5 @@
   "integration_type": "service",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/issues",
-  "version": "0.4.7"
+  "version": "0.4.8"
 }

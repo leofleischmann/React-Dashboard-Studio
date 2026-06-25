@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useEntities, useEntityHistory, useEntityStatistics } from '@ha';
+import { useEntities, useEntityHistory, useEntityHistoryPending, useEntityStatistics } from '@ha';
 import { entityDisplayName, num } from '@ha/format';
 import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
@@ -24,6 +24,7 @@ export function ChartsPage() {
   const sensors = useMemo(() => pickChartSensors(entities), [entities]);
   const ids = useMemo(() => sensors.map((s) => s.entity_id), [sensors]);
   const history = useEntityHistory(ids, { hours: 48 });
+  const historyLoading = useEntityHistoryPending(ids, { hours: 48 });
   const primaryId = ids[0];
   const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });
   const stats = primaryId ? statsMap[primaryId] : undefined;
@@ -52,13 +53,14 @@ export function ChartsPage() {
         <>
           <Section title="SparkChart · Multi-Series (48 h)">
             <div className="rd-sdk-chart-card">
-              <SparkChart series={series} height={120} />
+              <SparkChart series={series} height={120} loading={historyLoading} />
             </div>
           </Section>
 
           <Section title="HistoryChart · Einzelverlauf">
             <div className="rd-sdk-chart-card">
               <HistoryChart
+                loading={historyLoading}
                 series={[
                   {
                     label: entityDisplayName(sensors[0], sensors[0].entity_id),
