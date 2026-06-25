@@ -20,7 +20,7 @@ import {
 import { generateEntityTypes } from './gen-entity-types.mjs';
 import { generateSdkReference } from './gen-sdk-reference.mjs';
 import { readSyncState, workspaceHash, writeSyncState } from './sync-state.mjs';
-import { migrateToWorkspace, normalizeWorkspace } from './workspace.mjs';
+import { normalizeWorkspace } from './workspace.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WS_GET = 'homeassistant_dashboard_studio/get_workspace';
@@ -178,8 +178,7 @@ async function pull(conn) {
   const localWorkspace = readLocalWorkspace();
 
   const res = await conn.call({ type: WS_GET });
-  const remoteWorkspace =
-    normalizeWorkspace(res?.workspace) ?? migrateToWorkspace(res?.workspace);
+  const remoteWorkspace = normalizeWorkspace(res?.workspace);
   if (!remoteWorkspace) {
     console.log('In HA ist noch kein Dashboard gespeichert – nichts zu laden.');
     return;
@@ -241,8 +240,7 @@ async function push(conn) {
   console.log(`✓ dashboard/ kompiliert (${count} Datei(en), Projekte: ${ids}).`);
 
   const res = await conn.call({ type: WS_GET });
-  const remote =
-    normalizeWorkspace(res?.workspace) ?? migrateToWorkspace(res?.workspace);
+  const remote = normalizeWorkspace(res?.workspace);
   const remoteIds = new Set(Object.keys(remote?.projects ?? {}));
   const removed = [...remoteIds].filter((id) => !(id in workspace.projects));
 

@@ -1,9 +1,4 @@
-import {
-  createWorkspaceProject,
-  deleteWorkspaceProject,
-  renameWorkspaceProject,
-  type Workspace,
-} from './workspace';
+import type { Workspace } from './workspace';
 
 type Props = {
   workspace: Workspace;

@@ -16,7 +16,6 @@ _LOGGER = logging.getLogger(__name__)
 
 STORAGE_VERSION = 2
 WORKSPACE_VERSION = 2
-DEFAULT_PROJECT_ID = "default"
 PROJECT_SLUG_RE = re.compile(r"^[a-z][a-z0-9_-]{0,31}$")
 
 
@@ -60,24 +59,6 @@ def normalize_workspace(data: dict[str, Any] | None) -> dict[str, Any] | None:
     return {"version": WORKSPACE_VERSION, "activeId": active_id, "projects": projects}
 
 
-def migrate_to_workspace(stored: dict[str, Any] | None) -> dict[str, Any] | None:
-    if not stored:
-        return None
-    as_v2 = normalize_workspace(stored)
-    if as_v2:
-        return as_v2
-    legacy = normalize_project(stored)
-    if legacy is None:
-        return None
-    return {
-        "version": WORKSPACE_VERSION,
-        "activeId": DEFAULT_PROJECT_ID,
-        "projects": {
-            DEFAULT_PROJECT_ID: {"name": "Dashboard", **legacy},
-        },
-    }
-
-
 class DashboardStore:
     """Persists dashboards under .storage/homeassistant_dashboard_studio."""
 
@@ -89,7 +70,7 @@ class DashboardStore:
 
     async def async_load(self) -> None:
         stored = await self._store.async_load()
-        self._workspace = migrate_to_workspace(stored)
+        self._workspace = normalize_workspace(stored)
         self._loaded = True
         count = len(self._workspace["projects"]) if self._workspace else 0
         _LOGGER.debug("[Debug dashboard_store]: loaded workspace (%s project(s))", count)

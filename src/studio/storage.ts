@@ -1,11 +1,6 @@
 import { hassStore } from '../sdk/hass/store';
 import { DEFAULT_PROJECT, blankProject, type Project } from './project';
-import {
-  migrateToWorkspace,
-  normalizeWorkspace,
-  withActiveProject,
-  type Workspace,
-} from './workspace';
+import { normalizeWorkspace, withActiveProject, type Workspace } from './workspace';
 
 const WS_GET = 'homeassistant_dashboard_studio/get_workspace';
 const WS_SAVE = 'homeassistant_dashboard_studio/save_workspace';
@@ -24,7 +19,7 @@ async function loadLocalWorkspace(): Promise<Workspace | null> {
     const res = await fetch(LOCAL_WORKSPACE_URL);
     if (!res.ok) return null;
     const data = await res.json();
-    return normalizeWorkspace(data) ?? migrateToWorkspace(data);
+    return normalizeWorkspace(data);
   } catch {
     return null;
   }
@@ -48,8 +43,7 @@ export async function loadWorkspace(): Promise<Workspace | null> {
     const res = await connection.sendMessagePromise<{ workspace: unknown }>({
       type: WS_GET,
     });
-    const workspace =
-      normalizeWorkspace(res?.workspace) ?? migrateToWorkspace(res?.workspace);
+    const workspace = normalizeWorkspace(res?.workspace);
     console.log('[Debug storage]: loaded global workspace', {
       activeId: workspace?.activeId,
       projects: workspace ? Object.keys(workspace.projects) : [],
@@ -92,12 +86,6 @@ export async function loadStudioState(): Promise<LoadedStudioState> {
   };
 }
 
-/** @deprecated use loadStudioState */
-export async function loadProject(): Promise<Project> {
-  const { project } = await loadStudioState();
-  return project;
-}
-
 export function subscribeWorkspaceReset(onReset: () => void): () => void {
   const connection = hassStore.getHass()?.connection;
   if (!connection?.subscribeMessage) return () => {};
@@ -112,9 +100,7 @@ export function subscribeWorkspaceReset(onReset: () => void): () => void {
           skipInitial = false;
           return;
         }
-        const workspace =
-          normalizeWorkspace(msg?.workspace) ?? migrateToWorkspace(msg?.workspace);
-        if (!workspace) {
+        if (!normalizeWorkspace(msg?.workspace)) {
           console.log('[Debug storage]: workspace cleared — reset to default');
           onReset();
         }
@@ -131,9 +117,6 @@ export function subscribeWorkspaceReset(onReset: () => void): () => void {
     unsub?.();
   };
 }
-
-/** @deprecated */
-export const subscribeProjectReset = subscribeWorkspaceReset;
 
 export async function saveWorkspace(workspace: Workspace): Promise<void> {
   if (localDashboardMode) {
@@ -171,13 +154,5 @@ export async function saveStudioState(
   await saveWorkspace(next);
 }
 
-/** @deprecated */
-export async function saveProject(project: Project): Promise<void> {
-  const state = await loadStudioState();
-  await saveStudioState(state.workspace, state.activeId, project);
-}
-
 export { blankProject };
-
-// re-export workspace helpers for studio UI
 export type { Workspace } from './workspace';

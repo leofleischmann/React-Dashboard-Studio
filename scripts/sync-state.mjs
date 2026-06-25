@@ -11,15 +11,6 @@ export function workspaceHash(workspace) {
   return createHash('sha256').update(payload).digest('hex').slice(0, 16);
 }
 
-/** @deprecated */
-export function filesHash(files, entry) {
-  return workspaceHash({
-    version: 2,
-    activeId: entry,
-    projects: { sync: { name: 'sync', entry, files } },
-  });
-}
-
 export function readSyncState() {
   if (!existsSync(SYNC_META_FILE)) return null;
   try {

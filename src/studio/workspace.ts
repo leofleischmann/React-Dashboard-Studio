@@ -76,21 +76,6 @@ export function normalizeWorkspace(data: unknown): Workspace | null {
   return { version: WORKSPACE_VERSION, activeId, projects };
 }
 
-export function migrateToWorkspace(stored: unknown): Workspace | null {
-  if (!stored) return null;
-  const asV2 = normalizeWorkspace(stored);
-  if (asV2) return asV2;
-  const legacy = normalizeProject(stored);
-  if (!legacy) return null;
-  return {
-    version: WORKSPACE_VERSION,
-    activeId: DEFAULT_PROJECT_ID,
-    projects: {
-      [DEFAULT_PROJECT_ID]: { name: 'Dashboard', ...legacy },
-    },
-  };
-}
-
 export function projectFromWorkspace(
   workspace: Workspace,
   activeId = workspace.activeId,
