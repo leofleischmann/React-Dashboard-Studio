@@ -77,6 +77,13 @@ export { fetchEntityHistory, fetchEntityStatistics, fetchCalendarEvents };
 export type { HistoryPoint } from './history';
 export { useTheme, useDarkMode, applyThemeVars };
 export type { TemplateListeners } from './templateTypes';
+export {
+  DashboardProvider,
+  useDashboardState,
+  usePersistentState,
+  clearPersistentState,
+  useDashboardScope,
+} from '../dashboard';
 
 export type HassServiceTarget = {
   entity_id?: string | string[];

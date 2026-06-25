@@ -35,6 +35,7 @@ import { ResponsiveGrid } from '@ha/layout';
 import { WeatherForecastRow } from '@ha/ui';
 import { PageHead } from '../components/PageHead';
 import { HookDemoCard } from '../components/HookDemoCard';
+import { DashboardStateSection } from '../components/DashboardStateSection';
 import { byDomain, numericSensors } from '../lib/pickers';
 
 export function HooksPage() {
@@ -424,6 +425,8 @@ export function HooksPage() {
           </div>
         )}
       </Section>
+
+      <DashboardStateSection />
 
       <Section title="Services & imperative Escape-Hatches">
         <ResponsiveGrid min={270}>

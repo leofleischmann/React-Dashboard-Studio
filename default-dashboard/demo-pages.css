@@ -107,7 +107,19 @@
   transition: filter 0.15s ease;
 }
 .rd-demo-btn:hover { filter: brightness(1.07); }
+.rd-dd-btn-row .rd-demo-btn:not(.is-active) {
+  background: color-mix(in srgb, var(--rd-text) 8%, transparent);
+  color: var(--rd-text-1);
+}
+.rd-demo-btn.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rd-accent) 55%, transparent);
+}
 .rd-demo-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.rd-dd-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .rd-theme-swatches { display: flex; align-items: center; gap: 8px; }
 .rd-theme-swatches span {
   width: 24px;
