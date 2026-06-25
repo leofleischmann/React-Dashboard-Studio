@@ -1,4 +1,5 @@
 import { Component, type ComponentType, type ReactNode } from 'react';
+import { DashboardProvider } from '../sdk/dashboard';
 
 class ErrorBoundary extends Component<
   { children: ReactNode; onError: (message: string) => void },
@@ -43,7 +44,9 @@ export function Preview({
   // so a previous render error doesn't stick around.
   return (
     <ErrorBoundary key={version} onError={onRuntimeError}>
-      <Dashboard />
+      <DashboardProvider>
+        <Dashboard />
+      </DashboardProvider>
     </ErrorBoundary>
   );
 }
