@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { useEntity, useEntityHistory, useEntityHistoryPending } from '../../hass/hooks';
 import type { HassEntity } from '../../hass/types';
-import { entityDisplayName, num } from '../../format';
+import { entityDisplayName, num, pct, stateNumber } from '../../format';
 import { CameraTile } from '../cards/domain';
 import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
 import { WeatherForecastRow } from '../featured/WeatherForecastRow';
 import { Minitimeline } from '../featured/Minitimeline';
-import { SparkChart } from '../charts';
+import { HistoryChart, SparkChart } from '../charts';
+import { CircularProgress } from '../CircularProgress';
 import { Stat } from '../primitives';
 
 /** First sensor with a parseable numeric state — for SparkChart demos. */
@@ -75,3 +76,50 @@ export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {
 export function MinitimelineDemo({ entityId }: { entityId: string }) {
   return <Minitimeline entityId={entityId} limit={5} hours={24} />;
 }
+
+export function HistoryChartDemo({ entityId }: { entityId: string }) {
+  const history = useEntityHistory([entityId], { hours: 48 });
+  const loading = useEntityHistoryPending([entityId], { hours: 48 });
+  const entity = useEntity(entityId);
+  const unit = entity?.attributes.unit_of_measurement as string | undefined;
+
+  return (
+    <HistoryChart
+      loading={loading}
+      series={[
+        {
+          label: entityDisplayName(entity, entityId),
+          color: '#6ea8fe',
+          points: history[entityId] ?? [],
+        },
+      ]}
+      height={120}
+      showLegend
+      axes={{ xLabel: 'Zeit', yLabel: unit ?? 'Wert' }}
+    />
+  );
+}
+
+function pickBatteryEntity(entities: readonly HassEntity[]): string | undefined {
+  return entities.find(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      e.attributes.device_class === 'battery',
+  )?.entity_id;
+}
+
+export function CircularProgressDemo({ entityId }: { entityId: string }) {
+  const entity = useEntity(entityId);
+  const value = stateNumber(entity) ?? 0;
+  return (
+    <CircularProgress
+      value={value}
+      max={100}
+      label={entityDisplayName(entity, entityId)}
+      caption={pct(value)}
+      color="var(--rd-accent)"
+    />
+  );
+}
+
+export { pickBatteryEntity };

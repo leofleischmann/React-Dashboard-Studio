@@ -99,3 +99,40 @@ export function forecastDayLabel(
   if (diffDays === 1) return 'Morgen';
   return date.toLocaleDateString(locale, { weekday: 'short' });
 }
+
+function toDate(value: string | number | Date | undefined): Date | undefined {
+  if (value === undefined) return undefined;
+  const d =
+    typeof value === 'string'
+      ? new Date(value)
+      : typeof value === 'number'
+        ? new Date(value)
+        : value;
+  return Number.isFinite(d.getTime()) ? d : undefined;
+}
+
+/** German date + time, e.g. "25.06.2026, 15:30". */
+export function timestamp(
+  isoOrDate: string | number | Date | undefined,
+  locale = 'de-DE',
+): string {
+  const d = toDate(isoOrDate);
+  if (!d) return '–';
+  return d.toLocaleString(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/** Weekday name, e.g. "Mittwoch". */
+export function weekday(
+  isoOrDate: string | number | Date | undefined,
+  locale = 'de-DE',
+): string {
+  const d = toDate(isoOrDate);
+  if (!d) return '–';
+  return d.toLocaleDateString(locale, { weekday: 'long' });
+}

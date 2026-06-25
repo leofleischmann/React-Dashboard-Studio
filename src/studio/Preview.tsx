@@ -1,32 +1,6 @@
-import { Component, type ComponentType, type ReactNode } from 'react';
+import { type ComponentType } from 'react';
 import { DashboardProvider } from '../sdk/dashboard';
-
-class ErrorBoundary extends Component<
-  { children: ReactNode; onError: (message: string) => void },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  componentDidCatch(error: Error) {
-    this.props.onError(error.message);
-  }
-
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="rd-studio__runtime-error">
-          <strong>Laufzeitfehler beim Rendern</strong>
-          <pre>{this.state.error.message}</pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+import { ErrorBoundary } from '../sdk/ui/ErrorBoundary';
 
 export function Preview({
   Dashboard,
@@ -43,7 +17,17 @@ export function Preview({
   // key=version remounts the boundary + component on each successful compile,
   // so a previous render error doesn't stick around.
   return (
-    <ErrorBoundary key={version} onError={onRuntimeError}>
+    <ErrorBoundary
+      key={version}
+      className="rd-studio__runtime-error"
+      onError={(error) => onRuntimeError(error.message)}
+      fallback={(error) => (
+        <div className="rd-studio__runtime-error">
+          <strong>Laufzeitfehler beim Rendern</strong>
+          <pre>{error.message}</pre>
+        </div>
+      )}
+    >
       <DashboardProvider>
         <Dashboard />
       </DashboardProvider>

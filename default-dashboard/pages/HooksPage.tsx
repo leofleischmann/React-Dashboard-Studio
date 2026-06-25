@@ -67,6 +67,10 @@ export function HooksPage() {
 
   const entity = useEntity(sampleId);
   const sampleState = useEntityState(sampleId);
+  const missingState = useEntityState('sensor.nicht_vorhanden_demo' as never, {
+    fallback: '–',
+  });
+  const missingEntity = useEntity('sensor.nicht_vorhanden_demo' as never, { fallback: '–' });
 
   const ageCandidates = useEntities({ domain: 'binary_sensor' });
   const ageEntityId = ageCandidates[0]?.entity_id ?? sampleId;
@@ -162,6 +166,24 @@ export function HooksPage() {
             <strong>{sampleState ?? '–'}</strong>
           </HookDemoCard>
 
+          <HookDemoCard
+            module="@ha"
+            name="useEntityState(id, { fallback })"
+            hint="fehlende Entity → Platzhalter"
+          >
+            <strong>{missingState}</strong>
+            <small>sensor.nicht_vorhanden_demo</small>
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useEntity(id, { fallback })"
+            hint="Stub-Entity statt undefined"
+          >
+            <strong>{missingEntity?.state}</strong>
+            <small>ohne optional chaining</small>
+          </HookDemoCard>
+
           <HookDemoCard module="@ha" name="useEntityAge(id)" hint={`${ageEntityId} · seit …`}>
             {entityAge.entity ? (
               <>
@@ -196,6 +218,10 @@ export function HooksPage() {
       </Section>
 
       <Section title="Templates (HA Jinja)">
+        <p className="rd-dd-lead">
+          Leere Templates oder nur Whitespace bleiben im Status <code>idle</code> (kein Fehler).
+          Nutze <code>loading</code> / <code>error</code> für die UI.
+        </p>
         <ResponsiveGrid min={270}>
           <HookDemoCard
             module="@ha"
