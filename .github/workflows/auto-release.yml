@@ -56,9 +56,10 @@ jobs:
           npm ci
           npm run check:default
           npm run build
-          test -f custom_components/homeassistant_dashboard_studio/dashboard.js
-          test -f custom_components/homeassistant_dashboard_studio/studio-editor.js
-          for f in dashboard.js studio-editor.js; do
+          v=$(jq -r .version custom_components/homeassistant_dashboard_studio/manifest.json)
+          test -f "custom_components/homeassistant_dashboard_studio/dashboard.v${v}.js"
+          test -f "custom_components/homeassistant_dashboard_studio/studio-editor.v${v}.js"
+          for f in "dashboard.v${v}.js" "studio-editor.v${v}.js"; do
             if ! git diff --quiet -- "custom_components/homeassistant_dashboard_studio/$f"; then
               echo "::error::custom_components/.../$f on main does not match a fresh build — refusing to release."
               exit 1

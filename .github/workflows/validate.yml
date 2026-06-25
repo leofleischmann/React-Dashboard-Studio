@@ -42,11 +42,14 @@ jobs:
       - name: Verify panel bundles
         shell: bash
         run: |
-          test -f custom_components/homeassistant_dashboard_studio/dashboard.js
-          test -f custom_components/homeassistant_dashboard_studio/studio-editor.js
-          unexpected=$(grep -oE 'from "\./[^"]+\.js"' custom_components/homeassistant_dashboard_studio/dashboard.js | grep -v './studio-editor.js' || true)
+          v=$(jq -r .version custom_components/homeassistant_dashboard_studio/manifest.json)
+          dashboard="custom_components/homeassistant_dashboard_studio/dashboard.v${v}.js"
+          editor="custom_components/homeassistant_dashboard_studio/studio-editor.v${v}.js"
+          test -f "$dashboard"
+          test -f "$editor"
+          unexpected=$(grep -oE 'from "\./[^"]+\.js"' "$dashboard" | grep -v "./studio-editor.v${v}.js" || true)
           if [ -n "$unexpected" ]; then
-            echo "dashboard.js must only import ./studio-editor.js as an optional chunk."
+            echo "dashboard bundle must only import ./studio-editor.v${v}.js as an optional chunk."
             echo "$unexpected"
             exit 1
           fi
@@ -54,7 +57,8 @@ jobs:
       - name: Ensure committed bundles are up to date
         shell: bash
         run: |
-          for f in dashboard.js studio-editor.js; do
+          v=$(jq -r .version custom_components/homeassistant_dashboard_studio/manifest.json)
+          for f in "dashboard.v${v}.js" "studio-editor.v${v}.js"; do
             if ! git diff --quiet -- "custom_components/homeassistant_dashboard_studio/$f"; then
               echo "::error::custom_components/.../$f is stale."
               echo "Run 'npm run build' and commit the result."
