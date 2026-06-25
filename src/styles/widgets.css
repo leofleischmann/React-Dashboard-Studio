@@ -596,32 +596,107 @@
 .rd-slider {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
 }
 .rd-slider__head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 10px;
 }
 .rd-slider__name {
   font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .rd-slider__value {
+  flex-shrink: 0;
   font-weight: 700;
+  font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
+  color: var(--rd-accent);
+}
+.rd-slider__track {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+.rd-slider__track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rd-text-2) 14%, transparent);
+}
+.rd-slider__track::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: var(--rd-slider-pct, 0%);
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--rd-accent) 80%, #fff),
+    var(--rd-accent)
+  );
+  pointer-events: none;
+  transition: width 0.15s ease;
 }
 .rd-slider__input {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  accent-color: var(--rd-accent);
+  height: 32px;
+  margin: 0;
+  background: transparent;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.rd-slider__input::-webkit-slider-runnable-track {
+  height: 8px;
+  background: transparent;
+  border: none;
+}
+.rd-slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--rd-card-bg, #fff);
+  background: var(--rd-accent);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.28);
+}
+.rd-slider__input::-moz-range-track {
+  height: 8px;
+  background: transparent;
+  border: none;
+}
+.rd-slider__input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--rd-card-bg, #fff);
+  background: var(--rd-accent);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.28);
 }
 .rd-slider__input:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+.rd-slider__input:disabled::-webkit-slider-thumb {
+  background: var(--rd-text-2);
 }
 
 /* ── Select card ─────────────────────────────────────────── */

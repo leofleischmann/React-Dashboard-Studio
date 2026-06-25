@@ -1,4 +1,5 @@
 import { callService, useEntity } from '../../../hass/hooks';
+import type { CSSProperties } from 'react';
 import { entityDomain } from '../../../entityActions';
 import { entityDisplayName, isAvailable, stateNumber } from '../../../format';
 
@@ -119,25 +120,34 @@ export function NumberSlider({
     }
   };
 
+  const pctFill =
+    maxVal > minVal ? `${((value - minVal) / (maxVal - minVal)) * 100}%` : '0%';
+  const unit =
+    domain === 'light'
+      ? '%'
+      : ((entity?.attributes.unit_of_measurement as string | undefined) ?? '');
+
   return (
     <div className="rd-card rd-slider">
       <div className="rd-slider__head">
         <span className="rd-slider__name">{name}</span>
         <span className="rd-slider__value">
           {value}
-          {domain === 'light' ? ' %' : ''}
+          {unit ? ` ${unit}` : ''}
         </span>
       </div>
-      <input
-        type="range"
-        className="rd-slider__input"
-        min={minVal}
-        max={maxVal}
-        step={stepVal}
-        value={value}
-        disabled={!usable}
-        onChange={(e) => setValue(Number(e.target.value))}
-      />
+      <div className="rd-slider__track" style={{ '--rd-slider-pct': pctFill } as CSSProperties}>
+        <input
+          type="range"
+          className="rd-slider__input"
+          min={minVal}
+          max={maxVal}
+          step={stepVal}
+          value={value}
+          disabled={!usable}
+          onChange={(e) => setValue(Number(e.target.value))}
+        />
+      </div>
     </div>
   );
 }

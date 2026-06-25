@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useEntity, useEntityHistory, useEntityHistoryPending } from '../../hass/hooks';
 import type { HassEntity } from '../../hass/types';
-import { entityDisplayName, num, pct, stateNumber } from '../../format';
+import { entityDisplayName, num, pct, stateNumber, batteryColor } from '../../format';
 import { CameraTile } from '../cards/domain';
 import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
@@ -43,6 +43,9 @@ export function SparkDemo({ entityId }: { entityId: string }) {
   return (
     <SparkChart
       loading={loading}
+      height={56}
+      showLegend={false}
+      showTooltip={false}
       emptyLabel="Kein numerischer Verlauf für diese Entity"
       series={[
         {
@@ -84,19 +87,25 @@ export function HistoryChartDemo({ entityId }: { entityId: string }) {
   const unit = entity?.attributes.unit_of_measurement as string | undefined;
 
   return (
-    <HistoryChart
-      loading={loading}
-      series={[
-        {
-          label: entityDisplayName(entity, entityId),
-          color: '#6ea8fe',
-          points: history[entityId] ?? [],
-        },
-      ]}
-      height={120}
-      showLegend
-      axes={{ xLabel: 'Zeit', yLabel: unit ?? 'Wert' }}
-    />
+    <div className="rd-chart-preview">
+      <HistoryChart
+        loading={loading}
+        height={64}
+        showLegend={false}
+        showTooltip={false}
+        series={[
+          {
+            label: entityDisplayName(entity, entityId),
+            color: '#6ea8fe',
+            points: history[entityId] ?? [],
+          },
+        ]}
+        axes={{
+          showTicks: false,
+          yLabel: unit,
+        }}
+      />
+    </div>
   );
 }
 
@@ -111,13 +120,20 @@ function pickBatteryEntity(entities: readonly HassEntity[]): string | undefined 
 export function CircularProgressDemo({ entityId }: { entityId: string }) {
   const entity = useEntity(entityId);
   const value = stateNumber(entity) ?? 0;
+  const isBattery = entity?.attributes.device_class === 'battery';
+  const shortLabel = isBattery
+    ? undefined
+    : (entity?.attributes.friendly_name as string | undefined)?.split(' ')[0];
+
   return (
     <CircularProgress
       value={value}
       max={100}
-      label={entityDisplayName(entity, entityId)}
+      size={76}
+      thickness={8}
+      label={shortLabel}
       caption={pct(value)}
-      color="var(--rd-accent)"
+      color={isBattery ? batteryColor(value) : 'var(--rd-accent)'}
     />
   );
 }

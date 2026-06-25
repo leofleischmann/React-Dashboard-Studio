@@ -584,19 +584,33 @@
   color: #e6e7ee;
 }
 .rd-widget-gallery__preview {
-  min-height: 64px;
+  min-height: 72px;
   overflow: hidden;
   border-radius: 8px;
   background: #12141c;
-  padding: 4px;
+  padding: 6px;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .rd-widget-gallery__preview .rd-card,
 .rd-widget-gallery__preview .rd-gauge,
-.rd-widget-gallery__preview .rd-entity-row {
+.rd-widget-gallery__preview .rd-entity-row,
+.rd-widget-gallery__preview .rd-slider {
   margin: 0;
-  transform: scale(0.88);
+  width: 100%;
+  transform: scale(0.92);
   transform-origin: top center;
+}
+.rd-widget-gallery__preview .rd-circular-stack {
+  transform: none;
+  width: auto;
+}
+.rd-widget-gallery__preview .rd-chart,
+.rd-widget-gallery__preview .rd-chart-preview {
+  transform: none;
+  width: 100%;
 }
 .rd-widget-gallery__missing {
   display: block;
