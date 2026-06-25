@@ -21,6 +21,8 @@ import {
   readProjectFromDir,
 } from './project-files.mjs';
 
+export { ENTRY_DEFAULT, isDashboardCodeFile } from './project-files.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Active dev project: personal dashboard/ or default-dashboard/ via VITE_DEV_PROJECT. */
