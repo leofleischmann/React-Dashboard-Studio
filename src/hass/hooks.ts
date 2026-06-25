@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { hassStore } from './store';
 import type { HassEntity } from './types';
 import type { KnownEntityId } from './entityId';
+import {
+  fetchEntityHistory,
+  type HistoryPoint,
+} from './history';
 
 /**
  * Reactive access to one entity. Re-renders the component ONLY when this
@@ -121,4 +125,44 @@ export function callService(
 /** Raw hass object (for advanced custom dashboards using callApi, etc.). */
 export function getAppHass() {
   return hassStore.getHass();
+}
+
+export {
+  fetchEntityHistory,
+  type HistoryPoint,
+} from './history';
+
+/** Reactive recorder history for chart widgets. Refreshes on an interval. */
+export function useEntityHistory(
+  entityIds: string[],
+  options: { hours?: number; refreshMs?: number } = {},
+): Record<string, HistoryPoint[]> {
+  const { hours = 24, refreshMs = 180_000 } = options;
+  const ready = useHassReady();
+  const idsKey = entityIds.join('\0');
+  const [data, setData] = useState<Record<string, HistoryPoint[]>>({});
+
+  useEffect(() => {
+    if (!ready || entityIds.length === 0) return;
+
+    let cancelled = false;
+    const load = () => {
+      fetchEntityHistory(entityIds, hours)
+        .then((next) => {
+          if (!cancelled) setData(next);
+        })
+        .catch(() => {
+          /* recorder unavailable */
+        });
+    };
+
+    load();
+    const timer = setInterval(load, refreshMs);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [ready, idsKey, hours, refreshMs]);
+
+  return data;
 }
