@@ -64,6 +64,31 @@ export async function loadProject(): Promise<Project> {
   }
 }
 
+/** Live reload when integration options clear saved user_data (reset to default). */
+export function subscribeProjectReset(onReset: () => void): () => void {
+  const connection = hassStore.getHass()?.connection;
+  if (!connection?.subscribeMessage) return () => {};
+
+  let active = true;
+  let unsub: (() => void) | undefined;
+  void connection
+    .subscribeMessage<{ value: StoredV1 | null }>(
+      (msg) => {
+        if (!parseStored(msg?.value)) onReset();
+      },
+      { type: 'frontend/subscribe_user_data', key: KEY },
+    )
+    .then((fn) => {
+      if (active) unsub = fn;
+      else fn();
+    });
+
+  return () => {
+    active = false;
+    unsub?.();
+  };
+}
+
 export async function saveProject(project: Project): Promise<void> {
   if (localDashboardMode) {
     const res = await fetch(LOCAL_PROJECT_URL, {

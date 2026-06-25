@@ -26,6 +26,10 @@ export interface HassConnection {
     type: string;
     [key: string]: unknown;
   }) => Promise<T>;
+  subscribeMessage?: <T = unknown>(
+    callback: (msg: T) => void,
+    subscribeMessage: { type: string; [key: string]: unknown },
+  ) => Promise<() => void>;
 }
 
 export interface AppHass {

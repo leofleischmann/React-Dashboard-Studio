@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.core import callback
 
 from .const import DOMAIN, PANEL_TITLE
+from .options_flow import ReactDashboardStudioOptionsFlowHandler
 
 
 class ReactDashboardStudioConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Home Assistant Dashboard Studio."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Options under Geräte & Dienste → Integration → Optionen."""
+        return ReactDashboardStudioOptionsFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict | None = None

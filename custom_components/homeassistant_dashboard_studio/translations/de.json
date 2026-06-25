@@ -10,5 +10,19 @@
       "already_configured": "Home Assistant Dashboard Studio ist bereits eingerichtet.",
       "already_in_progress": "Die Einrichtung läuft bereits."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Standard-Dashboard wiederherstellen",
+        "description": "Löscht alle gespeicherten Dashboard-Dateien für **alle Benutzer** und lädt beim nächsten Öffnen des Panels wieder das Standard-Showcase aus der Integration.\n\n**Hinweis:** Nicht gespeicherte Änderungen im Editor gehen verloren. Das Panel nach dem Zurücksetzen einmal neu laden (F5).",
+        "data": {
+          "confirm_reset": "Ja, gespeichertes Dashboard löschen und Standard wiederherstellen"
+        }
+      }
+    },
+    "error": {
+      "not_confirmed": "Bitte die Bestätigung aktivieren."
+    }
   }
 }

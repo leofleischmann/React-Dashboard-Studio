@@ -11,7 +11,7 @@ import {
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
 import { clearCompileCache, compileProject } from './compile';
-import { loadProject, isLocalDashboardMode, saveProject } from './storage';
+import { loadProject, isLocalDashboardMode, saveProject, subscribeProjectReset } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
 import { availableModules } from '../sdk/runtime';
 import { Preview } from './Preview';
@@ -85,6 +85,20 @@ export default function Studio() {
       cancelled = true;
     };
   }, [ready, loaded]);
+
+  // Integration options → „Standard wiederherstellen“ clears frontend user_data.
+  useEffect(() => {
+    if (!ready || !loaded || localMode) return;
+    return subscribeProjectReset(() => {
+      fullRebuildRef.current = true;
+      clearCompileCache();
+      setProject(DEFAULT_PROJECT);
+      setSavedProject(DEFAULT_PROJECT);
+      setActivePath(DEFAULT_PROJECT.entry);
+      setMode('view');
+      hasCompiledRef.current = false;
+    });
+  }, [ready, loaded, localMode]);
 
   // VS Code / sync: reload when dashboard/ files change on disk.
   useEffect(() => {
