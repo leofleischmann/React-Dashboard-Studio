@@ -1,0 +1,3 @@
+/* Widget styles co-located under featured/ and cards/ — pulled in by src/styles.css */
+@import './featured/SunArc.css';
+@import './featured/LiveClock.css';

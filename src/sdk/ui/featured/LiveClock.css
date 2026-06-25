@@ -1,0 +1,25 @@
+.rd-clock { text-align: right; }
+.rd-clock__time {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.rd-clock__time strong {
+  font-size: clamp(2.4rem, 6vw, 3.3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.rd-clock__sec {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rd-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.rd-clock__date {
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+  text-transform: capitalize;
+}

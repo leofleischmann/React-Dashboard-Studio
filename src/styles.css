@@ -1,4 +1,12 @@
 /*
+ * Panel stylesheet (injected into the shadow root via mount.tsx ?inline).
+ *
+ * Widget CSS lives next to components (featured/*.css, cards/…); registered in
+ * sdk/ui/widget-styles.css. User code imports @ha/ui only — styles must ship here.
+ */
+@import './sdk/ui/widget-styles.css';
+
+/*
  * Rendered inside Home Assistant's light DOM, so HA theme variables
  * (--primary-color, --card-background-color, …) are available and used with
  * fallbacks — matching the user's theme in production, looking fine standalone.
@@ -587,104 +595,6 @@
   border-radius: 4px;
   border: 1px solid color-mix(in srgb, var(--rd-text) 18%, transparent);
 }
-
-/* ── Live clock ──────────────────────────────────────────── */
-.rd-clock { text-align: right; }
-.rd-clock__time {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 6px;
-}
-.rd-clock__time strong {
-  font-size: clamp(2.4rem, 6vw, 3.3rem);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-.rd-clock__sec {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--rd-text-2);
-  font-variant-numeric: tabular-nums;
-}
-.rd-clock__date {
-  font-size: 0.85rem;
-  color: var(--rd-text-2);
-  text-transform: capitalize;
-}
-
-/* ── Sun arc ─────────────────────────────────────────────── */
-.rd-sunarc {
-  padding: 10px 12px 12px;
-  border-radius: var(--rd-radius);
-  border: 1px solid var(--rd-border);
-  overflow: hidden;
-  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
-}
-.rd-sunarc__svg { width: 100%; height: auto; display: block; }
-.rd-sunarc__horizon {
-  stroke: color-mix(in srgb, var(--rd-text) 28%, transparent);
-  stroke-width: 1.5;
-}
-.rd-sunarc--night .rd-sunarc__horizon {
-  stroke: color-mix(in srgb, #a8b4ff 35%, transparent);
-}
-.rd-sunarc__celestial {
-  transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-@media (prefers-reduced-motion: reduce) {
-  .rd-sunarc__celestial { transition: none; }
-}
-.rd-sunarc__body { filter: drop-shadow(0 0 6px currentColor); }
-.rd-sunarc__body.is-day { fill: #ffcf5c; color: #ffcf5c; }
-.rd-sunarc__star {
-  fill: #fff;
-  opacity: 0.75;
-}
-.rd-sunarc__glow-haze {
-  fill: #ff9f43;
-  opacity: 0.18;
-  filter: blur(8px);
-}
-.rd-sunarc__rays { opacity: 0.55; }
-.rd-sunarc__ray {
-  stroke: #ffcf5c;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-}
-.rd-sunarc__moon-body {
-  fill: #e8eeff;
-  filter: drop-shadow(0 0 5px #cdd6ff);
-}
-.rd-sunarc__moon-shadow {
-  fill: color-mix(in srgb, var(--rd-card-bg) 55%, #0a0e1f);
-}
-.rd-sunarc__labels {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: 4px;
-}
-.rd-sunarc__labels > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-.rd-sunarc__labels strong { font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-.rd-sunarc__labels small { color: var(--rd-text-2); font-size: 0.64rem; }
-.rd-sunarc__elev strong { color: var(--rd-accent); }
-.rd-sunarc__ico { color: var(--rd-text-2); font-size: 0.8rem; }
-.rd-sunarc__remaining {
-  margin: 6px 0 0;
-  text-align: center;
-  font-size: 0.72rem;
-  color: var(--rd-text-2);
-  font-variant-numeric: tabular-nums;
-}
-.rd-sunarc--golden .rd-sunarc__remaining { color: #e8a54b; }
 
 /* ── KPI tiles ───────────────────────────────────────────── */
 .rd-kpis {
