@@ -1,10 +1,8 @@
-// Local ⇄ Home Assistant sync for your dashboard project.
+// Local ⇄ Home Assistant sync for your dashboard workspace.
 //
-//   node scripts/sync.mjs pull    # HA  → ./dashboard
+//   node scripts/sync.mjs pull    # HA  → ./dashboard/{project}/
 //   node scripts/sync.mjs push    # ./dashboard → HA
 //   node scripts/sync.mjs watch   # push once, then push on every save
-//
-// Config: .env.local (same as `npm run dev`).
 
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
@@ -14,27 +12,19 @@ import { fileURLToPath } from 'node:url';
 import WebSocket from 'ws';
 import { validateDashboardProject } from './compile-check.mjs';
 import {
-  ENTRY_DEFAULT,
   DASHBOARD_DIR,
-  filterDashboardFiles,
   isDashboardCodeFile,
-  listLocalFiles,
-  pruneLocalOrphans,
-  readEntry,
-  writeEntry,
-  writeLocalFiles,
+  readLocalWorkspace,
+  writeLocalWorkspaceFromRemote,
 } from './dashboard-local.mjs';
 import { generateEntityTypes } from './gen-entity-types.mjs';
 import { generateSdkReference } from './gen-sdk-reference.mjs';
-import {
-  filesHash,
-  readSyncState,
-  writeSyncState,
-} from './sync-state.mjs';
+import { readSyncState, workspaceHash, writeSyncState } from './sync-state.mjs';
+import { migrateToWorkspace, normalizeWorkspace } from './workspace.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const WS_GET = 'homeassistant_dashboard_studio/get_project';
-const WS_SAVE = 'homeassistant_dashboard_studio/save_project';
+const WS_GET = 'homeassistant_dashboard_studio/get_workspace';
+const WS_SAVE = 'homeassistant_dashboard_studio/save_workspace';
 
 function loadEnv() {
   const env = { ...process.env };
@@ -126,15 +116,28 @@ function connect() {
   });
 }
 
-async function validateLocalDashboardOrConfirm() {
-  const files = listLocalFiles();
-  if (Object.keys(files).length === 0) return;
+function validateWorkspaceProjects(workspace, label) {
+  let total = 0;
+  for (const [id, project] of Object.entries(workspace.projects)) {
+    const { count } = validateDashboardProject({
+      files: project.files,
+      entry: project.entry,
+      label: `${label}${id}/`,
+    });
+    total += count;
+  }
+  return total;
+}
+
+async function validateLocalWorkspaceOrConfirm() {
+  const local = readLocalWorkspace();
+  if (!local) return;
 
   console.log('🔍 Lokales dashboard/ prüfen …');
-  const entry = readEntry();
   try {
-    const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
-    console.log(`✓ dashboard/ kompiliert (${count} Datei(en)).`);
+    const count = validateWorkspaceProjects(local, 'dashboard/');
+    const ids = Object.keys(local.projects).join(', ');
+    console.log(`✓ dashboard/ kompiliert (${count} Datei(en), Projekte: ${ids}).`);
   } catch (err) {
     console.error(`✗ ${err.message}`);
     const ok = await confirm('Trotzdem von HA laden (pull)?');
@@ -144,17 +147,17 @@ async function validateLocalDashboardOrConfirm() {
   }
 }
 
-async function warnPullConflict(localFiles, localEntry, remoteFiles, remoteEntry) {
-  if (Object.keys(localFiles).length === 0) return true;
+async function warnPullConflict(localWorkspace, remoteWorkspace) {
+  if (!localWorkspace || !Object.keys(localWorkspace.projects).length) return true;
 
   const meta = readSyncState();
-  const localHash = filesHash(localFiles, localEntry);
-  const remoteHash = filesHash(remoteFiles, remoteEntry);
+  const localHash = workspaceHash(localWorkspace);
+  const remoteHash = workspaceHash(remoteWorkspace);
 
   let reason = null;
-  if (meta?.filesHash && localHash !== meta.filesHash) {
+  if (meta?.workspaceHash && localHash !== meta.workspaceHash) {
     reason = 'Lokale Änderungen seit dem letzten Sync (nicht gepusht).';
-  } else if (!meta?.filesHash && localHash !== remoteHash) {
+  } else if (!meta?.workspaceHash && localHash !== remoteHash) {
     reason = 'Lokales dashboard/ weicht von HA ab (noch nie synchronisiert).';
   }
 
@@ -170,57 +173,46 @@ async function warnPullConflict(localFiles, localEntry, remoteFiles, remoteEntry
 }
 
 async function pull(conn) {
-  await validateLocalDashboardOrConfirm();
+  await validateLocalWorkspaceOrConfirm();
 
-  const localFiles = listLocalFiles();
-  const localEntry = readEntry();
+  const localWorkspace = readLocalWorkspace();
 
   const res = await conn.call({ type: WS_GET });
-  const value = res?.project;
-  if (!value?.files || Object.keys(value.files).length === 0) {
+  const remoteWorkspace =
+    normalizeWorkspace(res?.workspace) ?? migrateToWorkspace(res?.workspace);
+  if (!remoteWorkspace) {
     console.log('In HA ist noch kein Dashboard gespeichert – nichts zu laden.');
     return;
   }
 
-  const remoteFiles = filterDashboardFiles(value.files);
-  if (Object.keys(remoteFiles).length === 0) {
-    console.log('In HA sind keine Dashboard-Code-Dateien gespeichert – nichts zu laden.');
-    return;
-  }
-
-  const remoteEntry = value.entry || ENTRY_DEFAULT;
-
-  console.log('🔍 HA-Dashboard prüfen …');
+  console.log('🔍 HA-Dashboards prüfen …');
   try {
-    validateDashboardProject({
-      files: remoteFiles,
-      entry: remoteEntry,
-      label: 'HA-Dashboard',
-    });
-    console.log(`✓ HA-Dashboard kompiliert (${Object.keys(remoteFiles).length} Datei(en)).`);
+    const count = validateWorkspaceProjects(remoteWorkspace, 'HA/');
+    const ids = Object.keys(remoteWorkspace.projects).join(', ');
+    console.log(`✓ HA-Workspace kompiliert (${count} Datei(en), Projekte: ${ids}).`);
   } catch (err) {
     console.error(`✗ ${err.message}`);
-    const ok = await confirm('Fehlerhaftes HA-Dashboard trotzdem laden?');
-    if (!ok) throw new Error('Pull abgebrochen — HA-Dashboard hat Compile-Fehler.');
+    const ok = await confirm('Fehlerhafte HA-Dashboards trotzdem laden?');
+    if (!ok) throw new Error('Pull abgebrochen — HA-Workspace hat Compile-Fehler.');
   }
 
-  if (!(await warnPullConflict(localFiles, localEntry, remoteFiles, remoteEntry))) {
+  if (!(await warnPullConflict(localWorkspace, remoteWorkspace))) {
     console.log('Pull abgebrochen. Tipp: npm run sync:push zum Hochladen.');
     return;
   }
 
-  writeLocalFiles(remoteFiles);
-  const removed = pruneLocalOrphans(Object.keys(remoteFiles));
-  writeEntry(remoteEntry);
-  writeSyncState({ files: remoteFiles, entry: remoteEntry, direction: 'pull' });
+  writeLocalWorkspaceFromRemote(remoteWorkspace);
+  writeSyncState({ workspace: remoteWorkspace, direction: 'pull' });
 
-  console.log(
-    `⬇️  ${Object.keys(remoteFiles).length} Datei(en) nach dashboard/ geladen ` +
-      `(Einstieg: ${remoteEntry}).`,
+  const projectCount = Object.keys(remoteWorkspace.projects).length;
+  const fileCount = Object.values(remoteWorkspace.projects).reduce(
+    (n, p) => n + Object.keys(p.files).length,
+    0,
   );
-  if (removed.length > 0) {
-    console.log(`   🗑  ${removed.length} veraltete lokale Datei(en) entfernt: ${removed.join(', ')}`);
-  }
+  console.log(
+    `⬇️  ${fileCount} Datei(en) in ${projectCount} Projekt(en) nach dashboard/ geladen ` +
+      `(aktiv: ${remoteWorkspace.activeId}).`,
+  );
 
   console.log('🏷  SDK-Referenz + Entity-Typen generieren …');
   try {
@@ -236,34 +228,38 @@ async function pull(conn) {
 }
 
 async function push(conn) {
-  const files = listLocalFiles();
-  if (Object.keys(files).length === 0) {
-    throw new Error('Keine Code-Dateien in dashboard/ gefunden – erst "pull" oder Dateien anlegen.');
+  const workspace = readLocalWorkspace();
+  if (!workspace || !Object.keys(workspace.projects).length) {
+    throw new Error(
+      'Kein dashboard/ Workspace gefunden – erst "pull" oder Projekte anlegen.',
+    );
   }
 
   console.log('🔍 Lokales dashboard/ prüfen …');
-  let entry = readEntry();
-  if (!files[entry]) entry = files[ENTRY_DEFAULT] ? ENTRY_DEFAULT : Object.keys(files).sort()[0];
-  const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
-  console.log(`✓ dashboard/ kompiliert (${count} Datei(en)).`);
+  const count = validateWorkspaceProjects(workspace, 'dashboard/');
+  const ids = Object.keys(workspace.projects).join(', ');
+  console.log(`✓ dashboard/ kompiliert (${count} Datei(en), Projekte: ${ids}).`);
 
   const res = await conn.call({ type: WS_GET });
-  const remoteCode = filterDashboardFiles(res?.project?.files ?? {});
-  const removed = Object.keys(remoteCode).filter((path) => !(path in files));
+  const remote =
+    normalizeWorkspace(res?.workspace) ?? migrateToWorkspace(res?.workspace);
+  const remoteIds = new Set(Object.keys(remote?.projects ?? {}));
+  const removed = [...remoteIds].filter((id) => !(id in workspace.projects));
 
-  await conn.call({
-    type: WS_SAVE,
-    project: { files, entry },
-  });
-  writeSyncState({ files, entry, direction: 'push' });
+  await conn.call({ type: WS_SAVE, workspace });
+  writeSyncState({ workspace, direction: 'push' });
 
+  const fileCount = Object.values(workspace.projects).reduce(
+    (n, p) => n + Object.keys(p.files).length,
+    0,
+  );
   const stamp = new Date().toLocaleTimeString();
   console.log(
-    `⬆️  [${stamp}] ${Object.keys(files).length} Datei(en) zu HA gepusht ` +
-      `(Einstieg: ${entry}). Studio/Dashboard neu laden zum Sehen.`,
+    `⬆️  [${stamp}] ${fileCount} Datei(en) in ${Object.keys(workspace.projects).length} Projekt(en) zu HA gepusht ` +
+      `(aktiv: ${workspace.activeId}). Studio neu laden zum Sehen.`,
   );
   if (removed.length > 0) {
-    console.log(`   🗑  ${removed.length} entfernte Datei(en) in HA gelöscht: ${removed.join(', ')}`);
+    console.log(`   🗑  ${removed.length} entfernte Projekt(e) in HA gelöscht: ${removed.join(', ')}`);
   }
 }
 
@@ -287,6 +283,7 @@ async function watch(conn) {
   watchFs(DASHBOARD_DIR, { recursive: true }, (_event, filename) => {
     if (!filename) return;
     const base = filename.replace(/\\/g, '/').split('/').pop() ?? '';
+    if (base === '.studio.json' || base === '.studio-sync.json') return;
     if (!isDashboardCodeFile(base)) return;
     schedulePush();
   });

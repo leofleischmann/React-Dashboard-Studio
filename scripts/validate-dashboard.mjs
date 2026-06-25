@@ -1,26 +1,32 @@
-// Validate ./dashboard/ compiles (npm run check:dashboard).
+// Validate ./dashboard/ workspace compiles (npm run check:dashboard).
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  ENTRY_DEFAULT,
-  listLocalFiles,
-  readEntry,
-} from './dashboard-local.mjs';
+import { readLocalWorkspace } from './dashboard-local.mjs';
 import { validateDashboardProject } from './compile-check.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const files = listLocalFiles();
-if (Object.keys(files).length === 0) {
-  console.error('Kein dashboard/ Projekt gefunden.');
+const workspace = readLocalWorkspace();
+if (!workspace || !Object.keys(workspace.projects).length) {
+  console.error('Kein dashboard/ Workspace gefunden.');
   process.exit(1);
 }
 
-const entry = readEntry();
+let total = 0;
 try {
-  const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
-  console.log(`✓ dashboard/ OK — ${count} Datei(en), Einstieg "${entry || ENTRY_DEFAULT}".`);
+  for (const [id, project] of Object.entries(workspace.projects)) {
+    const { count } = validateDashboardProject({
+      files: project.files,
+      entry: project.entry,
+      label: `dashboard/${id}/`,
+    });
+    total += count;
+  }
+  const ids = Object.keys(workspace.projects).join(', ');
+  console.log(
+    `✓ dashboard/ OK — ${total} Datei(en), Projekte: ${ids}, aktiv "${workspace.activeId}".`,
+  );
 } catch (err) {
   console.error(`✗ ${err.message}`);
   process.exit(1);

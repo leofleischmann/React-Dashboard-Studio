@@ -5,10 +5,19 @@ import { DASHBOARD_DIR } from './dashboard-local.mjs';
 
 export const SYNC_META_FILE = join(DASHBOARD_DIR, '.studio-sync.json');
 
-/** Stable hash of dashboard code files (ignores helper files). */
-export function filesHash(files, entry) {
-  const payload = JSON.stringify({ entry, files });
+/** Stable hash of the full workspace. */
+export function workspaceHash(workspace) {
+  const payload = JSON.stringify(workspace);
   return createHash('sha256').update(payload).digest('hex').slice(0, 16);
+}
+
+/** @deprecated */
+export function filesHash(files, entry) {
+  return workspaceHash({
+    version: 2,
+    activeId: entry,
+    projects: { sync: { name: 'sync', entry, files } },
+  });
 }
 
 export function readSyncState() {
@@ -20,13 +29,14 @@ export function readSyncState() {
   }
 }
 
-export function writeSyncState({ files, entry, direction }) {
+export function writeSyncState({ workspace, direction }) {
   writeFileSync(
     SYNC_META_FILE,
     JSON.stringify(
       {
-        entry,
-        filesHash: filesHash(files, entry),
+        workspaceHash: workspaceHash(workspace),
+        activeId: workspace.activeId,
+        projectIds: Object.keys(workspace.projects).sort(),
         syncedAt: new Date().toISOString(),
         direction,
       },
@@ -36,8 +46,9 @@ export function writeSyncState({ files, entry, direction }) {
   );
 }
 
-export function localHasUnsyncedChanges(localFiles, entry) {
+export function localHasUnsyncedChanges(localWorkspace) {
+  if (!localWorkspace) return false;
   const meta = readSyncState();
-  if (!meta?.filesHash) return Object.keys(localFiles).length > 0;
-  return filesHash(localFiles, entry) !== meta.filesHash;
+  if (!meta?.workspaceHash) return Object.keys(localWorkspace.projects).length > 0;
+  return workspaceHash(localWorkspace) !== meta.workspaceHash;
 }

@@ -13,8 +13,23 @@ import { projectUsesDefaultDashboardStyles } from '../lib/projectUsesDefaultStyl
 import { syncDefaultDashboardStyles } from '../mount';
 import { useRenderRoot } from './shadowRoot';
 import { clearCompileCache, compileProject } from './compile';
-import { loadProject, isLocalDashboardMode, saveProject, subscribeProjectReset } from './storage';
+import {
+  isLocalDashboardMode,
+  loadStudioState,
+  saveStudioState,
+  subscribeWorkspaceReset,
+  blankProject,
+} from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
+import {
+  createWorkspaceProject,
+  deleteWorkspaceProject,
+  projectFromWorkspace,
+  renameWorkspaceProject,
+  withActiveProject,
+  type Workspace,
+} from './workspace';
+import { ProjectSwitcher } from './ProjectSwitcher';
 import { Preview } from './Preview';
 
 const loadEditorModule = () => import('./studio-editor-module');
@@ -40,6 +55,9 @@ export default function Studio() {
   const ready = useHassReady();
   const mobile = useIsMobile();
 
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [savedWorkspace, setSavedWorkspace] = useState<Workspace | null>(null);
+  const [activeId, setActiveId] = useState('default');
   const [project, setProject] = useState<Project>(DEFAULT_PROJECT);
   const [savedProject, setSavedProject] = useState<Project>(DEFAULT_PROJECT);
   const [activePath, setActivePath] = useState<string>(DEFAULT_PROJECT.entry);
@@ -69,13 +87,20 @@ export default function Studio() {
   useEffect(() => {
     if (!ready || loaded) return;
     let cancelled = false;
-    loadProject().then((p) => {
+    loadStudioState().then((state) => {
       if (cancelled) return;
       const fromLocal = isLocalDashboardMode();
       setLocalMode(fromLocal);
-      setProject(p);
-      setSavedProject(p);
-      setActivePath(p.files[p.entry] !== undefined ? p.entry : Object.keys(p.files)[0]);
+      setWorkspace(state.workspace);
+      setSavedWorkspace(state.workspace);
+      setActiveId(state.activeId);
+      setProject(state.project);
+      setSavedProject(state.project);
+      setActivePath(
+        state.project.files[state.project.entry] !== undefined
+          ? state.project.entry
+          : Object.keys(state.project.files)[0],
+      );
       setLoaded(true);
       fullRebuildRef.current = true;
     });
@@ -86,9 +111,19 @@ export default function Studio() {
 
   useEffect(() => {
     if (!ready || !loaded || localMode) return;
-    return subscribeProjectReset(() => {
+    return subscribeWorkspaceReset(() => {
+      const fallback: Workspace = {
+        version: 2,
+        activeId: 'default',
+        projects: {
+          default: { name: 'Dashboard', ...DEFAULT_PROJECT },
+        },
+      };
       fullRebuildRef.current = true;
       clearCompileCache();
+      setWorkspace(fallback);
+      setSavedWorkspace(fallback);
+      setActiveId('default');
       setProject(DEFAULT_PROJECT);
       setSavedProject(DEFAULT_PROJECT);
       setActivePath(DEFAULT_PROJECT.entry);
@@ -101,12 +136,17 @@ export default function Studio() {
     if (!import.meta.hot) return;
     const reloadFromDisk = async () => {
       if (!isLocalDashboardMode()) return;
-      const p = await loadProject();
+      const state = await loadStudioState();
       fullRebuildRef.current = true;
       clearCompileCache();
-      setProject(p);
-      setSavedProject(p);
-      setActivePath((prev) => (p.files[prev] !== undefined ? prev : p.entry));
+      setWorkspace(state.workspace);
+      setSavedWorkspace(state.workspace);
+      setActiveId(state.activeId);
+      setProject(state.project);
+      setSavedProject(state.project);
+      setActivePath((prev) =>
+        state.project.files[prev] !== undefined ? prev : state.project.entry,
+      );
       hasCompiledRef.current = false;
     };
     import.meta.hot.on('dashboard-changed', reloadFromDisk);
@@ -143,17 +183,100 @@ export default function Studio() {
     if (mobile && mode === 'edit') setMode('view');
   }, [mobile, mode]);
 
-  const dirty = serialize(project) !== serialize(savedProject);
+  const dirty =
+    serialize(project) !== serialize(savedProject) ||
+    JSON.stringify(workspace) !== JSON.stringify(savedWorkspace);
+
+  const persistWorkspace = useCallback(
+    (nextWorkspace: Workspace, nextActiveId: string, nextProject: Project) => {
+      setWorkspace(nextWorkspace);
+      setActiveId(nextActiveId);
+      setProject(nextProject);
+      setActivePath(
+        nextProject.files[nextProject.entry] !== undefined
+          ? nextProject.entry
+          : Object.keys(nextProject.files)[0],
+      );
+      fullRebuildRef.current = true;
+      clearCompileCache();
+      hasCompiledRef.current = false;
+    },
+    [],
+  );
+
+  const switchProject = useCallback(
+    (id: string) => {
+      if (!workspace || id === activeId) return;
+      if (dirty && !window.confirm('Ungespeicherte Änderungen verwerfen?')) return;
+
+      const base = dirty
+        ? savedWorkspace!
+        : withActiveProject(workspace, activeId, project);
+      const nextWs = { ...base, activeId: id };
+      const nextProject = projectFromWorkspace(nextWs, id) ?? blankProject();
+      setSavedWorkspace(nextWs);
+      setSavedProject(nextProject);
+      persistWorkspace(nextWs, id, nextProject);
+    },
+    [workspace, activeId, project, dirty, savedWorkspace, persistWorkspace],
+  );
+
+  const createProject = useCallback(
+    (name: string) => {
+      if (!workspace) return;
+      if (dirty && !window.confirm('Ungespeicherte Änderungen verwerfen?')) return;
+
+      const base = dirty
+        ? savedWorkspace!
+        : withActiveProject(workspace, activeId, project);
+      const { workspace: nextWs, id } = createWorkspaceProject(base, name, blankProject());
+      const nextProject = projectFromWorkspace(nextWs, id)!;
+      setSavedWorkspace(nextWs);
+      setSavedProject(nextProject);
+      persistWorkspace(nextWs, id, nextProject);
+    },
+    [workspace, activeId, project, dirty, savedWorkspace, persistWorkspace],
+  );
+
+  const renameProject = useCallback(
+    (id: string, name: string) => {
+      if (!workspace) return;
+      const nextWs = renameWorkspaceProject(workspace, id, name);
+      setWorkspace(nextWs);
+    },
+    [workspace],
+  );
+
+  const removeProject = useCallback(
+    (id: string) => {
+      if (!workspace) return;
+      if (dirty && !window.confirm('Ungespeicherte Änderungen verwerfen?')) return;
+      const base = dirty
+        ? savedWorkspace!
+        : withActiveProject(workspace, activeId, project);
+      const nextWs = deleteWorkspaceProject(base, id);
+      if (!nextWs) return;
+      const nextProject = projectFromWorkspace(nextWs, nextWs.activeId) ?? DEFAULT_PROJECT;
+      setSavedWorkspace(nextWs);
+      setSavedProject(nextProject);
+      persistWorkspace(nextWs, nextWs.activeId, nextProject);
+    },
+    [workspace, activeId, project, dirty, savedWorkspace, persistWorkspace],
+  );
 
   const save = useCallback(async () => {
+    if (!workspace) return;
     try {
-      await saveProject(project);
+      await saveStudioState(workspace, activeId, project);
+      const merged = withActiveProject(workspace, activeId, project);
+      setWorkspace(merged);
+      setSavedWorkspace(merged);
       setSavedProject(project);
       setError(null);
     } catch (err) {
       setError(`Speichern fehlgeschlagen: ${(err as Error).message}`);
     }
-  }, [project]);
+  }, [workspace, activeId, project]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -225,7 +348,7 @@ export default function Studio() {
     }
   }, []);
 
-  if (!ready || !loaded) {
+  if (!ready || !loaded || !workspace) {
     return (
       <div className="rd-center">
         <div className="rd-spinner" />
@@ -304,6 +427,17 @@ export default function Studio() {
         )}
 
         <span className="rd-studio__title">Dashboard Studio</span>
+
+        {workspace && !mobile && (
+          <ProjectSwitcher
+            workspace={{ ...workspace, activeId }}
+            disabled={editing && dirty}
+            onSwitch={switchProject}
+            onCreate={createProject}
+            onRename={renameProject}
+            onDelete={removeProject}
+          />
+        )}
 
         {localMode && (
           <span className="rd-studio__local" title="Projekt aus ./dashboard/ (VS Code)">

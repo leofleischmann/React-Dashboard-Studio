@@ -1,15 +1,14 @@
-// Vite plugin: serve ./dashboard/ to the local dev Studio (live preview + entity
-// inserter over WebSocket). Watches dashboard/ and notifies the browser on save.
+// Vite plugin: serve ./dashboard/ workspace to the local dev Studio.
 
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   DASHBOARD_DIR,
-  readLocalProject,
-  writeLocalProject,
+  readLocalWorkspace,
+  writeLocalWorkspace,
 } from './dashboard-local.mjs';
 
-const API = '/__dashboard/project.json';
+const API = '/__dashboard/workspace.json';
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -36,10 +35,10 @@ export function dashboardDevPlugin() {
         if (req.url !== API) return next();
 
         if (req.method === 'GET' || req.method === 'HEAD') {
-          const project = readLocalProject();
-          if (!project) {
+          const workspace = readLocalWorkspace();
+          if (!workspace) {
             res.statusCode = 404;
-            res.end(JSON.stringify({ error: 'Kein dashboard/ Projekt gefunden.' }));
+            res.end(JSON.stringify({ error: 'Kein dashboard/ Workspace gefunden.' }));
             return;
           }
           res.setHeader('Content-Type', 'application/json');
@@ -48,15 +47,15 @@ export function dashboardDevPlugin() {
             res.end();
             return;
           }
-          res.end(JSON.stringify(project));
+          res.end(JSON.stringify(workspace));
           return;
         }
 
         if (req.method === 'PUT') {
           try {
             const raw = await readBody(req);
-            const project = JSON.parse(raw);
-            writeLocalProject(project);
+            const workspace = JSON.parse(raw);
+            writeLocalWorkspace(workspace);
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ ok: true }));
