@@ -17,7 +17,7 @@ async def async_reset_all_dashboard_projects(hass: HomeAssistant) -> int:
     from homeassistant.components.frontend.storage import async_user_store
 
     cleared = 0
-    for user in hass.auth.async_get_users():
+    for user in await hass.auth.async_get_users():
         try:
             store = await async_user_store(hass, user.id)
         except Exception:  # noqa: BLE001 — skip broken stores
