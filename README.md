@@ -1,28 +1,32 @@
-# <img src="https://raw.githubusercontent.com/leofleischmann/Home-Assistant-Dashboard-Studio/main/images/icon.png" width="36" align="top" alt=""> Home Assistant Dashboard Studio für Home Assistant
+# <img src="https://raw.githubusercontent.com/leofleischmann/Home-Assistant-Dashboard-Studio/main/images/icon.png" width="36" align="top" alt=""> Home Assistant Dashboard Studio
 
-![Home Assistant Dashboard Studio — Code-Editor mit Live-Vorschau](https://raw.githubusercontent.com/leofleischmann/Home-Assistant-Dashboard-Studio/main/images/preview.png)
+![Preview](https://raw.githubusercontent.com/leofleischmann/Home-Assistant-Dashboard-Studio/main/images/preview.png)
 
-React-Dashboard als **Custom Panel** in Home Assistant: JSX schreiben, live im Browser ansehen, in HA speichern. Installierbar über **HACS** — für normale Nutzung brauchst du **kein Node.js** auf dem Rechner.
+## The problem
 
----
+Home Assistant dashboards are great for quick cards, but painful when you want **real UI code**: reusable components, live entity data, charts, and layouts you fully control. YAML and card stacks hit a ceiling fast.
 
-## Installation (HACS)
+## The solution
 
-1. **HACS → Integrations → ⋮ → Custom repositories**
-   - URL: `https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio`
-   - Kategorie: **Integration** (nicht Dashboard)
-2. **HACS → Integrations** → **Home Assistant Dashboard Studio** → Download → **Home Assistant neu starten**
-3. **Einstellungen → Geräte & Dienste → Integration hinzufügen** → **Home Assistant Dashboard Studio**
+**Home Assistant Dashboard Studio** is a Home Assistant **custom panel** with a built-in code editor and **live preview**. You write JSX against a small SDK (`@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`), save in HA, and run it as a panel — **no Node.js on your HA server**, no `configuration.yaml` entry. Code survives HACS updates and normal backups.
 
-Kein Eintrag in der `configuration.yaml` nötig. Dein Dashboard-Code wird in HA gespeichert und überlebt HACS-Updates sowie normale Backups.
+Fresh installs ship a **showcase dashboard** (Widgets, Charts, Hooks, Layout, Format) you can replace anytime.
 
 ---
 
-## Dashboard bauen (in Home Assistant)
+## Install (HACS)
+
+1. **HACS → Integrations → ⋮ → Custom repositories** → `https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio` (category: **Integration**)
+2. Install **Home Assistant Dashboard Studio** → restart HA
+3. **Settings → Devices & services → Add integration** → **Home Assistant Dashboard Studio**
+
+---
+
+## Build a dashboard (in HA)
 
 1. Sidebar → **Dashboard Studio**
-2. **✎ Bearbeiten** — links Dateien & Editor, rechts Live-Vorschau
-3. **Strg/⌘ + S** speichert · **◀ Ansicht** zeigt das Dashboard im Vollbild
+2. **✎ Edit** — files + editor on the left, live preview on the right
+3. **Ctrl/⌘ + S** to save · **◀ View** for fullscreen
 
 ```tsx
 import { useEntity } from '@ha';
@@ -30,77 +34,50 @@ import { Stat } from '@ha/ui';
 import { num } from '@ha/format';
 
 export default function Dashboard() {
-  const temp = useEntity('sensor.aussentemperatur');
-  return <Stat label="Außen" value={num(temp?.state)} unit="°C" />;
+  const temp = useEntity('sensor.outdoor_temperature');
+  return <Stat label="Outside" value={num(temp?.state)} unit="°C" />;
 }
 ```
 
-| Thema | Kurz |
+| Topic | Notes |
 | --- | --- |
-| **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
-| **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (Entities + **Galerie**), Domain-Filter |
-| **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
-| **Erstinstallation** | SDK-Showcase aus `default-dashboard/` (Home, Widgets, Charts, Hooks, Layout, Format) — ersetzbar via ✎ Bearbeiten |
-| **Mobil** | Nur Anzeige, kein Editor |
+| **Files** | Multi-file projects in the file panel; `./components/Card.tsx` imports work. ⌂ = entry file |
+| **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or widget snippets + gallery |
+| **Modules** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` only |
+| **Mobile** | View-only, no editor |
+
+### SDK (short)
+
+| Module | What you get |
+| --- | --- |
+| `@ha` | Entity hooks, history, logbook, weather, energy, templates, persistent state, `callService`, … |
+| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) |
+| `@ha/layout` | `PageShell`, `Tabs`, grids, routing helpers |
+| `@ha/format` | Numbers, labels, time, icons |
+
+Explore the **Hooks**, **Widgets**, and **Format** pages in the default dashboard. [Releases](https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/releases) for changelog.
 
 ---
 
-## Optional: VS Code + Live-Vorschau
+## Local dev (optional)
 
-**Für wen:** Du willst in **VS Code** (Git, Autocomplete) arbeiten, aber echte Sensorwerte aus HA sehen — ohne das Studio in HA parallel offen zu haben.
-
-**Voraussetzung:** Dieses Repo **von GitHub klonen** (nicht der HACS-Download). Node.js installiert.
+Clone this repo (not the HACS zip), use **VS Code + live HA data**:
 
 ```bash
 npm install
-cp .env.local.example .env.local   # VITE_HASS_URL + VITE_HASS_TOKEN eintragen
-npm run sync:pull                  # Dashboard aus HA → ./dashboard/ (+ gen:types)
+cp .env.local.example .env.local   # VITE_HASS_URL + long-lived token
+npm run sync:pull                  # HA → ./dashboard/
+npm run dev                        # preview + entity snippets
 ```
 
-Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → erstellen.
-
-**Windows:** `studio.bat` — interaktives Menü für alle npm-Befehle.
-
-| Befehl | Wann |
-| --- | --- |
-| `npm run dev` | Nur **Live-Vorschau** + **⚡ Entities** (Snippet kopieren) · Code in VS Code |
-| `npm run sync:watch` | Optional parallel: Push (mit Compile-Check) bei jedem Speichern |
-| `npm run sync:pull` / `sync:push` | Laden / Hochladen · `pull` prüft lokal + warnt bei Konflikten |
-| `npm run check:dashboard` | `./dashboard/` manuell auf Compile-Fehler prüfen |
-| `npm run dev:default` | Live-Vorschau des **HACS-Start-Dashboards** (`default-dashboard/`) |
-| `npm run check:default` | `default-dashboard/` auf Compile-Fehler prüfen |
-| `npm run gen:types` | Manuell: Entity-Liste (läuft automatisch bei `sync:pull`) |
-
-**Typischer Ablauf:** Terminal 1 → `npm run dev` (Vorschau) · VS Code → `./dashboard/` · Terminal 2 optional → `npm run sync:watch` (Push inkl. Löschen entfernter Dateien in HA).
-
-Oben **📁 dashboard/** = lokaler Modus (nur Entwicklung, Ordner ist **gitignored** — dein persönliches Projekt, nicht das HACS-Start-Dashboard). **⚡ Entities** öffnet den Browser zum Kopieren von Snippets. `sync:pull` validiert `./dashboard/` vor dem Laden und warnt, wenn lokale Änderungen noch nicht gepusht wurden.
-
-Release-Notes werden automatisch aus den Git-Commits seit dem letzten Tag erzeugt und erscheinen in [GitHub Releases](https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/releases) (HACS zeigt diese an). Lokal vorab ansehen: `npm run release:notes -- 0.4.3`.
+`npm run sync:watch` pushes on save. Windows: `studio.bat`. `./dashboard/` is gitignored (your project, not the HACS starter).
 
 ---
 
-## API-Referenz (Kurz)
-
-| Modul | Inhalt |
-| --- | --- |
-| `@ha` | `useEntity`, `useEntityHistory`, `useEntityStatistics`, `useAreas`, `useTheme`, `callService`, … |
-| `@ha/ui` | `Stat`, `SparkChart`, `LightTile`, `ClimateCard`, `PageShell`-Widgets, Domain-Cards, … |
-| `@ha/layout` | `PageShell`, `Tabs`, `Stack`, `Row`, `ResponsiveGrid`, `useHashRoute` |
-| `@ha/format` | `num`, `temp`, `stateLabel`, `relativeTime`, `entityDisplayName`, … |
-| `react` | React inkl. Hooks |
-
-Details: [GitHub Releases](https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/releases).
-
----
-
-## Optional: Panel selbst erweitern
-
-Nur wenn du **diese Integration** (Editor, API, Widgets) weiterentwickelst — nicht für normales Dashboard-Bauen:
+## Contributing to the panel itself
 
 ```bash
 npm run build   # → custom_components/homeassistant_dashboard_studio/dashboard.js
 ```
 
-Neue Exports in `src/sdk/` (Hooks, UI, Layout, Format) und in [`src/sdk/runtime.ts`](src/sdk/runtime.ts) registrieren. Das Start-Dashboard liegt in [`default-dashboard/`](default-dashboard/) — nach Änderungen `npm run embed:default` (läuft automatisch bei `npm run build`).
-
----
+Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). Starter dashboard: [`default-dashboard/`](default-dashboard/).
