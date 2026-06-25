@@ -8,18 +8,16 @@ import {
   type ComponentType,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
-import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
 import { clearCompileCache, compileProject } from './compile';
 import { loadProject, isLocalDashboardMode, saveProject, subscribeProjectReset } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
-import { availableModules } from '../sdk/runtime';
 import { Preview } from './Preview';
-import { FilePanel } from './FilePanel';
-import { EntityInserter } from './EntityInserter';
 
-const Editor = lazy(() =>
-  import('./Editor').then((m) => ({ default: m.Editor })),
+const loadEditorModule = () => import('./studio-editor-module');
+const StudioEditorLayout = lazy(() => loadEditorModule());
+const DevEntityInserter = lazy(() =>
+  loadEditorModule().then((m) => ({ default: m.DevEntityInserter })),
 );
 
 type Mode = 'view' | 'edit';
@@ -29,14 +27,6 @@ const serialize = (p: Project) => JSON.stringify({ e: p.entry, f: p.files });
 /** `npm run dev` — preview only; code is edited in VS Code (./dashboard/). */
 const isDevPreview = import.meta.env.DEV;
 
-/**
- * Ask Home Assistant to toggle its sidebar. On mobile, custom panels render
- * without HA's own header, so the sidebar is otherwise unreachable — we provide
- * the hamburger that opens it. On desktop HA always shows the sidebar (or its
- * rail) with its own toggle, so we hide ours there to avoid a duplicate button.
- * The event is `composed`, so it crosses our shadow boundary up to
- * <home-assistant>, which handles it.
- */
 function toggleHaSidebar(target: EventTarget): void {
   target.dispatchEvent(
     new CustomEvent('hass-toggle-menu', { bubbles: true, composed: true }),
@@ -61,13 +51,11 @@ export default function Studio() {
   const [error, setError] = useState<string | null>(null);
   const [splitPct, setSplitPct] = useState(46);
 
-  const cmRef = useRef<ReactCodeMirrorRef>(null);
   const splitRef = useRef<HTMLDivElement>(null);
   const changedPathRef = useRef<string | null>(null);
   const fullRebuildRef = useRef(false);
   const hasCompiledRef = useRef(false);
 
-  // Load saved project from HA once connected.
   useEffect(() => {
     if (!ready || loaded) return;
     let cancelled = false;
@@ -86,7 +74,6 @@ export default function Studio() {
     };
   }, [ready, loaded]);
 
-  // Integration options → „Standard wiederherstellen“ clears frontend user_data.
   useEffect(() => {
     if (!ready || !loaded || localMode) return;
     return subscribeProjectReset(() => {
@@ -100,7 +87,6 @@ export default function Studio() {
     });
   }, [ready, loaded, localMode]);
 
-  // VS Code / sync: reload when dashboard/ files change on disk.
   useEffect(() => {
     if (!import.meta.hot) return;
     const reloadFromDisk = async () => {
@@ -117,8 +103,6 @@ export default function Studio() {
     return () => import.meta.hot?.off('dashboard-changed', reloadFromDisk);
   }, []);
 
-  // Recompile on project changes (debounced in edit mode).
-  // Dev preview recompiles on every ./dashboard/ change; production view mode only once.
   useEffect(() => {
     if (!loaded) return;
     if (!isDevPreview && mode !== 'edit' && hasCompiledRef.current) return;
@@ -145,8 +129,6 @@ export default function Studio() {
     return () => clearTimeout(handle);
   }, [project, mode, loaded]);
 
-  // The code editor is desktop-only. If we end up on a mobile layout (e.g. the
-  // window was resized, or HA reports narrow), drop back to the live view.
   useEffect(() => {
     if (mobile && mode === 'edit') setMode('view');
   }, [mobile, mode]);
@@ -163,7 +145,6 @@ export default function Studio() {
     }
   }, [project]);
 
-  // Ctrl/Cmd+S to save.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -175,9 +156,6 @@ export default function Studio() {
     return () => window.removeEventListener('keydown', onKey);
   }, [save, mode]);
 
-  // Drag-to-resize the editor/preview split. Measured relative to the split
-  // container (not the window): on desktop the panel sits to the right of HA's
-  // sidebar, so the window origin is not the container origin.
   const dragging = useRef(false);
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -196,7 +174,6 @@ export default function Studio() {
     };
   }, []);
 
-  // ── File / editor handlers ──
   const setActiveContent = useCallback(
     (content: string) => {
       changedPathRef.current = activePath;
@@ -219,24 +196,11 @@ export default function Studio() {
     setProject((p) => ({ ...p, entry: path }));
   }, []);
 
-  const insertSnippet = useCallback((text: string) => {
-    const view = cmRef.current?.view;
-    if (!view) return;
-    const { from, to } = view.state.selection.main;
-    view.dispatch({
-      changes: { from, to, insert: text },
-      selection: { anchor: from + text.length },
-    });
-    view.focus();
+  const openEditMode = useCallback(() => {
+    void import('./studio-editor-module');
+    setMode('edit');
   }, []);
 
-  // Home Assistant registers single-key shortcuts (a, c, e, m, …) on document.
-  // Because we render inside HA's shadow DOM, keydown targets are retargeted to
-  // our host element, so HA no longer sees that the user is typing in a field and
-  // fires the shortcut mid-edit (e.g. "a" opens Assist, "m" a My link). Keep
-  // plain keystrokes that originate from an editable element (the code editor,
-  // the entity search) inside the panel; let modifier combos through so Ctrl/⌘+S
-  // still saves and global shortcuts keep working when nothing is focused.
   const stopShortcutsWhileTyping = useCallback((e: ReactKeyboardEvent) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const target = e.target as HTMLElement | null;
@@ -294,10 +258,12 @@ export default function Studio() {
           )}
         </div>
         {entityBrowserOpen && (
-          <EntityInserter
-            copyToClipboard
-            onClose={() => setEntityBrowserOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <DevEntityInserter
+              copyToClipboard
+              onClose={() => setEntityBrowserOpen(false)}
+            />
+          </Suspense>
         )}
       </div>
     );
@@ -311,8 +277,6 @@ export default function Studio() {
       onKeyDown={stopShortcutsWhileTyping}
     >
       <div className="rd-studio__bar">
-        {/* Sidebar toggle only where HA's own is out of reach (mobile). On
-            desktop HA's sidebar/rail is always present, so ours would duplicate. */}
         {mobile && (
           <button
             className="rd-studio__menu"
@@ -365,19 +329,15 @@ export default function Studio() {
         <span className="rd-studio__spacer" />
 
         {editing ? (
-          <button
-            className="rd-studio__btn"
-            onClick={() => setMode('view')}
-          >
+          <button className="rd-studio__btn" onClick={() => setMode('view')}>
             ◀ Ansicht
           </button>
         ) : (
-          // Desktop only: a discreet, ghost-styled entry point into the editor.
           !mobile && (
             <button
               className="rd-studio__edit"
               title="Dashboard bearbeiten"
-              onClick={() => setMode('edit')}
+              onClick={openEditMode}
             >
               <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                 <path
@@ -401,59 +361,32 @@ export default function Studio() {
           )}
         </div>
       ) : (
-        <div className="rd-studio__split" ref={splitRef}>
-          <FilePanel
-            files={project.files}
-            entry={project.entry}
+        <Suspense
+          fallback={
+            <div className="rd-center">
+              <div className="rd-spinner" />
+              <p>Editor wird geladen…</p>
+            </div>
+          }
+        >
+          <StudioEditorLayout
+            project={project}
             activePath={activePath}
-            onSelect={setActivePath}
+            splitPct={splitPct}
+            splitRef={splitRef}
+            inserterOpen={inserterOpen}
+            onCloseInserter={() => setInserterOpen(false)}
+            Dashboard={Dashboard}
+            version={version}
+            error={error}
+            onRuntimeError={setError}
+            onSelectPath={setActivePath}
             onChangeFiles={changeFiles}
             onSetEntry={setEntry}
+            onContentChange={setActiveContent}
+            onDividerPointerDown={() => (dragging.current = true)}
           />
-
-          <div className="rd-studio__editor" style={{ flex: `${splitPct} 1 0%` }}>
-            <Suspense
-              fallback={
-                <div className="rd-studio__empty">Editor wird geladen…</div>
-              }
-            >
-              <Editor
-                ref={cmRef}
-                value={project.files[activePath] ?? ''}
-                onChange={setActiveContent}
-              />
-            </Suspense>
-            <div className="rd-studio__modules">
-              <code>{activePath}</code> · import aus:{' '}
-              {availableModules.map((m) => `'${m}'`).join(', ')} · oder eigene
-              Dateien (./…)
-            </div>
-          </div>
-
-          <div
-            className="rd-studio__divider"
-            onPointerDown={() => (dragging.current = true)}
-          />
-
-          <div
-            className="rd-studio__preview"
-            style={{ flex: `${100 - splitPct} 1 0%` }}
-          >
-            <Preview Dashboard={Dashboard} version={version} onRuntimeError={setError} />
-            {error && (
-              <div className="rd-studio__error">
-                <pre>{error}</pre>
-              </div>
-            )}
-          </div>
-
-          {inserterOpen && (
-            <EntityInserter
-              onInsert={insertSnippet}
-              onClose={() => setInserterOpen(false)}
-            />
-          )}
-        </div>
+        </Suspense>
       )}
     </div>
   );

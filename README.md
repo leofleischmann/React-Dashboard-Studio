@@ -75,7 +75,7 @@ Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → ers
 
 Oben **📁 dashboard/** = lokaler Modus (nur Entwicklung, Ordner ist **gitignored** — dein persönliches Projekt, nicht das HACS-Start-Dashboard). **⚡ Entities** öffnet den Browser zum Kopieren von Snippets. `sync:pull` validiert `./dashboard/` vor dem Laden und warnt, wenn lokale Änderungen noch nicht gepusht wurden.
 
-Release-Notes pro Version: [`CHANGELOG.md`](CHANGELOG.md) (erscheinen in HACS als GitHub-Release).
+Release-Notes werden automatisch aus den Git-Commits seit dem letzten Tag erzeugt und erscheinen in [GitHub Releases](https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/releases) (HACS zeigt diese an). Lokal vorab ansehen: `npm run release:notes -- 0.4.3`.
 
 ---
 
@@ -89,7 +89,7 @@ Release-Notes pro Version: [`CHANGELOG.md`](CHANGELOG.md) (erscheinen in HACS al
 | `@ha/format` | `num`, `temp`, `stateLabel`, `relativeTime`, `entityDisplayName`, … |
 | `react` | React inkl. Hooks |
 
-Details & Changelog: [`CHANGELOG.md`](CHANGELOG.md).
+Details: [GitHub Releases](https://github.com/leofleischmann/Home-Assistant-Dashboard-Studio/releases).
 
 ---
 

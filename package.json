@@ -1,7 +1,7 @@
 {
   "name": "homeassistant_dashboard_studio",
   "private": true,
-  "version": "0.4.3",
+  "version": "0.4.4",
   "type": "module",
   "description": "Home Assistant Dashboard Studio - pro-code Home Assistant dashboard as a custom panel, installable via HACS.",
   "scripts": {
@@ -16,7 +16,8 @@
     "sync": "node scripts/sync.mjs",
     "sync:pull": "node scripts/sync.mjs pull",
     "sync:push": "node scripts/sync.mjs push",
-    "sync:watch": "node scripts/sync.mjs watch"
+    "sync:watch": "node scripts/sync.mjs watch",
+    "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",

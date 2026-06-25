@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - id: version
         shell: bash
@@ -56,10 +57,13 @@ jobs:
           npm run check:default
           npm run build
           test -f custom_components/homeassistant_dashboard_studio/dashboard.js
-          if ! git diff --quiet -- custom_components/homeassistant_dashboard_studio/dashboard.js; then
-            echo "::error::dashboard.js on main does not match a fresh build — refusing to release."
-            exit 1
-          fi
+          test -f custom_components/homeassistant_dashboard_studio/studio-editor.js
+          for f in dashboard.js studio-editor.js; do
+            if ! git diff --quiet -- "custom_components/homeassistant_dashboard_studio/$f"; then
+              echo "::error::custom_components/.../$f on main does not match a fresh build — refusing to release."
+              exit 1
+            fi
+          done
 
       - name: Publish release
         if: steps.check.outputs.exists == 'false'

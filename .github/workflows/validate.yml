@@ -39,24 +39,29 @@ jobs:
             exit 1
           fi
 
-      - name: Verify panel bundle
+      - name: Verify panel bundles
         shell: bash
         run: |
           test -f custom_components/homeassistant_dashboard_studio/dashboard.js
-          if grep -q 'from "./' custom_components/homeassistant_dashboard_studio/dashboard.js; then
-            echo "dashboard.js must not import other chunks."
+          test -f custom_components/homeassistant_dashboard_studio/studio-editor.js
+          unexpected=$(grep -oE 'from "\./[^"]+\.js"' custom_components/homeassistant_dashboard_studio/dashboard.js | grep -v './studio-editor.js' || true)
+          if [ -n "$unexpected" ]; then
+            echo "dashboard.js must only import ./studio-editor.js as an optional chunk."
+            echo "$unexpected"
             exit 1
           fi
 
-      - name: Ensure committed bundle is up to date
+      - name: Ensure committed bundles are up to date
         shell: bash
         run: |
-          if ! git diff --quiet -- custom_components/homeassistant_dashboard_studio/dashboard.js; then
-            echo "::error::custom_components/.../dashboard.js is stale."
-            echo "Run 'npm run build' and commit the result."
-            git --no-pager diff --stat -- custom_components/homeassistant_dashboard_studio/dashboard.js
-            exit 1
-          fi
+          for f in dashboard.js studio-editor.js; do
+            if ! git diff --quiet -- "custom_components/homeassistant_dashboard_studio/$f"; then
+              echo "::error::custom_components/.../$f is stale."
+              echo "Run 'npm run build' and commit the result."
+              git --no-pager diff --stat -- "custom_components/homeassistant_dashboard_studio/$f"
+              exit 1
+            fi
+          done
 
       - uses: hacs/action@main
         with:
