@@ -6,6 +6,17 @@ import {
   fetchEntityHistory,
   type HistoryPoint,
 } from './history';
+import { filterEntities, type EntityFilter } from './entityFilter';
+import { registryStore } from './registryStore';
+
+export type { EntityFilter } from './entityFilter';
+
+export type HassServiceTarget = {
+  entity_id?: string | string[];
+  area_id?: string | string[];
+  device_id?: string | string[];
+  label_id?: string | string[];
+};
 
 /**
  * Reactive access to one entity. Re-renders the component ONLY when this
@@ -29,6 +40,102 @@ export function useEntityState(entityId: KnownEntityId): string | undefined {
     [entityId],
   );
   return useSyncExternalStore(hassStore.subscribe, getSnapshot);
+}
+
+/** Reactive access to a single entity attribute. */
+export function useEntityAttribute<T = unknown>(
+  entityId: KnownEntityId,
+  attribute: string,
+): T | undefined {
+  const getSnapshot = useCallback(
+    () => hassStore.getEntity(entityId)?.attributes[attribute] as T | undefined,
+    [entityId, attribute],
+  );
+  return useSyncExternalStore(hassStore.subscribe, getSnapshot);
+}
+
+/**
+ * Filtered entity list — domain, name pattern, device_class, area, state.
+ * Area filter loads the HA entity registry once over WebSocket.
+ */
+export function useEntities(filter: EntityFilter = {}): HassEntity[] {
+  const needsRegistry = Boolean(filter.areaId);
+  const filterKey = JSON.stringify(filter);
+  const cacheRef = useRef<HassEntity[]>([]);
+  const ready = useHassReady();
+
+  useEffect(() => {
+    if (needsRegistry && ready) registryStore.ensureLoaded();
+  }, [needsRegistry, ready]);
+
+  const getSnapshot = useCallback(() => {
+    const parsed = JSON.parse(filterKey) as EntityFilter;
+    const next = filterEntities(hassStore.getAllEntities(), parsed);
+    const prev = cacheRef.current;
+    if (prev.length === next.length && prev.every((e, i) => e === next[i])) {
+      return prev;
+    }
+    cacheRef.current = next;
+    return next;
+  }, [filterKey]);
+
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      const unsubHass = hassStore.subscribe(listener);
+      const unsubRegistry = needsRegistry
+        ? registryStore.subscribe(listener)
+        : () => {};
+      return () => {
+        unsubHass();
+        unsubRegistry();
+      };
+    },
+    [needsRegistry],
+  );
+
+  return useSyncExternalStore(subscribe, getSnapshot);
+}
+
+/** Entities assigned to a Home Assistant area (via entity registry). */
+export function useAreaEntities(areaId: string): HassEntity[] {
+  return useEntities({ areaId });
+}
+
+/** Current time, re-renders on an interval (default: every minute). */
+export function useTime(tickMs = 60_000): Date {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), tickMs);
+    return () => window.clearInterval(id);
+  }, [tickMs]);
+
+  return now;
+}
+
+/** Sun position and schedule from `sun.sun`. */
+export function useSun() {
+  const sun = useEntity('sun.sun' as KnownEntityId);
+  const now = useTime(60_000);
+  const attrs = sun?.attributes ?? {};
+
+  const parseDate = (value: unknown): Date | undefined => {
+    if (typeof value !== 'string') return undefined;
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) ? d : undefined;
+  };
+
+  return {
+    entity: sun,
+    state: sun?.state,
+    isDay: sun?.state === 'above_horizon',
+    isNight: sun?.state === 'below_horizon',
+    elevation: attrs.elevation as number | undefined,
+    azimuth: attrs.azimuth as number | undefined,
+    rising: parseDate(attrs.next_rising),
+    setting: parseDate(attrs.next_setting),
+    now,
+  };
 }
 
 /**
@@ -118,6 +225,16 @@ export function callService(
   service: string,
   serviceData?: Record<string, unknown>,
   target?: Record<string, unknown>,
+): Promise<unknown> {
+  return hassStore.callService(domain, service, serviceData, target);
+}
+
+/** callService with typed HA target (entity, area, device, label). */
+export function callServiceWithTarget(
+  domain: string,
+  service: string,
+  serviceData?: Record<string, unknown>,
+  target?: HassServiceTarget,
 ): Promise<unknown> {
   return hassStore.callService(domain, service, serviceData, target);
 }

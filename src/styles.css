@@ -1039,3 +1039,321 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ── Select card ─────────────────────────────────────────── */
+.rd-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-select__name {
+  font-weight: 600;
+}
+.rd-select__input {
+  width: 100%;
+  font: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+  color: var(--rd-text);
+}
+.rd-select__input:disabled {
+  opacity: 0.5;
+}
+
+/* ── Lock card ───────────────────────────────────────────── */
+.rd-lock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-lock__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-lock__name {
+  font-weight: 600;
+}
+.rd-lock__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-lock__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-lock__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-lock__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-lock__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Vacuum card ─────────────────────────────────────────── */
+.rd-vacuum {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-vacuum__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-vacuum__name {
+  font-weight: 600;
+}
+.rd-vacuum__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-vacuum__battery {
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-vacuum__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-vacuum__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-vacuum__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-vacuum__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Fan card ────────────────────────────────────────────── */
+.rd-fan {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-fan__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-fan__name {
+  font-weight: 600;
+}
+.rd-fan__speed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Alarm panel ─────────────────────────────────────────── */
+.rd-alarm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-alarm.is-armed {
+  border-color: color-mix(in srgb, var(--rd-warn) 45%, var(--rd-border));
+}
+.rd-alarm__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-alarm__name {
+  font-weight: 600;
+}
+.rd-alarm__state {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.rd-alarm__actions {
+  display: flex;
+  gap: 6px;
+}
+.rd-alarm__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-alarm__btn--off {
+  color: var(--rd-danger);
+}
+.rd-alarm__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-alarm__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Camera tile ─────────────────────────────────────────── */
+.rd-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+.rd-camera__name {
+  padding: 12px 14px 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.rd-camera__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--rd-border);
+}
+
+/* ── Timer card ──────────────────────────────────────────── */
+.rd-timer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-timer.is-active {
+  border-color: color-mix(in srgb, var(--rd-ok) 40%, var(--rd-border));
+}
+.rd-timer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-timer__name {
+  font-weight: 600;
+}
+.rd-timer__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-timer__remaining {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.rd-timer__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-timer__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-timer__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Counter card ────────────────────────────────────────── */
+.rd-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.rd-counter__name {
+  font-weight: 600;
+  align-self: stretch;
+  text-align: left;
+}
+.rd-counter__value {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.rd-counter__actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.rd-counter__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-counter__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-counter__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Scene / Script buttons ──────────────────────────────── */
+.rd-scene-btn,
+.rd-script-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.rd-scene-btn:hover:not(:disabled),
+.rd-script-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--rd-accent) 40%, var(--rd-border));
+}
+.rd-scene-btn:disabled,
+.rd-script-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rd-scene-btn__icon,
+.rd-script-btn__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.rd-scene-btn__name,
+.rd-script-btn__name {
+  font-weight: 600;
+}

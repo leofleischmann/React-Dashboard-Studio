@@ -71,6 +71,13 @@ class HassStore {
   getEntitiesByDomain = (domain: string): readonly HassEntity[] =>
     this.domainIndex.get(domain) ?? EMPTY_ENTITIES;
 
+  /** All entities currently known to HA. */
+  getAllEntities = (): readonly HassEntity[] => {
+    const states = this.hass?.states;
+    if (!states) return EMPTY_ENTITIES;
+    return Object.values(states);
+  };
+
   callService = (
     domain: string,
     service: string,

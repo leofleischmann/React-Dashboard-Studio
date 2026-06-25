@@ -11,14 +11,24 @@ type WidgetName =
   | 'WeatherCard'
   | 'PersonChip'
   | 'NumberSlider'
-  | 'ActionButton';
+  | 'ActionButton'
+  | 'SelectCard'
+  | 'LockCard'
+  | 'VacuumCard'
+  | 'FanCard'
+  | 'AlarmPanel'
+  | 'CameraTile'
+  | 'TimerCard'
+  | 'CounterCard'
+  | 'SceneButton'
+  | 'ScriptButton';
 
 const WIDGET_BY_DOMAIN: Record<string, WidgetName> = {
   sensor: 'Gauge',
   binary_sensor: 'BinaryBadge',
   light: 'LightTile',
   switch: 'EntityRow',
-  fan: 'EntityRow',
+  fan: 'FanCard',
   climate: 'ClimateCard',
   cover: 'CoverCard',
   media_player: 'MediaPlayerCard',
@@ -26,13 +36,19 @@ const WIDGET_BY_DOMAIN: Record<string, WidgetName> = {
   person: 'PersonChip',
   device_tracker: 'PersonChip',
   input_number: 'NumberSlider',
-  script: 'ActionButton',
-  scene: 'ActionButton',
+  script: 'ScriptButton',
+  scene: 'SceneButton',
   button: 'ActionButton',
   automation: 'ActionButton',
   input_boolean: 'EntityRow',
-  lock: 'EntityRow',
-  vacuum: 'EntityRow',
+  lock: 'LockCard',
+  vacuum: 'VacuumCard',
+  input_select: 'SelectCard',
+  select: 'SelectCard',
+  alarm_control_panel: 'AlarmPanel',
+  camera: 'CameraTile',
+  timer: 'TimerCard',
+  counter: 'CounterCard',
 };
 
 export function widgetForDomain(domain: string): WidgetName {
@@ -46,4 +62,4 @@ export function entityWidgetSnippet(entityId: string): string {
 }
 
 export const WIDGET_IMPORTS =
-  'import { EntityRow, Gauge, BinaryBadge, LightTile, ClimateCard, CoverCard, MediaPlayerCard, WeatherCard, PersonChip, NumberSlider, ActionButton } from \'@ha/ui\';';
+  "import { EntityRow, Gauge, BinaryBadge, LightTile, ClimateCard, CoverCard, MediaPlayerCard, WeatherCard, PersonChip, NumberSlider, ActionButton, SelectCard, LockCard, VacuumCard, FanCard, AlarmPanel, CameraTile, TimerCard, CounterCard, SceneButton, ScriptButton } from '@ha/ui';";
