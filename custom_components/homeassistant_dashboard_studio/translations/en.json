@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Home Assistant Dashboard Studio",
-        "description": "Installs the dashboard studio as a sidebar panel. After setup, **Dashboard Studio** appears in the sidebar — no configuration.yaml entry required."
+        "description": "Registers dashboard studio panels in the sidebar. Each saved dashboard gets its own entry — no configuration.yaml entry required."
       }
     },
     "abort": {
@@ -15,9 +15,9 @@
     "step": {
       "init": {
         "title": "Restore default dashboard",
-        "description": "Deletes the **globally stored** dashboard (visible to everyone in your household) and loads the bundled example dashboard the next time the panel is opened.\n\n**Note:** Unsaved editor changes are lost. Reload the panel after resetting (F5).",
+        "description": "Deletes the **globally stored** workspace (all dashboards, visible to everyone in your household). The sidebar keeps one default dashboard with the bundled example.\n\n**Note:** Unsaved editor changes are lost. Reload the page after resetting (F5).",
         "data": {
-          "confirm_reset": "Yes, delete saved dashboard and restore default"
+          "confirm_reset": "Yes, delete saved dashboards and restore default"
         }
       }
     },
