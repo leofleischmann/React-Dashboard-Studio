@@ -1,0 +1,430 @@
+/* Shared primitives: Card, Section, Grid, composites */
+/* ── Card base ───────────────────────────────────────────── */
+.rd-card {
+  background: var(--rd-card-bg);
+  border: 1px solid var(--rd-border);
+  border-radius: var(--rd-radius);
+  box-shadow: var(--rd-shadow);
+  padding: 18px;
+}
+
+/* ── Topbar ──────────────────────────────────────────────── */
+.rd-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+.rd-topbar__greet {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+}
+.rd-topbar__date {
+  margin: 4px 0 0;
+  color: var(--rd-text-2);
+  text-transform: capitalize;
+}
+.rd-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.rd-weather {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+.rd-weather__icon {
+  font-size: 1.6rem;
+}
+.rd-weather__temp {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.rd-weather__sub {
+  font-size: 0.78rem;
+  color: var(--rd-text-2);
+}
+.rd-people {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rd-person {
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+  color: var(--rd-text-2);
+  white-space: nowrap;
+}
+.rd-person.is-home {
+  color: var(--rd-ok);
+  border-color: color-mix(in srgb, var(--rd-ok) 35%, transparent);
+  background: color-mix(in srgb, var(--rd-ok) 10%, transparent);
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.rd-section {
+  margin-bottom: 28px;
+}
+.rd-section__title {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rd-text-2);
+  margin: 0 0 12px 2px;
+}
+
+/* ── Grids ───────────────────────────────────────────────── */
+.rd-grid {
+  display: grid;
+  gap: 14px;
+}
+.rd-grid--rooms {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.rd-grid--devices {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  margin-top: 14px;
+}
+.rd-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+/* ── Room card ───────────────────────────────────────────── */
+.rd-room {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-room__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rd-room__name {
+  font-weight: 600;
+}
+.rd-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rd-border);
+}
+.rd-dot.is-on {
+  background: var(--rd-ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-ok) 20%, transparent);
+}
+.rd-room__temp {
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rd-room__temp small {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--rd-text-2);
+}
+.rd-room__metrics {
+  display: flex;
+  gap: 14px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-pill {
+  margin-top: 4px;
+  align-self: flex-start;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  color: var(--rd-text-2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rd-pill.is-on {
+  color: #fff;
+  background: var(--rd-accent);
+  border-color: var(--rd-accent);
+}
+.rd-pill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Device / power card ─────────────────────────────────── */
+.rd-device {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-device__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rd-device__name {
+  font-weight: 600;
+}
+.rd-device__power {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rd-device__power small {
+  font-size: 0.9rem;
+  color: var(--rd-text-2);
+}
+.rd-device__foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+}
+.rd-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--rd-border);
+  overflow: hidden;
+}
+.rd-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--rd-accent), #7aa8ff);
+  transition: width 0.4s ease;
+}
+
+/* iOS-style toggle */
+.rd-switch {
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: var(--rd-border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.18s;
+  padding: 0;
+}
+.rd-switch.is-on {
+  background: var(--rd-ok);
+}
+.rd-switch__knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s;
+}
+.rd-switch.is-on .rd-switch__knob {
+  transform: translateX(18px);
+}
+.rd-switch:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Live power hero ─────────────────────────────────────── */
+.rd-livepower {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--rd-accent) 14%, var(--rd-card-bg)),
+    var(--rd-card-bg)
+  );
+}
+.rd-livepower__label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+}
+.rd-livepower__value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.rd-livepower__value small {
+  font-size: 1rem;
+  color: var(--rd-text-2);
+}
+.rd-livepower__proj {
+  text-align: right;
+  font-weight: 700;
+}
+.rd-livepower__proj small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--rd-text-2);
+}
+
+/* ── Batteries ───────────────────────────────────────────── */
+.rd-batts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-batt {
+  display: grid;
+  grid-template-columns: 1fr 90px 42px;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+.rd-batt__name {
+  color: var(--rd-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-batt__track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rd-border);
+  overflow: hidden;
+}
+.rd-batt__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.rd-batt__val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ── Stat tile ───────────────────────────────────────────── */
+.rd-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rd-stat__label {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+}
+.rd-stat__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.rd-stat.is-accent {
+  color: #fff;
+  background: var(--rd-accent);
+  border-color: var(--rd-accent);
+}
+.rd-stat.is-accent .rd-stat__label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Plant ───────────────────────────────────────────────── */
+.rd-plant {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rd-plant__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+.rd-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.rd-tag.is-ok {
+  color: var(--rd-ok);
+  background: color-mix(in srgb, var(--rd-ok) 14%, transparent);
+}
+.rd-tag.is-danger {
+  color: var(--rd-danger);
+  background: color-mix(in srgb, var(--rd-danger) 14%, transparent);
+}
+.rd-plant__moist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-plant__bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--rd-border);
+  overflow: hidden;
+}
+.rd-plant__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3aa6c9, #36c98f);
+  transition: width 0.4s ease;
+}
+.rd-plant__foot {
+  display: flex;
+  gap: 18px;
+  font-size: 0.9rem;
+  color: var(--rd-text-2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   EPIC HOME — design system for the default "Home" showcase page.
+   Theme-aware (HA variables), looks great in light + dark + any accent.
+   ══════════════════════════════════════════════════════════ */
+
+/* Motion primitives */
+@keyframes rd-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rd-aurora {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(3%, -2%) scale(1.14); }
+  100% { transform: translate(-3%, 2%) scale(1.06); }
+}
+@keyframes rd-pulse-ring {
+  0%   { transform: scale(1); opacity: 0.7; }
+  70%  { transform: scale(2.6); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes rd-wave {
+  0%, 60%, 100% { transform: rotate(0); }
+  10%, 30%      { transform: rotate(16deg); }
+  20%           { transform: rotate(-8deg); }
+}
+
+.rd-rise { animation: rd-rise-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.rd-rise:nth-child(2) { animation-delay: 0.05s; }
+.rd-rise:nth-child(3) { animation-delay: 0.10s; }
+.rd-rise:nth-child(4) { animation-delay: 0.15s; }
+.rd-rise:nth-child(5) { animation-delay: 0.20s; }
+.rd-rise:nth-child(6) { animation-delay: 0.25s; }
+.rd-rise:nth-child(7) { animation-delay: 0.30s; }
+.rd-rise:nth-child(8) { animation-delay: 0.35s; }
+
+/* Premium surface */
+.rd-glass {
+  border-radius: calc(var(--rd-radius) + 2px);
+  background: var(--rd-card-bg);
+  border: 1px solid var(--rd-border);
+  box-shadow: 0 1px 2px rgba(16, 18, 40, 0.04), 0 16px 44px -26px rgba(16, 18, 40, 0.4);
+}
+

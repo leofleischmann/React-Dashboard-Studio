@@ -2,10 +2,10 @@ import { type ComponentType } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import Studio from './studio/Studio';
 import { RenderRootContext } from './studio/shadowRoot';
-import appCss from './styles.css?inline';
+import { panelCss } from './panel-styles';
 import studioCss from './studio/studio.css?inline';
 
-const CSS = `:host { display: block; height: 100%; }\n${appCss}\n${studioCss}`;
+const CSS = `:host { display: block; height: 100%; }\n${panelCss}\n${studioCss}`;
 
 /**
  * Render the Studio into `host`'s shadow root, fully style-isolated from HA.
