@@ -27,10 +27,12 @@ import {
   useTemplate,
   useTheme,
   useTime,
+  useWeatherForecast,
 } from '@ha';
-import { entityDisplayName, energy, num, stateLabel } from '@ha/format';
+import { entityDisplayName, energy, forecastDayLabel, num, stateLabel, weatherIcon } from '@ha/format';
 import { Section } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
+import { WeatherForecastRow } from '@ha/ui';
 import { PageHead } from '../components/PageHead';
 import { HookDemoCard } from '../components/HookDemoCard';
 import { byDomain, numericSensors } from '../lib/pickers';
@@ -90,6 +92,10 @@ export function HooksPage() {
 
   const calendar = useEntitiesByDomain('calendar')[0];
   const events = useCalendarEvents(calendar?.entity_id ?? '', 7);
+
+  const weatherEntity = useEntitiesByDomain('weather')[0];
+  const weatherId = weatherEntity?.entity_id ?? '';
+  const weatherForecast = useWeatherForecast(weatherId, { days: 5 });
 
   const firstLight = lights[0]?.entity_id;
   const allLightIds = lights.map((l) => l.entity_id);
@@ -384,6 +390,39 @@ export function HooksPage() {
             <small>Recorder-Verläufe für SparkChart &amp; HistoryChart — siehe Charts.</small>
           </HookDemoCard>
         </ResponsiveGrid>
+      </Section>
+
+      <Section title="Wetter-Vorhersage">
+        <ResponsiveGrid min={270}>
+          <HookDemoCard
+            module="@ha"
+            name="useWeatherForecast(id, { days: 5 })"
+            hint={weatherId || 'weather.*'}
+          >
+            {!weatherId ? (
+              <span className="rd-empty">Keine weather-Entity</span>
+            ) : weatherForecast.loading ? (
+              <span className="rd-empty">Vorhersage lädt…</span>
+            ) : weatherForecast.forecast.length === 0 ? (
+              <span className="rd-empty">Keine Daten (get_forecasts)</span>
+            ) : (
+              <ul className="rd-dd-hook-list">
+                {weatherForecast.forecast.map((entry) => (
+                  <li key={entry.datetime.toISOString()}>
+                    {weatherIcon(entry.condition)} {forecastDayLabel(entry.datetime)}{' '}
+                    {num(entry.temperature, 0)}°
+                    {entry.templow !== undefined ? ` / ${num(entry.templow, 0)}°` : ''}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </HookDemoCard>
+        </ResponsiveGrid>
+        {weatherId && (
+          <div style={{ marginTop: 14 }}>
+            <WeatherForecastRow entityId={weatherId} days={5} />
+          </div>
+        )}
       </Section>
 
       <Section title="Services & imperative Escape-Hatches">
