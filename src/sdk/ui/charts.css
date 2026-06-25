@@ -1,6 +1,10 @@
 /* SparkChart / HistoryChart */
 .rd-chart { margin-top: auto; }
 
+.rd-chart--interactive {
+  overflow: visible;
+}
+
 .rd-chart__legend {
   display: flex;
   flex-wrap: wrap;
