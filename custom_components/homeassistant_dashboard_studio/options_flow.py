@@ -8,7 +8,7 @@ import voluptuous as vol
 
 from homeassistant import data_entry_flow
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
-from homeassistant.helpers import selector
+from homeassistant.helpers import config_validation as cv
 
 from .const import CONF_CONFIRM_RESET
 from .user_data import async_reset_all_dashboard_projects
@@ -44,8 +44,6 @@ class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
     def _schema() -> vol.Schema:
         return vol.Schema(
             {
-                vol.Required(CONF_CONFIRM_RESET, default=False): selector.BooleanSelector(
-                    selector.BooleanSelectorConfig()
-                ),
+                vol.Required(CONF_CONFIRM_RESET, default=False): cv.boolean,
             }
         )

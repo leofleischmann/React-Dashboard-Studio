@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an Home Assistant Dashboard Studio. HACS-Updates zeigen die jeweilige Sektion als GitHub-Release-Notes.
 
+## 0.4.2
+
+### Fixes
+
+- **Integration:** Config Flow lädt wieder zuverlässig („Invalid handler specified“) — Options-Flow wird lazy importiert, Schema ohne `BooleanSelector`
+- **Optionen:** „Standard-Dashboard wiederherstellen“ — `STORAGE_DIR`-Import-Fehler behoben
+
 ## 0.4.0
 
 ### Neu in @ha
