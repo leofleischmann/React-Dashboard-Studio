@@ -33,7 +33,8 @@ import {
 } from './sync-state.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const STORAGE_KEY = 'homeassistant_dashboard_studio';
+const WS_GET = 'homeassistant_dashboard_studio/get_project';
+const WS_SAVE = 'homeassistant_dashboard_studio/save_project';
 
 function loadEnv() {
   const env = { ...process.env };
@@ -174,8 +175,8 @@ async function pull(conn) {
   const localFiles = listLocalFiles();
   const localEntry = readEntry();
 
-  const res = await conn.call({ type: 'frontend/get_user_data', key: STORAGE_KEY });
-  const value = res?.value;
+  const res = await conn.call({ type: WS_GET });
+  const value = res?.project;
   if (!value?.files || Object.keys(value.files).length === 0) {
     console.log('In HA ist noch kein Dashboard gespeichert – nichts zu laden.');
     return;
@@ -246,14 +247,13 @@ async function push(conn) {
   const { count } = validateDashboardProject({ files, entry, label: 'dashboard/' });
   console.log(`✓ dashboard/ kompiliert (${count} Datei(en)).`);
 
-  const res = await conn.call({ type: 'frontend/get_user_data', key: STORAGE_KEY });
-  const remoteCode = filterDashboardFiles(res?.value?.files ?? {});
+  const res = await conn.call({ type: WS_GET });
+  const remoteCode = filterDashboardFiles(res?.project?.files ?? {});
   const removed = Object.keys(remoteCode).filter((path) => !(path in files));
 
   await conn.call({
-    type: 'frontend/set_user_data',
-    key: STORAGE_KEY,
-    value: { files, entry },
+    type: WS_SAVE,
+    project: { files, entry },
   });
   writeSyncState({ files, entry, direction: 'push' });
 

@@ -12,18 +12,25 @@ from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN, PANEL_ICON, PANEL_TAG, PANEL_TITLE, PANEL_URL_PATH
+from .store import DashboardStore
+from . import websocket_api
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Home Assistant Dashboard Studio from a config entry."""
+    store = DashboardStore(hass)
+    await store.async_load()
+    hass.data.setdefault(DOMAIN, {})["store"] = store
+    websocket_api.async_setup(hass)
     await _async_register_panel(hass)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload the config entry."""
+    hass.data.get(DOMAIN, {}).pop("store", None)
     return True
 
 

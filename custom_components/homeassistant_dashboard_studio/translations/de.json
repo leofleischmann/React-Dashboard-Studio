@@ -15,7 +15,7 @@
     "step": {
       "init": {
         "title": "Standard-Dashboard wiederherstellen",
-        "description": "Löscht alle gespeicherten Dashboard-Dateien für **alle Benutzer** und lädt beim nächsten Öffnen des Panels wieder das mitgelieferte Beispiel-Dashboard aus der Integration.\n\n**Hinweis:** Nicht gespeicherte Änderungen im Editor gehen verloren. Das Panel nach dem Zurücksetzen einmal neu laden (F5).",
+        "description": "Löscht das **global gespeicherte** Dashboard (für alle Haushaltsmitglieder sichtbar) und lädt beim nächsten Öffnen des Panels wieder das mitgelieferte Beispiel-Dashboard aus der Integration.\n\n**Hinweis:** Nicht gespeicherte Änderungen im Editor gehen verloren. Das Panel nach dem Zurücksetzen einmal neu laden (F5).",
         "data": {
           "confirm_reset": "Ja, gespeichertes Dashboard löschen und Standard wiederherstellen"
         }
