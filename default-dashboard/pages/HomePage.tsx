@@ -321,10 +321,11 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
                 <span>{entityDisplayName(primaryPower, primaryPower.entity_id)} · jetzt</span>
               </div>
               <SparkChart
-                height={92}
+                height={110}
                 showLegend={false}
                 loading={historyLoading}
                 series={[{ label: 'Verbrauch', color: theme.primary, points: history[primaryPower.entity_id] ?? [] }]}
+                axes={{ xLabel: 'Zeit', yLabel: 'W' }}
               />
               {powerStats && (
                 <div className="rd-energy__stats">

@@ -57,7 +57,7 @@ export const DOMAIN_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     category: 'domain',
     domains: ['sensor'],
     pickExample: pickNumericSensorEntity,
-    snippet: '<SparkChart series={[…]} height={88} strokeWidth={2} />',
+    snippet: '<SparkChart series={[…]} height={120} axes={{ xLabel: "Zeit", yLabel: "W" }} />',
     Demo: SparkDemo,
   },
   {
