@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { HistoryPoint } from '../history';
 import type { EntityStatistics } from '../statistics';
 import {
@@ -12,6 +12,7 @@ import { normalizeIds } from '../restCache';
 import { fetchCalendarEvents, type CalendarEvent } from '../calendar';
 import { useHassReady } from './ready';
 import { entityIdsFromKey } from './shared';
+import { EMPTY_REST_RECORD, useSharedRestSubscribe } from './restStore';
 
 /** Reactive recorder history for chart widgets. Refreshes on an interval. */
 export function useEntityHistory(
@@ -21,21 +22,25 @@ export function useEntityHistory(
   const { hours = 24, refreshMs = 180_000 } = options;
   const ready = useHassReady();
   const idsKey = normalizeIds(entityIds);
+  const active = ready && Boolean(idsKey);
 
-  const getSnapshot = useCallback(() => {
-    if (!ready || !idsKey) return {};
-    return getEntityHistorySnapshot(entityIdsFromKey(idsKey), hours);
-  }, [ready, idsKey, hours]);
-
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      if (!ready || !idsKey) return () => {};
-      return subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener);
-    },
-    [ready, idsKey, hours, refreshMs],
+  const getSnapshot = useCallback(
+    () => getEntityHistorySnapshot(entityIdsFromKey(idsKey), hours),
+    [idsKey, hours],
   );
 
-  return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
+  const subscribe = useCallback(
+    (listener: () => void) =>
+      subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener),
+    [idsKey, hours, refreshMs],
+  );
+
+  return useSharedRestSubscribe(
+    active,
+    subscribe,
+    getSnapshot,
+    EMPTY_REST_RECORD,
+  );
 }
 
 /** True until the first history fetch for this entity set completes. */
@@ -46,21 +51,20 @@ export function useEntityHistoryPending(
   const { hours = 24, refreshMs = 180_000 } = options;
   const ready = useHassReady();
   const idsKey = normalizeIds(entityIds);
+  const active = ready && Boolean(idsKey);
 
-  const getSnapshot = useCallback(() => {
-    if (!ready || !idsKey) return false;
-    return isEntityHistoryPending(entityIdsFromKey(idsKey), hours);
-  }, [ready, idsKey, hours]);
-
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      if (!ready || !idsKey) return () => {};
-      return subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener);
-    },
-    [ready, idsKey, hours, refreshMs],
+  const getSnapshot = useCallback(
+    () => isEntityHistoryPending(entityIdsFromKey(idsKey), hours),
+    [idsKey, hours],
   );
 
-  return useSyncExternalStore(subscribe, getSnapshot, () => false);
+  const subscribe = useCallback(
+    (listener: () => void) =>
+      subscribeEntityHistory(entityIdsFromKey(idsKey), hours, refreshMs, listener),
+    [idsKey, hours, refreshMs],
+  );
+
+  return useSharedRestSubscribe(active, subscribe, getSnapshot, false);
 }
 
 /** Reactive statistics (min/max/mean) over 7 or 30 days. */
@@ -71,21 +75,25 @@ export function useEntityStatistics(
   const { days = 7, refreshMs = 300_000 } = options;
   const ready = useHassReady();
   const idsKey = normalizeIds(entityIds);
+  const active = ready && Boolean(idsKey);
 
-  const getSnapshot = useCallback(() => {
-    if (!ready || !idsKey) return {};
-    return getEntityStatisticsSnapshot(entityIdsFromKey(idsKey), days);
-  }, [ready, idsKey, days]);
-
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      if (!ready || !idsKey) return () => {};
-      return subscribeEntityStatistics(entityIdsFromKey(idsKey), days, refreshMs, listener);
-    },
-    [ready, idsKey, days, refreshMs],
+  const getSnapshot = useCallback(
+    () => getEntityStatisticsSnapshot(entityIdsFromKey(idsKey), days),
+    [idsKey, days],
   );
 
-  return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
+  const subscribe = useCallback(
+    (listener: () => void) =>
+      subscribeEntityStatistics(entityIdsFromKey(idsKey), days, refreshMs, listener),
+    [idsKey, days, refreshMs],
+  );
+
+  return useSharedRestSubscribe(
+    active,
+    subscribe,
+    getSnapshot,
+    EMPTY_REST_RECORD,
+  );
 }
 
 /** Upcoming events for a calendar entity. */

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   getLogbookSnapshot,
   isLogbookPending,
@@ -10,6 +10,8 @@ import {
   type LogbookEntry,
 } from '../logbook';
 import { useHassReady } from './ready';
+import { stableArraySnapshot } from './shared';
+import { useSharedRestQuery } from './restStore';
 
 const EMPTY_LOGBOOK = EMPTY_LOGBOOK_ENTRIES;
 
@@ -50,32 +52,29 @@ export function useLogbook(options: UseLogbookOptions = {}): UseLogbookResult {
   const queryKey = `${marker}\0${hours}\0${limit}`;
   const entriesCacheRef = useRef<LogbookEntry[]>(EMPTY_LOGBOOK);
 
-  const getSnapshot = useCallback(() => {
-    if (!ready) return EMPTY_LOGBOOK;
+  const getDataSnapshot = useCallback(() => {
     const next = getLogbookSnapshot(marker, hours, limit);
-    const prev = entriesCacheRef.current;
-    if (prev === next || (prev.length === next.length && prev.every((e, i) => e === next[i]))) {
-      return prev;
-    }
-    entriesCacheRef.current = next;
-    return next;
-  }, [ready, marker, hours, limit]);
+    return stableArraySnapshot(entriesCacheRef, next);
+  }, [marker, hours, limit]);
 
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      if (!ready) return () => {};
-      return subscribeLogbook(marker, hours, limit, refreshMs, listener);
-    },
-    [ready, marker, hours, limit, refreshMs],
+  const getPendingSnapshot = useCallback(
+    () => isLogbookPending(marker, hours, limit),
+    [marker, hours, limit],
   );
 
-  const getPendingSnapshot = useCallback(() => {
-    if (!ready) return false;
-    return isLogbookPending(marker, hours, limit);
-  }, [ready, marker, hours, limit]);
+  const subscribe = useCallback(
+    (listener: () => void) =>
+      subscribeLogbook(marker, hours, limit, refreshMs, listener),
+    [marker, hours, limit, refreshMs],
+  );
 
-  const loading = useSyncExternalStore(subscribe, getPendingSnapshot, () => false);
-  const entries = useSyncExternalStore(subscribe, getSnapshot, () => EMPTY_LOGBOOK);
+  const { data: entries, loading } = useSharedRestQuery(
+    ready,
+    subscribe,
+    getDataSnapshot,
+    getPendingSnapshot,
+    EMPTY_LOGBOOK,
+  );
 
   useEffect(() => {
     if (loading) return;

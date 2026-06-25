@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   getWeatherForecastSnapshot,
   isWeatherForecastPending,
@@ -12,6 +12,7 @@ import {
 import { normalizeIds } from '../restCache';
 import { useHassReady } from './ready';
 import { entityIdsFromKey } from './shared';
+import { useSharedRestQuery } from './restStore';
 
 const EMPTY_WEATHER_FORECAST: WeatherForecastEntry[] = [];
 
@@ -42,45 +43,43 @@ export function useWeatherForecast(
   const typeParam = FORECAST_TYPE_PARAM[type];
   const ready = useHassReady();
   const idsKey = normalizeIds(entityId ? [entityId] : []);
+  const active = ready && Boolean(entityId);
 
-  const getSnapshot = useCallback(() => {
-    if (!ready || !entityId) return EMPTY_WEATHER_FORECAST;
+  const getDataSnapshot = useCallback(() => {
     return (
       getWeatherForecastSnapshot(entityIdsFromKey(idsKey), typeParam)[entityId] ??
       EMPTY_WEATHER_FORECAST
     );
-  }, [ready, entityId, idsKey, typeParam]);
+  }, [entityId, idsKey, typeParam]);
+
+  const getPendingSnapshot = useCallback(
+    () => isWeatherForecastPending(entityIdsFromKey(idsKey), typeParam),
+    [idsKey, typeParam],
+  );
 
   const subscribe = useCallback(
-    (listener: () => void) => {
-      if (!ready || !entityId) return () => {};
-      return subscribeWeatherForecast(
+    (listener: () => void) =>
+      subscribeWeatherForecast(
         entityIdsFromKey(idsKey),
         typeParam,
         refreshMs,
         listener,
-      );
-    },
-    [ready, entityId, idsKey, typeParam, refreshMs],
+      ),
+    [idsKey, typeParam, refreshMs],
   );
 
-  const getPendingSnapshot = useCallback(() => {
-    if (!ready || !entityId) return false;
-    return isWeatherForecastPending(entityIdsFromKey(idsKey), typeParam);
-  }, [ready, entityId, idsKey, typeParam]);
-
-  const pending = useSyncExternalStore(subscribe, getPendingSnapshot, () => false);
-
-  const all = useSyncExternalStore(
+  const { data: all, loading } = useSharedRestQuery(
+    active,
     subscribe,
-    getSnapshot,
-    () => EMPTY_WEATHER_FORECAST,
+    getDataSnapshot,
+    getPendingSnapshot,
+    EMPTY_WEATHER_FORECAST,
   );
 
   const forecast = useMemo(() => all.slice(0, days), [all, days]);
 
   useEffect(() => {
-    if (pending || !entityId) return;
+    if (loading || !entityId) return;
     console.log(
       '[Debug useWeatherForecast]:',
       entityId,
@@ -88,7 +87,7 @@ export function useWeatherForecast(
       forecast.length,
       'entries shown',
     );
-  }, [entityId, type, forecast.length, pending]);
+  }, [entityId, type, forecast.length, loading]);
 
-  return { forecast, loading: pending, type };
+  return { forecast, loading, type };
 }
