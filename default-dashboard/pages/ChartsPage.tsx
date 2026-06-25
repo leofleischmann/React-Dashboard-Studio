@@ -92,7 +92,7 @@ export function ChartsPage() {
   }));
 
   return (
-    <div className="rd-sdk-charts">
+    <>
       <PageHead icon="📈" module="@ha · @ha/ui" title="Charts, Verlauf & Statistik">
         SparkChart, HistoryChart, useEntityHistory, useEntityStatistics und die
         aggregateHistory-Helfer — Echtzeit-Verläufe direkt aus deinem Recorder.
@@ -135,7 +135,7 @@ export function ChartsPage() {
                 <Stat label="Mittel" value={num(stats.mean)} accent />
                 <Stat label="Summe" value={num(stats.sum)} />
               </ResponsiveGrid>
-              <p className="rd-sdk-ref__lead" style={{ marginTop: 10 }}>
+              <p className="rd-dd-lead" style={{ marginTop: 10 }}>
                 Entity: <code>{primaryId}</code> · geladen über WebSocket
                 (<code>recorder/statistics_during_period</code>).
               </p>
@@ -145,7 +145,7 @@ export function ChartsPage() {
           {energy && (
             <Section title="aggregateHistory · Tagesverbrauch">
               <div className="rd-glass rd-chart-panel">
-                <p className="rd-sdk-ref__lead">
+                <p className="rd-dd-lead">
                   Aus dem kumulativen Zähler{' '}
                   <code>{entityDisplayName(energy, energy.entity_id)}</code> werden über
                   <code> aggregateHistoryByDay</code> Tages-Deltas berechnet:
@@ -172,6 +172,6 @@ export function ChartsPage() {
           </Section>
         </>
       )}
-    </div>
+    </>
   );
 }

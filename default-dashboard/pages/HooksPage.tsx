@@ -84,7 +84,7 @@ export function HooksPage() {
   const haVersion = (hass?.config as { version?: string } | undefined)?.version;
 
   return (
-    <div className="rd-sdk-hooks">
+    <>
       <PageHead icon="⚡" module="@ha" title="Hooks, Services & State">
         Reaktive Hooks für jede Facette von Home Assistant. Komponenten rendern nur neu,
         wenn sich relevante Entities ändern — jede Karte zeigt Live-Daten.
@@ -133,7 +133,7 @@ export function HooksPage() {
       <Section title="Registry, Räume & Labels">
         <ResponsiveGrid min={270}>
           <HookDemoCard module="@ha" name="useAreas()">
-            <ul className="rd-sdk-hook-list">
+            <ul className="rd-dd-hook-list">
               {areas.slice(0, 5).map((a) => (
                 <li key={a.area_id}>{a.name}</li>
               ))}
@@ -150,7 +150,7 @@ export function HooksPage() {
           </HookDemoCard>
 
           <HookDemoCard module="@ha" name="useLabels()">
-            <ul className="rd-sdk-hook-list">
+            <ul className="rd-dd-hook-list">
               {labels.slice(0, 5).map((l) => (
                 <li key={l.label_id}>{l.name}</li>
               ))}
@@ -228,7 +228,7 @@ export function HooksPage() {
 
           <HookDemoCard module="@ha" name="useCalendarEvents(id, days)" hint={calendar?.entity_id ?? 'calendar.*'}>
             {calendar ? (
-              <ul className="rd-sdk-hook-list">
+              <ul className="rd-dd-hook-list">
                 {events.slice(0, 3).map((ev) => (
                   <li key={ev.summary + ev.start.toISOString()}>
                     {ev.summary}{' '}
@@ -287,12 +287,12 @@ export function HooksPage() {
             </small>
           </HookDemoCard>
         </ResponsiveGrid>
-        <p className="rd-sdk-ref__lead" style={{ marginTop: 14 }}>
+        <p className="rd-dd-lead" style={{ marginTop: 14 }}>
           Ebenfalls exportiert: <code>fetchEntityHistory</code>, <code>fetchEntityStatistics</code>,{' '}
           <code>fetchCalendarEvents</code> (imperative Promise-APIs) sowie{' '}
           <code>aggregateHistory</code> &amp; Co. — live im Tab <strong>Charts</strong>.
         </p>
       </Section>
-    </div>
+    </>
   );
 }

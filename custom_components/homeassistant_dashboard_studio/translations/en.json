@@ -15,7 +15,7 @@
     "step": {
       "init": {
         "title": "Restore default dashboard",
-        "description": "Deletes all saved dashboard files for **every user** and loads the bundled default showcase the next time the panel is opened.\n\n**Note:** Unsaved editor changes are lost. Reload the panel after resetting (F5).",
+        "description": "Deletes all saved dashboard files for **every user** and loads the bundled example dashboard the next time the panel is opened.\n\n**Note:** Unsaved editor changes are lost. Reload the panel after resetting (F5).",
         "data": {
           "confirm_reset": "Yes, delete saved dashboard and restore default"
         }

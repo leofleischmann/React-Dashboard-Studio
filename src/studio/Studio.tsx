@@ -9,6 +9,9 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
+import { projectUsesDefaultDashboardStyles } from '../lib/projectUsesDefaultStyles';
+import { syncDefaultDashboardStyles } from '../mount';
+import { useRenderRoot } from './shadowRoot';
 import { clearCompileCache, compileProject } from './compile';
 import { loadProject, isLocalDashboardMode, saveProject, subscribeProjectReset } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
@@ -55,6 +58,13 @@ export default function Studio() {
   const changedPathRef = useRef<string | null>(null);
   const fullRebuildRef = useRef(false);
   const hasCompiledRef = useRef(false);
+  const renderRoot = useRenderRoot();
+
+  useEffect(() => {
+    if (!loaded || !(renderRoot instanceof ShadowRoot)) return;
+    const needs = projectUsesDefaultDashboardStyles(project);
+    syncDefaultDashboardStyles(renderRoot, needs);
+  }, [loaded, project, renderRoot]);
 
   useEffect(() => {
     if (!ready || loaded) return;

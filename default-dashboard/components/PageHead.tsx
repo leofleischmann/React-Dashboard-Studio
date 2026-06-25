@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-/** Consistent premium page header used across the showcase sub-pages. */
+/** Page header for example-dashboard reference tabs. */
 export function PageHead({
   icon,
   module,

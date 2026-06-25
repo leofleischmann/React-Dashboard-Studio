@@ -1,17 +1,17 @@
-/* Widget catalog grid (@ha/ui) — used in Studio gallery and default-dashboard reference */
-.rd-sdk-ref-card {
+/* Widget catalog grid (@ha/ui) */
+.rd-widget-catalog-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
   content-visibility: auto;
   contain-intrinsic-size: auto 200px;
 }
-.rd-sdk-ref-card__head {
+.rd-widget-catalog-card__head {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.rd-sdk-ref-card__head code {
+.rd-widget-catalog-card__head code {
   font-size: 0.68rem;
   color: var(--rd-text-2);
   word-break: break-all;

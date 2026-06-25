@@ -1,1 +1,1 @@
-export type ShowcasePage = 'home' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';
+export type ExampleTab = 'home' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';

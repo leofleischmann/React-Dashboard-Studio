@@ -23,8 +23,8 @@ const RefCard = memo(function RefCard({
 }) {
   const domain = entry.domains[0];
   return (
-    <article className="rd-card rd-sdk-ref-card">
-      <header className="rd-sdk-ref-card__head">
+    <article className="rd-card rd-widget-catalog-card">
+      <header className="rd-widget-catalog-card__head">
         <strong>{entry.label}</strong>
         <code>{catalogSnippetDisplay(entry)}</code>
       </header>
@@ -37,7 +37,7 @@ const RefCard = memo(function RefCard({
   );
 });
 
-/** Live widget grid for SDK reference dashboards (@ha/ui). */
+/** Live widget grid for reference pages and custom dashboards (@ha/ui). */
 export function WidgetCatalogGrid({
   categories,
 }: {

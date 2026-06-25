@@ -1,13 +1,10 @@
 /**
- * Panel CSS bundle for the shadow root (mount.tsx).
+ * Panel CSS for the shadow root (mount.tsx).
  *
- * SDK (for all dashboards):
- *   - tokens, primitives, widgets, co-located sdk/ui CSS (auto via Vite glob)
+ * SDK (all dashboards): tokens, primitives, widgets, sdk/ui CSS (Vite glob).
+ * Default-dashboard example: home.css + demo-pages.css (injected only when needed).
  *
- * Default-dashboard example only (not required for custom projects):
- *   - default-dashboard/home.css, default-dashboard/demo-pages.css
- *
- * Studio editor chrome lives in studio.css (imported separately in mount.tsx).
+ * Studio editor chrome: studio.css (separate import in mount.tsx).
  */
 
 import tokens from './styles/tokens.css?inline';
@@ -27,12 +24,8 @@ const sdkUiCss = Object.keys(sdkUiCssModules)
   .map((key) => sdkUiCssModules[key])
   .join('\n');
 
-/** SDK layers first, then shipped example-dashboard styles */
-export const panelCss = [
-  tokens,
-  primitives,
-  widgets,
-  sdkUiCss,
-  defaultHome,
-  defaultDemoPages,
-].join('\n');
+/** @ha/ui + layout primitives — always loaded */
+export const sdkPanelCss = [tokens, primitives, widgets, sdkUiCss].join('\n');
+
+/** Shipped example dashboard only — loaded when project references these classes */
+export const defaultDashboardCss = [defaultHome, defaultDemoPages].join('\n');

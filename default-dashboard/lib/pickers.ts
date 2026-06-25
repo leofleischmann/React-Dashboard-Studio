@@ -1,6 +1,5 @@
-// Shared, defensive entity-picking helpers. The showcase must look great on ANY
-// Home Assistant install, so every page selects representative entities from
-// whatever happens to exist — never assuming a specific entity_id.
+// Shared entity-picking helpers for the example dashboard.
+// Picks representative entities from whatever exists — never assumes a fixed entity_id.
 import type { HassEntity } from '@ha';
 
 export type Entities = readonly HassEntity[];

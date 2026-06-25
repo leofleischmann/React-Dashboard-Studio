@@ -28,9 +28,9 @@ type FormatRow = { fn: string; result: string };
 
 function FormatTable({ rows }: { rows: FormatRow[] }) {
   return (
-    <div className="rd-sdk-format-table">
+    <div className="rd-dd-format-table">
       {rows.map((row) => (
-        <div key={row.fn} className="rd-sdk-format-row">
+        <div key={row.fn} className="rd-dd-format-row">
           <code>{row.fn}</code>
           <span>{row.result}</span>
         </div>
@@ -76,7 +76,7 @@ export function FormatPage() {
   }
 
   return (
-    <div className="rd-sdk-format">
+    <>
       <PageHead icon="🔤" module="@ha/format" title="Werte, Zustände & Zeiten">
         Einheitliche, lokalisierte Darstellung — Zahlen, Einheiten, Zustände, Farben und Zeiten.
         Alle Beispiele rechnen mit echten Werten aus deinen Entities.
@@ -132,6 +132,6 @@ export function FormatPage() {
           </code>
         </Card>
       </Section>
-    </div>
+    </>
   );
 }

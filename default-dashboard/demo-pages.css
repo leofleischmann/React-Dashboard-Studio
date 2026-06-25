@@ -1,19 +1,18 @@
-/* Default-dashboard SDK reference tabs (Widgets, Charts, Hooks, Layout, Format).
-   Not part of @ha/ui — only used by the shipped example project. */
+/* Default-dashboard SDK reference tabs (Widgets, Charts, Hooks, Layout, Format) */
 
 /* ── Shell (dashboard.tsx root) ──────────────────────────── */
-.rd-sdk-ref .rd-page-shell__main {
+.rd-dd .rd-page-shell__main {
   padding: 16px clamp(12px, 3vw, 28px) 88px;
 }
-.rd-sdk-showcase > .rd-page-shell > .rd-tabs {
+.rd-dd > .rd-page-shell > .rd-tabs {
   overflow-x: auto;
   scrollbar-width: none;
 }
-.rd-sdk-showcase > .rd-page-shell > .rd-tabs::-webkit-scrollbar {
+.rd-dd > .rd-page-shell > .rd-tabs::-webkit-scrollbar {
   display: none;
 }
 
-.rd-sdk-ref__lead {
+.rd-dd-lead {
   margin: 0 0 14px;
   font-size: 0.88rem;
   color: var(--rd-text-2);
@@ -55,39 +54,39 @@
 .rd-pagehead p { margin: 2px 0 0; font-size: 0.88rem; line-height: 1.5; color: var(--rd-text-2); max-width: 72ch; }
 
 /* ── Hooks demo cards ────────────────────────────────────── */
-.rd-sdk-hook {
+.rd-dd-hook {
   display: flex;
   flex-direction: column;
   gap: 10px;
   min-height: 100px;
 }
-.rd-sdk-hook__module {
+.rd-dd-hook__module {
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--primary-color, #6ea8fe);
 }
-.rd-sdk-hook__name {
+.rd-dd-hook__name {
   font-size: 0.82rem;
   word-break: break-all;
 }
-.rd-sdk-hook__hint {
+.rd-dd-hook__hint {
   margin: 4px 0 0;
   font-size: 0.72rem;
   color: var(--rd-text-2);
 }
-.rd-sdk-hook__live {
+.rd-dd-hook__live {
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-size: 0.9rem;
 }
-.rd-sdk-hook__live small {
+.rd-dd-hook__live small {
   color: var(--rd-text-2);
   font-size: 0.78rem;
 }
-.rd-sdk-hook-list {
+.rd-dd-hook-list {
   margin: 0;
   padding-left: 1rem;
   font-size: 0.85rem;
@@ -127,12 +126,12 @@
 }
 
 /* ── Format page ─────────────────────────────────────────── */
-.rd-sdk-format-table {
+.rd-dd-format-table {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.rd-sdk-format-row {
+.rd-dd-format-row {
   display: grid;
   grid-template-columns: minmax(140px, 1fr) auto;
   gap: 12px;
@@ -143,7 +142,7 @@
   border: 1px solid var(--rd-border);
   font-size: 0.85rem;
 }
-.rd-sdk-format-row code {
+.rd-dd-format-row code {
   color: var(--primary-color, #6ea8fe);
   font-size: 0.78rem;
   word-break: break-all;
@@ -208,7 +207,7 @@
 }
 .rd-miniapp__body { margin-top: 12px; }
 
-.rd-sdk-code {
+.rd-dd-code {
   margin: 10px 0;
   padding: 12px;
   border-radius: var(--rd-radius);

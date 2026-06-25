@@ -50,7 +50,7 @@ export function LayoutDemo() {
   const [tab, setTab] = useState<LayoutTab>('grid');
 
   return (
-    <div className="rd-sdk-layout">
+    <>
       <PageHead icon="📐" module="@ha/layout" title="Layout-Bausteine">
         ResponsiveGrid, Stack, Row, Tabs, PageShell, useHashRoute und RoutedPageShell —
         die Bausteine für Multi-Page-Dashboards wie diese Referenz.
@@ -92,7 +92,7 @@ export function LayoutDemo() {
       </Section>
 
       <Section title="Tabs · Mini-App (live)">
-        <p className="rd-sdk-ref__lead">
+        <p className="rd-dd-lead">
           Eine eigenständige Mini-App aus <code>Tabs</code> + Komponenten-State:
         </p>
         <MiniApp />
@@ -100,12 +100,12 @@ export function LayoutDemo() {
 
       <Section title="PageShell · useHashRoute · RoutedPageShell">
         <Card>
-          <p className="rd-sdk-ref__lead" style={{ marginTop: 0 }}>
+          <p className="rd-dd-lead" style={{ marginTop: 0 }}>
             Dieses ganze Dashboard ist eine <code>PageShell</code> mit <code>Tabs</code> und{' '}
             <code>useHashRoute</code> — Deep-Links wie <code>#/home</code>, <code>#/charts</code>.
             <code> RoutedPageShell</code> fasst alle drei zu einer Zeile zusammen:
           </p>
-          <pre className="rd-sdk-code">{`import { RoutedPageShell } from '@ha/layout';
+          <pre className="rd-dd-code">{`import { RoutedPageShell } from '@ha/layout';
 
 export default function Dashboard() {
   return (
@@ -121,6 +121,6 @@ export default function Dashboard() {
 }`}</pre>
         </Card>
       </Section>
-    </div>
+    </>
   );
 }

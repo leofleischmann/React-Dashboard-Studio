@@ -22,7 +22,7 @@ import {
   weatherIcon,
 } from '@ha/format';
 import { LightTile, SparkChart, SunArc, LiveClock } from '@ha/ui';
-import type { ShowcasePage } from '../types';
+import type { ExampleTab } from '../types';
 import { homeContext } from '../lib/pickers';
 
 /* ── small presentational helpers ──────────────────────────────────────── */
@@ -135,7 +135,7 @@ function pickPrimaryPower(power: HassEntity[]): HassEntity | undefined {
 
 /* ── page ──────────────────────────────────────────────────────────────── */
 
-export function HomePage({ onNavigate }: { onNavigate: (p: ShowcasePage) => void }) {
+export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }) {
   const ready = useHassReady();
   const dark = useDarkMode();
   const theme = useTheme();

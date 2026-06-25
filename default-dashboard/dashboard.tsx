@@ -1,5 +1,5 @@
 import { PageShell, Tabs, useHashRoute, type TabItem } from '@ha/layout';
-import type { ShowcasePage } from './types';
+import type { ExampleTab } from './types';
 import { HomePage } from './pages/HomePage';
 import { WidgetReference } from './pages/WidgetReference';
 import { ChartsPage } from './pages/ChartsPage';
@@ -7,7 +7,7 @@ import { HooksPage } from './pages/HooksPage';
 import { LayoutDemo } from './pages/LayoutDemo';
 import { FormatPage } from './pages/FormatPage';
 
-const TABS: TabItem<ShowcasePage>[] = [
+const TABS: TabItem<ExampleTab>[] = [
   { id: 'home', label: 'Home', icon: '🏠' },
   { id: 'widgets', label: 'Widgets', icon: '🧩' },
   { id: 'charts', label: 'Charts', icon: '📈' },
@@ -23,16 +23,16 @@ const VALID_PAGES = [
   'hooks',
   'layout',
   'format',
-] as const satisfies readonly ShowcasePage[];
+] as const satisfies readonly ExampleTab[];
 
-/** SDK showcase — shipped on first install. Fully editable via ✎ Bearbeiten. */
+/** Beispiel-Dashboard — bei Erstinstallation mitgeliefert, vollständig über ✎ Bearbeiten anpassbar. */
 export default function Dashboard() {
-  const [page, setPage] = useHashRoute<ShowcasePage>('home', VALID_PAGES);
+  const [page, setPage] = useHashRoute<ExampleTab>('home', VALID_PAGES);
 
   return (
-    <div className="rd-root rd-sdk-ref rd-sdk-showcase">
+    <div className="rd-root rd-dd">
       <PageShell
-        nav={<Tabs tabs={TABS} value={page} onChange={setPage} ariaLabel="SDK Showcase" />}
+        nav={<Tabs tabs={TABS} value={page} onChange={setPage} ariaLabel="Beispiel-Dashboard" />}
       >
         {page === 'home' && <HomePage onNavigate={setPage} />}
         {page === 'widgets' && <WidgetReference />}
