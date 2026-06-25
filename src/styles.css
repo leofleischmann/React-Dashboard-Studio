@@ -651,3 +651,177 @@
     transform: rotate(360deg);
   }
 }
+
+/* ── Generic entity row ──────────────────────────────────── */
+.rd-entity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-entity-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rd-entity-row__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-entity-row__id {
+  font-size: 0.72rem;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--rd-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-entity-row__side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.rd-entity-row__state {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Gauge ───────────────────────────────────────────────── */
+.rd-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-gauge__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.rd-gauge__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-gauge__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rd-gauge__value small {
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Action button ───────────────────────────────────────── */
+.rd-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.rd-action-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--rd-accent) 40%, var(--rd-border));
+  background: color-mix(in srgb, var(--rd-accent) 6%, var(--rd-card-bg));
+}
+.rd-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rd-action-btn__name {
+  font-weight: 600;
+}
+.rd-action-btn__hint {
+  font-size: 0.72rem;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--rd-text-2);
+}
+
+/* ── Climate card ────────────────────────────────────────── */
+.rd-climate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-climate__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-climate__name {
+  font-weight: 600;
+}
+.rd-climate__mode {
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  color: var(--rd-text-2);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+}
+.rd-climate__temps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.rd-climate__temps small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--rd-text-2);
+}
+.rd-climate__target {
+  color: var(--rd-accent);
+}
+
+/* ── Binary badge ────────────────────────────────────────── */
+.rd-binary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-binary__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rd-border);
+  flex-shrink: 0;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.rd-binary.is-on .rd-binary__dot {
+  background: var(--rd-ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-ok) 18%, transparent);
+}
+.rd-binary__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-binary__name {
+  font-weight: 600;
+}
+.rd-binary__state {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+  text-transform: capitalize;
+}
+.rd-binary.is-on .rd-binary__state {
+  color: var(--rd-ok);
+}

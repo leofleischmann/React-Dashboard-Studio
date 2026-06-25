@@ -14,18 +14,20 @@ export function isEntityIdContext(linePrefix: string): boolean {
 }
 
 /**
- * Lazily search entities — no upfront sort, O(n) scan stopped at `limit`.
- * With an empty query only the first `limit` entities are returned.
+ * Lazily search entities — optional domain filter, sorted by friendly name.
  */
 export function searchEntities(
   states: Record<string, HassEntity>,
   query: string,
   limit = 50,
+  domain?: string,
 ): HassEntity[] {
   const q = query.trim().toLowerCase();
   const results: HassEntity[] = [];
+  const scanCap = Math.max(limit, 400);
 
   for (const id in states) {
+    if (domain && !id.startsWith(`${domain}.`)) continue;
     const entity = states[id];
     if (
       q &&
@@ -35,10 +37,16 @@ export function searchEntities(
       continue;
     }
     results.push(entity);
-    if (results.length >= limit) break;
+    if (results.length >= scanCap) break;
   }
 
-  return results;
+  results.sort((a, b) =>
+    (a.attributes.friendly_name ?? a.entity_id).localeCompare(
+      b.attributes.friendly_name ?? b.entity_id,
+      'de',
+    ),
+  );
+  return results.slice(0, limit);
 }
 
 export { ENTITY_ID_RE };

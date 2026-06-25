@@ -19,6 +19,7 @@ import {
   writeEntry,
   writeLocalFiles,
 } from './dashboard-local.mjs';
+import { generateEntityTypes } from './gen-entity-types.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STORAGE_KEY = 'homeassistant_dashboard_studio';
@@ -122,6 +123,13 @@ async function pull(conn) {
   );
   if (removed.length > 0) {
     console.log(`   🗑  ${removed.length} veraltete lokale Datei(en) entfernt: ${removed.join(', ')}`);
+  }
+
+  console.log('🏷  Entity-Typen generieren …');
+  try {
+    await generateEntityTypes({ root: ROOT, hassUrl: HASS_URL, token: TOKEN });
+  } catch (err) {
+    console.warn(`⚠️  gen:types fehlgeschlagen: ${err.message}`);
   }
 }
 

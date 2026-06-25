@@ -2,39 +2,44 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { hassStore } from '../hass/store';
 import { searchEntities } from '../hass/entitySearch';
+import {
+  entityActionSnippet,
+  entityDomain,
+  entityIdSnippet,
+  entityValueSnippet,
+} from '../lib/entityActions';
 import type { HassEntity } from '../hass/types';
 
 type Mode = 'value' | 'action' | 'id';
 
 const LIST_LIMIT = 300;
 const ROW_HEIGHT = 52;
-const EMPTY_QUERY_LIMIT = 50;
+const EMPTY_QUERY_LIMIT = 80;
 
-const ACTION_SERVICE: Record<string, string> = {
-  light: 'toggle',
-  switch: 'toggle',
-  fan: 'toggle',
-  cover: 'toggle',
-  input_boolean: 'toggle',
-  media_player: 'media_play_pause',
-  script: 'turn_on',
-  scene: 'turn_on',
-  automation: 'trigger',
-  button: 'press',
-  lock: 'unlock',
-};
+const DOMAIN_FILTERS = [
+  ['', 'Alle'],
+  ['sensor', 'Sensor'],
+  ['binary_sensor', 'Binary'],
+  ['light', 'Licht'],
+  ['switch', 'Schalter'],
+  ['climate', 'Klima'],
+  ['cover', 'Rollo'],
+  ['media_player', 'Media'],
+  ['script', 'Script'],
+  ['scene', 'Szene'],
+  ['button', 'Button'],
+] as const;
 
 function snippetFor(mode: Mode, id: string): string {
-  if (mode === 'id') return `'${id}'`;
-  if (mode === 'value') return `useEntity('${id}')?.state`;
-  const domain = id.split('.')[0];
-  const service = ACTION_SERVICE[domain] ?? 'toggle';
-  return `callService('${domain}', '${service}', { entity_id: '${id}' })`;
+  if (mode === 'id') return entityIdSnippet(id);
+  if (mode === 'value') return entityValueSnippet(id);
+  return entityActionSnippet(id);
 }
 
-function useEntityMatches(query: string): HassEntity[] {
-  const cacheRef = useRef<{ q: string; key: string; result: HassEntity[] }>({
+function useEntityMatches(query: string, domain: string): HassEntity[] {
+  const cacheRef = useRef<{ q: string; d: string; key: string; result: HassEntity[] }>({
     q: '',
+    d: '',
     key: '',
     result: [],
   });
@@ -42,16 +47,16 @@ function useEntityMatches(query: string): HassEntity[] {
   const getSnapshot = useCallback(() => {
     const states = hassStore.getHass()?.states ?? {};
     const q = query.trim();
-    const limit = q ? LIST_LIMIT : EMPTY_QUERY_LIMIT;
-    const next = searchEntities(states, q, limit);
+    const limit = q || domain ? LIST_LIMIT : EMPTY_QUERY_LIMIT;
+    const next = searchEntities(states, q, limit, domain || undefined);
     const key = next.map((e) => `${e.entity_id}:${e.state}`).join('|');
     const prev = cacheRef.current;
-    if (prev.q === q && prev.key === key) {
+    if (prev.q === q && prev.d === domain && prev.key === key) {
       return prev.result;
     }
-    cacheRef.current = { q, key, result: next };
+    cacheRef.current = { q, d: domain, key, result: next };
     return next;
-  }, [query]);
+  }, [query, domain]);
 
   return useSyncExternalStore(hassStore.subscribe, getSnapshot, () => []);
 }
@@ -81,6 +86,9 @@ function EntityRow({
       <span className="rd-inserter__state">
         {entity.state}
         {unit ? ` ${unit}` : ''}
+        {mode === 'action' && (
+          <small className="rd-inserter__svc"> · {entityDomain(entity.entity_id)}</small>
+        )}
       </span>
     </div>
   );
@@ -95,10 +103,19 @@ export function EntityInserter({
 }) {
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<Mode>('value');
+  const [domain, setDomain] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
 
-  const matches = useEntityMatches(query);
+  const matches = useEntityMatches(query, domain);
   const hasQuery = query.trim().length > 0;
+  const exampleId =
+    domain === 'light'
+      ? 'light.wohnzimmer'
+      : domain === 'sensor'
+        ? 'sensor.temperatur'
+        : domain
+          ? `${domain}.beispiel`
+          : 'sensor.beispiel';
 
   const virtualizer = useVirtualizer({
     count: matches.length,
@@ -145,17 +162,32 @@ export function EntityInserter({
         ))}
       </div>
 
-      <div
-        className="rd-inserter__preview"
-        title={snippetFor(mode, 'sensor.beispiel')}
-      >
-        {snippetFor(mode, 'sensor.beispiel')}
+      <div className="rd-inserter__domains">
+        {DOMAIN_FILTERS.map(([value, label]) => (
+          <button
+            key={value || 'all'}
+            className={`rd-inserter__domain ${domain === value ? 'is-active' : ''}`}
+            onClick={() => setDomain(value)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {!hasQuery && (
+      <div className="rd-inserter__preview-wrap">
+        <span className="rd-inserter__preview-label">Beispiel:</span>
+        <div
+          className="rd-inserter__preview"
+          title={snippetFor(mode, exampleId)}
+        >
+          {snippetFor(mode, exampleId)}
+        </div>
+      </div>
+
+      {!hasQuery && !domain && (
         <p className="rd-inserter__hint">
-          Suchbegriff eingeben — es werden die ersten {EMPTY_QUERY_LIMIT} Entities
-          angezeigt.
+          Suchbegriff oder Domain wählen — es werden die ersten {EMPTY_QUERY_LIMIT}{' '}
+          Entities angezeigt.
         </p>
       )}
 

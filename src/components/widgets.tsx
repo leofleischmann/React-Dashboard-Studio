@@ -1,5 +1,10 @@
 import { callService, useEntity } from '../hass/hooks';
 import {
+  defaultEntityService,
+  entityDomain,
+  TOGGLE_DOMAINS,
+} from '../lib/entityActions';
+import {
   batteryColor,
   euro,
   isAvailable,
@@ -219,6 +224,197 @@ export function Stat({
         {value}
         {unit && <small> {unit}</small>}
       </span>
+    </div>
+  );
+}
+
+/** Responsive grid — `min` sets the minimum column width in px. */
+export function Grid({
+  children,
+  min = 180,
+}: {
+  children: React.ReactNode;
+  min?: number;
+}) {
+  return (
+    <div className="rd-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }}>
+      {children}
+    </div>
+  );
+}
+
+/** Generic entity row — state + optional toggle for switchable domains. */
+export function EntityRow({
+  entityId,
+  label,
+  toggle = 'auto',
+}: {
+  entityId: string;
+  label?: string;
+  toggle?: boolean | 'auto';
+}) {
+  const entity = useEntity(entityId);
+  const domain = entityDomain(entityId);
+  const name = label ?? entity?.attributes.friendly_name ?? entityId;
+  const unit = entity?.attributes.unit_of_measurement;
+  const showToggle =
+    toggle === 'auto' ? TOGGLE_DOMAINS.has(domain) : toggle;
+  const on = entity?.state === 'on' || entity?.state === 'open' || entity?.state === 'unlocked';
+
+  return (
+    <div className="rd-card rd-entity-row">
+      <div className="rd-entity-row__main">
+        <span className="rd-entity-row__name">{name}</span>
+        <span className="rd-entity-row__id">{entityId}</span>
+      </div>
+      <div className="rd-entity-row__side">
+        <span className="rd-entity-row__state">
+          {entity?.state ?? '–'}
+          {unit ? ` ${unit}` : ''}
+        </span>
+        {showToggle && (
+          <button
+            className={`rd-switch ${on ? 'is-on' : ''}`}
+            disabled={!isAvailable(entity)}
+            aria-label={`${name} schalten`}
+            onClick={() =>
+              callService(domain, defaultEntityService(entityId), { entity_id: entityId })
+            }
+          >
+            <span className="rd-switch__knob" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Numeric sensor with a horizontal gauge (default 0–100). */
+export function Gauge({
+  entityId,
+  label,
+  min = 0,
+  max = 100,
+  unit,
+}: {
+  entityId: string;
+  label?: string;
+  min?: number;
+  max?: number;
+  unit?: string;
+}) {
+  const entity = useEntity(entityId);
+  const value = stateNumber(entity);
+  const name = label ?? entity?.attributes.friendly_name ?? entityId;
+  const u = unit ?? (entity?.attributes.unit_of_measurement as string | undefined);
+  const pct =
+    value === undefined ? 0 : Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+
+  return (
+    <div className="rd-card rd-gauge">
+      <div className="rd-gauge__head">
+        <span className="rd-gauge__name">{name}</span>
+        <span className="rd-gauge__value">
+          {num(entity?.state)}
+          {u && <small> {u}</small>}
+        </span>
+      </div>
+      <div className="rd-bar">
+        <div className="rd-bar__fill" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/** Press button for script, scene, button, automation, … */
+export function ActionButton({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const entity = useEntity(entityId);
+  const domain = entityDomain(entityId);
+  const name = label ?? entity?.attributes.friendly_name ?? entityId;
+  const service = defaultEntityService(entityId);
+
+  return (
+    <button
+      className="rd-card rd-action-btn"
+      disabled={!isAvailable(entity)}
+      onClick={() => callService(domain, service, { entity_id: entityId })}
+    >
+      <span className="rd-action-btn__name">{name}</span>
+      <span className="rd-action-btn__hint">{domain}.{service}</span>
+    </button>
+  );
+}
+
+/** Climate entity — current/target temperature and HVAC mode. */
+export function ClimateCard({
+  entityId,
+  label,
+}: {
+  entityId: string;
+  label?: string;
+}) {
+  const climate = useEntity(entityId);
+  const name = label ?? climate?.attributes.friendly_name ?? entityId;
+  const current = climate?.attributes.current_temperature;
+  const target = climate?.attributes.temperature;
+  const mode = climate?.attributes.hvac_mode ?? climate?.state;
+
+  return (
+    <div className="rd-card rd-climate">
+      <div className="rd-climate__head">
+        <span className="rd-climate__name">{name}</span>
+        <span className="rd-climate__mode">{String(mode ?? '–')}</span>
+      </div>
+      <div className="rd-climate__temps">
+        <span>
+          {num(current !== undefined ? String(current) : undefined)}
+          <small> °C ist</small>
+        </span>
+        <span className="rd-climate__target">
+          → {num(target !== undefined ? String(target) : undefined)}
+          <small> °C soll</small>
+        </span>
+      </div>
+      <button
+        className="rd-pill"
+        disabled={!isAvailable(climate)}
+        onClick={() => callService('climate', 'toggle', { entity_id: entityId })}
+      >
+        Klima umschalten
+      </button>
+    </div>
+  );
+}
+
+/** Binary sensor / motion — on/off badge. */
+export function BinaryBadge({
+  entityId,
+  label,
+  onLabel = 'an',
+  offLabel = 'aus',
+}: {
+  entityId: string;
+  label?: string;
+  onLabel?: string;
+  offLabel?: string;
+}) {
+  const entity = useEntity(entityId);
+  const name = label ?? entity?.attributes.friendly_name ?? entityId;
+  const on = entity?.state === 'on';
+
+  return (
+    <div className={`rd-card rd-binary ${on ? 'is-on' : ''}`}>
+      <span className="rd-binary__dot" />
+      <div className="rd-binary__text">
+        <span className="rd-binary__name">{name}</span>
+        <span className="rd-binary__state">{on ? onLabel : offLabel}</span>
+      </div>
     </div>
   );
 }

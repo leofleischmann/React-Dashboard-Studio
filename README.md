@@ -38,7 +38,7 @@ export default function Dashboard() {
 | Thema | Kurz |
 | --- | --- |
 | **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
-| **Entities einfügen** | **⚡ Sensor / Aktion** — suchen, Klick fügt Snippet ein |
+| **Entities einfügen** | **⚡ Sensor / Aktion** — Domain-Filter, suchen, Snippet einfügen |
 | **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
 | **Mobil** | Nur Anzeige, kein Editor |
 
@@ -53,7 +53,7 @@ export default function Dashboard() {
 ```bash
 npm install
 cp .env.local.example .env.local   # VITE_HASS_URL + VITE_HASS_TOKEN eintragen
-npm run sync:pull                  # bestehendes Dashboard aus HA → ./dashboard/
+npm run sync:pull                  # Dashboard aus HA → ./dashboard/ (+ gen:types)
 ```
 
 Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → erstellen.
@@ -62,8 +62,8 @@ Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → ers
 | --- | --- |
 | `npm run dev` | Nur **Live-Vorschau** (kein Browser-Editor) — Code in VS Code unter `./dashboard/` |
 | `npm run sync:watch` | Optional parallel: jede Speicherung in VS Code wird zu HA hochladen |
-| `npm run gen:types` | Optional: Entity-Liste für VS Code (`dashboard/ENTITIES.md`) |
-| `npm run sync:pull` / `sync:push` | Einmalig laden bzw. hochladen |
+| `npm run sync:pull` / `sync:push` | Einmalig laden bzw. hochladen (`pull` generiert auch `ENTITIES.md`) |
+| `npm run gen:types` | Manuell: Entity-Liste für VS Code (läuft automatisch bei `sync:pull`) |
 
 **Typischer Ablauf:** Terminal 1 → `npm run dev` (Vorschau) · VS Code → `./dashboard/` · Terminal 2 optional → `npm run sync:watch` (Push inkl. Löschen entfernter Dateien in HA).
 
@@ -88,6 +88,6 @@ Neue Exports in `hooks.ts` / `widgets.tsx` / `format.ts` und in [`runtime.ts`](s
 | Modul | Inhalt |
 | --- | --- |
 | `@ha` | `useEntity`, `useEntityState`, `useEntitiesByDomain`, `useHassReady`, `callService`, `states` |
-| `@ha/ui` | `Card`, `Stat`, `Section`, `RoomCard`, `DeviceCard`, `BatteryRow`, `LightTile` |
+| `@ha/ui` | `Card`, `Stat`, `Section`, `Grid`, `EntityRow`, `Gauge`, `ActionButton`, `ClimateCard`, `BinaryBadge`, `LightTile`, `RoomCard`, `DeviceCard`, `BatteryRow` |
 | `@ha/format` | `num`, `euro`, `isAvailable`, `stateNumber`, `weatherIcon`, `greeting`, `batteryColor` |
 | `react` | React inkl. Hooks |
