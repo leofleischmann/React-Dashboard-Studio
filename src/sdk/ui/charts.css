@@ -1,5 +1,6 @@
 /* SparkChart / HistoryChart */
 .rd-chart { margin-top: auto; }
+
 .rd-chart__legend {
   display: flex;
   flex-wrap: wrap;
@@ -8,51 +9,133 @@
   font-size: 0.68rem;
   color: var(--rd-text-2);
 }
+
 .rd-chart__legend-item {
   display: inline-flex;
   align-items: center;
   gap: 5px;
 }
+
 .rd-chart__legend-item i {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   display: inline-block;
 }
-.rd-chart__plot-wrap {
+
+/* ── Sparkline (no axes) ─────────────────────────────────── */
+.rd-chart__spark {
   width: 100%;
   overflow: hidden;
   border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
 }
+
+/* ── Chart with HTML axes ────────────────────────────────── */
+.rd-chart__frame {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rd-chart__row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: 0;
+}
+
+.rd-chart__y-axis {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+
+.rd-chart__ylabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rd-text-2);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  align-self: center;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.rd-chart__y-ticks {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.rd-chart__tick-y {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--rd-text-2);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rd-chart__plot {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
+}
+
+.rd-chart__x-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 14px;
+}
+
+.rd-chart__tick-x {
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--rd-text-2);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rd-chart__xlabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rd-text-2);
+  text-align: center;
+  flex: 1;
+}
+
 .rd-chart__svg {
   display: block;
   width: 100%;
-  height: auto;
-  background: rgba(0, 0, 0, 0.06);
+  height: 100%;
 }
-.rd-chart--axes .rd-chart__svg {
-  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
-}
+
 .rd-chart__grid-line {
   stroke: color-mix(in srgb, var(--rd-text) 10%, transparent);
   stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
+
 .rd-chart__axis-line {
-  stroke: color-mix(in srgb, var(--rd-text) 24%, transparent);
+  stroke: color-mix(in srgb, var(--rd-text) 22%, transparent);
   stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
-.rd-chart__tick {
-  fill: var(--rd-text-2);
-  font-size: 10px;
-  font-family: inherit;
-  font-variant-numeric: tabular-nums;
-}
-.rd-chart__axis-label {
-  fill: var(--rd-text-2);
-  font-size: 10px;
-  font-weight: 600;
-  font-family: inherit;
-}
+
 .rd-chart__empty {
   margin: 0;
   padding: 28px 8px;

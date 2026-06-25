@@ -106,7 +106,7 @@ export function ChartsPage() {
         <>
           <Section title="SparkChart · Multi-Series (48 h)">
             <div className="rd-glass rd-chart-panel">
-              <SparkChart series={series} height={130} loading={historyLoading} axes={{ xLabel: 'Zeit', yLabel: 'Wert' }} />
+              <SparkChart series={series} height={80} loading={historyLoading} axes={{ xLabel: 'Zeit', yLabel: 'Wert' }} />
             </div>
           </Section>
 
@@ -121,7 +121,7 @@ export function ChartsPage() {
                     points: history[sensors[0].entity_id] ?? [],
                   },
                 ]}
-                height={170}
+                height={96}
                 showLegend
                 axes={{
                   xLabel: 'Zeit',
