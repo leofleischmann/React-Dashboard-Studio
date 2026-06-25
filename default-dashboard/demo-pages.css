@@ -1,0 +1,221 @@
+/* Default-dashboard SDK reference tabs (Widgets, Charts, Hooks, Layout, Format).
+   Not part of @ha/ui — only used by the shipped example project. */
+
+/* ── Shell (dashboard.tsx root) ──────────────────────────── */
+.rd-sdk-ref .rd-page-shell__main {
+  padding: 16px clamp(12px, 3vw, 28px) 88px;
+}
+.rd-sdk-showcase > .rd-page-shell > .rd-tabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rd-sdk-showcase > .rd-page-shell > .rd-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rd-sdk-ref__lead {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Shared page header ──────────────────────────────────── */
+.rd-pagehead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.rd-pagehead__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  font-size: 1.6rem;
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--rd-accent) 28%, var(--rd-card-bg)),
+    color-mix(in srgb, var(--rd-accent) 10%, var(--rd-card-bg))
+  );
+  border: 1px solid color-mix(in srgb, var(--rd-accent) 30%, transparent);
+}
+.rd-pagehead__text { display: flex; flex-direction: column; gap: 2px; }
+.rd-pagehead__module {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rd-accent);
+}
+.rd-pagehead h2 { margin: 0; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.01em; }
+.rd-pagehead p { margin: 2px 0 0; font-size: 0.88rem; line-height: 1.5; color: var(--rd-text-2); max-width: 72ch; }
+
+/* ── Hooks demo cards ────────────────────────────────────── */
+.rd-sdk-hook {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100px;
+}
+.rd-sdk-hook__module {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-color, #6ea8fe);
+}
+.rd-sdk-hook__name {
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+.rd-sdk-hook__hint {
+  margin: 4px 0 0;
+  font-size: 0.72rem;
+  color: var(--rd-text-2);
+}
+.rd-sdk-hook__live {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+.rd-sdk-hook__live small {
+  color: var(--rd-text-2);
+  font-size: 0.78rem;
+}
+.rd-sdk-hook-list {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.rd-demo-btn {
+  align-self: flex-start;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--rd-accent);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.rd-demo-btn:hover { filter: brightness(1.07); }
+.rd-demo-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.rd-theme-swatches { display: flex; align-items: center; gap: 8px; }
+.rd-theme-swatches span {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--rd-text) 15%, transparent);
+}
+.rd-theme-swatches code { font-size: 0.74rem; color: var(--rd-text-2); }
+.rd-theme-box {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--primary-color) 50%, var(--rd-border));
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--rd-card-bg));
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ── Format page ─────────────────────────────────────────── */
+.rd-sdk-format-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rd-sdk-format-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--rd-radius);
+  background: var(--rd-card-bg);
+  border: 1px solid var(--rd-border);
+  font-size: 0.85rem;
+}
+.rd-sdk-format-row code {
+  color: var(--primary-color, #6ea8fe);
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+.rd-fmt-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.rd-fmt-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+  font-size: 0.8rem;
+}
+.rd-fmt-swatch i { width: 14px; height: 14px; border-radius: 50%; }
+.rd-fmt-swatch code { color: var(--rd-text-2); }
+.rd-fmt-weather { display: flex; flex-wrap: wrap; gap: 10px; }
+.rd-fmt-weather__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 70px;
+  padding: 12px;
+  border-radius: var(--rd-radius);
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+}
+.rd-fmt-weather__item strong { font-size: 1.8rem; }
+.rd-fmt-weather__item code { font-size: 0.66rem; color: var(--rd-text-2); }
+.rd-fmt-weather__item.is-live {
+  border-color: color-mix(in srgb, var(--rd-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--rd-accent) 8%, var(--rd-card-bg));
+}
+.rd-fmt-import { font-size: 0.78rem; color: var(--rd-accent); word-break: break-all; }
+
+/* ── Charts page ─────────────────────────────────────────── */
+.rd-aggbars { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
+.rd-aggbar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.rd-aggbar__fill {
+  width: 100%;
+  min-height: 3px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, var(--rd-accent), color-mix(in srgb, var(--rd-accent) 45%, transparent));
+  transition: height 0.5s ease;
+}
+.rd-aggbar__label { font-size: 0.62rem; color: var(--rd-text-2); }
+.rd-aggbar__val { font-size: 0.64rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rd-agg-total { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
+.rd-agg-total span { display: flex; flex-direction: column; }
+.rd-agg-total small { font-size: 0.68rem; color: var(--rd-text-2); }
+.rd-agg-total strong { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rd-chart-panel { padding: 16px; }
+
+/* ── Layout demo · mini app ──────────────────────────────── */
+.rd-miniapp {
+  padding: 14px;
+  border-radius: var(--rd-radius);
+  border: 1px solid var(--rd-border);
+  background: color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
+}
+.rd-miniapp__body { margin-top: 12px; }
+
+.rd-sdk-code {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: var(--rd-radius);
+  background: color-mix(in srgb, var(--rd-text) 6%, var(--rd-card-bg));
+  border: 1px solid var(--rd-border);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  overflow-x: auto;
+  white-space: pre;
+}
