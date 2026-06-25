@@ -1,1 +1,1 @@
-export type ShowcasePage = 'overview' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';
+export type ShowcasePage = 'home' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';

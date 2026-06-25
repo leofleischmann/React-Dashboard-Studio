@@ -33,10 +33,25 @@ function domainOf(entityId: string): string {
   return entityId.split('.')[0] ?? entityId;
 }
 
-function matchesPattern(entity: HassEntity, pattern: string): boolean {
-  const re = new RegExp(pattern, 'i');
-  const name = entity.attributes.friendly_name;
-  return re.test(entity.entity_id) || (typeof name === 'string' && re.test(name));
+function buildPatternMatcher(pattern: string): (entity: HassEntity) => boolean {
+  let re: RegExp | null = null;
+  try {
+    re = new RegExp(pattern, 'i');
+  } catch {
+    // Invalid regex (e.g. a stray "[") — fall back to case-insensitive substring.
+    re = null;
+  }
+  const needle = pattern.toLowerCase();
+
+  return (entity) => {
+    const name = entity.attributes.friendly_name;
+    const nameStr = typeof name === 'string' ? name : '';
+    if (re) return re.test(entity.entity_id) || re.test(nameStr);
+    return (
+      entity.entity_id.toLowerCase().includes(needle) ||
+      nameStr.toLowerCase().includes(needle)
+    );
+  };
 }
 
 /** Filter entities from a list (non-reactive helper). */
@@ -64,9 +79,11 @@ export function filterEntities(
     ? new Set(registryStore.getEntitiesWithLabel(filter.labelId))
     : null;
 
+  const patternMatch = filter.pattern ? buildPatternMatcher(filter.pattern) : null;
+
   return entities.filter((entity) => {
     if (domains && !domains.includes(domainOf(entity.entity_id))) return false;
-    if (filter.pattern && !matchesPattern(entity, filter.pattern)) return false;
+    if (patternMatch && !patternMatch(entity)) return false;
     if (deviceClasses) {
       const dc = entity.attributes.device_class as string | undefined;
       if (!dc || !deviceClasses.includes(dc)) return false;

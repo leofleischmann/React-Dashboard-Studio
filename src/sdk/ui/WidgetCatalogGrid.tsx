@@ -5,8 +5,10 @@ import { ResponsiveGrid } from './layout';
 import {
   WIDGET_CATALOG,
   catalogSnippetDisplay,
+  catalogByCategory,
   type WidgetCatalogEntry,
-} from './widgetCatalog';
+  type WidgetCategory,
+} from './catalog';
 
 function buildExampleMap(entities: readonly HassEntity[]): Map<string, string> {
   const byDomain = new Map<string, string>();
@@ -30,14 +32,15 @@ const RefCard = memo(function RefCard({
   children: (entityId: string) => ReactNode;
 }) {
   const domain = entry.domains[0];
+  const canDemo = entityId || entry.optionalEntity;
   return (
     <article className="rd-card rd-sdk-ref-card">
       <header className="rd-sdk-ref-card__head">
         <strong>{entry.label}</strong>
         <code>{catalogSnippetDisplay(entry)}</code>
       </header>
-      {entityId ? (
-        children(entityId)
+      {canDemo ? (
+        children(entityId ?? '')
       ) : (
         <p className="rd-empty">Kein {domain}.* gefunden</p>
       )}
@@ -46,13 +49,20 @@ const RefCard = memo(function RefCard({
 });
 
 /** Live widget grid for SDK reference dashboards (@ha/ui). */
-export function WidgetCatalogGrid() {
+export function WidgetCatalogGrid({
+  categories,
+}: {
+  categories?: WidgetCategory[];
+} = {}) {
   const entities = useEntities();
   const examples = useMemo(() => buildExampleMap(entities), [entities]);
+  const entries = categories?.length
+    ? categories.flatMap((c) => catalogByCategory(c))
+    : WIDGET_CATALOG;
 
   return (
     <ResponsiveGrid min={260}>
-      {WIDGET_CATALOG.map((entry) => {
+      {entries.map((entry) => {
         const Demo = entry.Demo;
         const entityId =
           entry.pickExample?.(entities) ??
@@ -67,5 +77,11 @@ export function WidgetCatalogGrid() {
   );
 }
 
-export { WIDGET_CATALOG, catalogSnippet, catalogSnippetDisplay } from './widgetCatalog';
-export type { WidgetCatalogEntry } from './widgetCatalog';
+export {
+  WIDGET_CATALOG,
+  catalogSnippet,
+  catalogSnippetDisplay,
+  catalogByCategory,
+  widgetNameForDomain,
+} from './catalog';
+export type { WidgetCatalogEntry, WidgetCategory } from './catalog';

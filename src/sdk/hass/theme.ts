@@ -28,6 +28,13 @@ export function readDarkMode(): boolean {
   return theme.includes('dark') || theme === 'midnight' || theme === 'ios-dark';
 }
 
+// useSyncExternalStore requires getSnapshot to return a referentially stable
+// value while nothing changed — otherwise React re-renders in an infinite loop.
+// We cache the computed object and only hand out a new reference when the
+// effective theme actually changes.
+let cachedTheme: ThemeVars | null = null;
+let cachedThemeSig = '';
+
 function readTheme(): ThemeVars {
   const hass = hassStore.getHass();
   const themeName = activeThemeName(hass);
@@ -44,11 +51,17 @@ function readTheme(): ThemeVars {
     (themeVars['accent-color'] ?? themeVars['primary-color'] ?? primary.trim()) ||
     '#03a9f4';
 
-  return {
+  const next: ThemeVars = {
     ...themeVars,
     primary: primary.trim() || '#03a9f4',
     accent: accent.trim() || primary.trim() || '#03a9f4',
   };
+
+  const sig = `${themeName}\0${JSON.stringify(next)}`;
+  if (sig === cachedThemeSig && cachedTheme) return cachedTheme;
+  cachedThemeSig = sig;
+  cachedTheme = next;
+  return next;
 }
 
 /** Home Assistant theme colors as CSS-ready values. */

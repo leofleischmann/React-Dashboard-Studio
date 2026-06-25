@@ -24,13 +24,15 @@ import {
   registryStore,
   type EntityRegistryEntry,
   type AreaEntry,
+  type LabelEntry,
 } from './registryStore';
 import { useTheme, useDarkMode, applyThemeVars } from './theme';
 
+export type { HassEntity } from './types';
 export type { EntityFilter } from './entityFilter';
 export type { EntityStatistics } from './statistics';
 export type { CalendarEvent } from './calendar';
-export type { EntityRegistryEntry, AreaEntry } from './registryStore';
+export type { EntityRegistryEntry, AreaEntry, LabelEntry } from './registryStore';
 export { aggregateHistory, aggregateHistoryByDay, aggregateHistoryDelta };
 export { fetchEntityHistory, fetchEntityStatistics, fetchCalendarEvents };
 export type { HistoryPoint } from './history';
@@ -171,6 +173,28 @@ export function useAreas(): AreaEntry[] {
   return useSyncExternalStore(subscribe, getSnapshot, () => []);
 }
 
+/** All labels from the HA label registry. */
+export function useLabels(): LabelEntry[] {
+  const ready = useHassReady();
+  const cacheRef = useRef<LabelEntry[]>([]);
+
+  useEffect(() => {
+    if (ready) registryStore.ensureLoaded();
+  }, [ready]);
+
+  const getSnapshot = useCallback(() => {
+    const next = registryStore.getLabels();
+    const prev = cacheRef.current;
+    if (prev.length === next.length && prev.every((l, i) => l === next[i])) {
+      return prev;
+    }
+    cacheRef.current = next;
+    return next;
+  }, []);
+
+  return useSyncExternalStore(registryStore.subscribe, getSnapshot, () => []);
+}
+
 /** Name of a HA area by id. */
 export function useAreaName(areaId: string): string | undefined {
   const ready = useHassReady();
@@ -217,9 +241,9 @@ export function useTime(tickMs = 60_000): Date {
   return now;
 }
 
-/** Sun position and schedule from `sun.sun`. */
-export function useSun() {
-  const sun = useEntity('sun.sun' as KnownEntityId);
+/** Sun position and schedule from a `sun.*` entity (default `sun.sun`). */
+export function useSun(entityId: KnownEntityId | string = 'sun.sun') {
+  const sun = useEntity(entityId as KnownEntityId);
   const now = useTime(60_000);
   const attrs = sun?.attributes ?? {};
 

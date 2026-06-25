@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-import voluptuous as vol
+import voluptuous as vol  # pyright: ignore[reportMissingImports]
 
-from homeassistant import data_entry_flow
-from homeassistant.config_entries import OptionsFlow
-from homeassistant.helpers import config_validation as cv
+from homeassistant import data_entry_flow  # pyright: ignore[reportMissingImports]
+from homeassistant.config_entries import OptionsFlow  # pyright: ignore[reportMissingImports]
+from homeassistant.helpers import config_validation as cv  # pyright: ignore[reportMissingImports]
 
 from .const import CONF_CONFIRM_RESET
 from .user_data import async_reset_all_dashboard_projects
