@@ -6,6 +6,7 @@ dist
 .DS_Store
 .claude
 TODO.txt
+notes.md
 
 # Python bytecode
 __pycache__/

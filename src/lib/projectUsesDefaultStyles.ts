@@ -4,6 +4,13 @@ import type { Project } from '../studio/project';
 const DEFAULT_DASHBOARD_STYLE_MARKERS = [
   'rd-dd',
   'rd-dd-hook',
+  'rd-stage',
+  'rd-atmo',
+  'rd-vital',
+  'rd-room2',
+  'rd-wx',
+  'rd-sec',
+  'rd-activity',
   'rd-hero',
   'rd-kpi',
   'rd-panel',
