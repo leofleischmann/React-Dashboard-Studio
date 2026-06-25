@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { dashboardDevPlugin } from './scripts/dashboard-dev-plugin.mjs';
 
 // Two modes from one config:
 //  - `vite`         → dev server using index.html + src/dev.tsx (live HA over WebSocket)
@@ -10,7 +11,7 @@ import react from '@vitejs/plugin-react';
 // asset HACS has to serve — no separate stylesheet, and the styles actually
 // reach the panel inside Home Assistant's shadow DOM.
 export default defineConfig(({ command }) => ({
-  plugins: [react()],
+  plugins: [react(), ...(command === 'serve' ? [dashboardDevPlugin()] : [])],
   // Vite's lib mode does NOT replace process.env.NODE_ENV (it assumes a
   // downstream bundler will). But we ship a finished, self-contained file, so
   // we must force React's production build ourselves — otherwise the dev build

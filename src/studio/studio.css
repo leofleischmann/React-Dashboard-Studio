@@ -110,6 +110,14 @@
   font-size: 0.72rem;
   color: var(--secondary-text-color, #6b6e7b);
 }
+.rd-studio__local {
+  font-size: 0.72rem;
+  color: #9aa3b8;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #3a4154;
+  background: #1e2433;
+}
 .rd-studio__status {
   font-size: 0.8rem;
   font-weight: 600;

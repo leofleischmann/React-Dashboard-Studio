@@ -11,7 +11,7 @@ import {
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useHassReady, useIsMobile } from '../hass/hooks';
 import { clearCompileCache, compileProject } from './compile';
-import { loadProject, saveProject } from './storage';
+import { loadProject, isLocalDashboardMode, saveProject } from './storage';
 import { DEFAULT_PROJECT, type Project } from './project';
 import { availableModules } from './runtime';
 import { Preview } from './Preview';
@@ -48,6 +48,7 @@ export default function Studio() {
   const [savedProject, setSavedProject] = useState<Project>(DEFAULT_PROJECT);
   const [activePath, setActivePath] = useState<string>(DEFAULT_PROJECT.entry);
   const [loaded, setLoaded] = useState(false);
+  const [localMode, setLocalMode] = useState(false);
   const [mode, setMode] = useState<Mode>('view');
   const [inserterOpen, setInserterOpen] = useState(false);
 
@@ -68,16 +69,36 @@ export default function Studio() {
     let cancelled = false;
     loadProject().then((p) => {
       if (cancelled) return;
+      const fromLocal = isLocalDashboardMode();
+      setLocalMode(fromLocal);
       setProject(p);
       setSavedProject(p);
       setActivePath(p.files[p.entry] !== undefined ? p.entry : Object.keys(p.files)[0]);
       setLoaded(true);
       fullRebuildRef.current = true;
+      if (fromLocal && import.meta.env.DEV) setMode('edit');
     });
     return () => {
       cancelled = true;
     };
   }, [ready, loaded]);
+
+  // VS Code / sync: reload when dashboard/ files change on disk.
+  useEffect(() => {
+    if (!import.meta.hot) return;
+    const reloadFromDisk = async () => {
+      if (!isLocalDashboardMode()) return;
+      const p = await loadProject();
+      fullRebuildRef.current = true;
+      clearCompileCache();
+      setProject(p);
+      setSavedProject(p);
+      setActivePath((prev) => (p.files[prev] !== undefined ? prev : p.entry));
+      hasCompiledRef.current = false;
+    };
+    import.meta.hot.on('dashboard-changed', reloadFromDisk);
+    return () => import.meta.hot?.off('dashboard-changed', reloadFromDisk);
+  }, []);
 
   // Recompile on project changes (debounced in edit mode).
   // In view mode only the initial compile runs so the preview is available.
@@ -249,6 +270,12 @@ export default function Studio() {
         )}
 
         <span className="rd-studio__title">Dashboard Studio</span>
+
+        {localMode && (
+          <span className="rd-studio__local" title="Projekt aus ./dashboard/ (VS Code)">
+            📁 dashboard/
+          </span>
+        )}
 
         {editing && (
           <>

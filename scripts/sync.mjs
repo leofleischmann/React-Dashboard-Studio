@@ -1,39 +1,27 @@
 // Local ⇄ Home Assistant sync for your dashboard project.
 //
-// Your dashboard code lives in HA's per-user `frontend/user_data` store (key
-// "homeassistant_dashboard_studio") — the exact same place the in-HA Studio reads and
-// writes. This tool talks to that store over the Home Assistant WebSocket API
-// using a Long-Lived Access Token, so you can edit the files locally (VS Code,
-// your own components, full TypeScript) and push them to HA.
-//
 //   node scripts/sync.mjs pull    # HA  → ./dashboard
 //   node scripts/sync.mjs push    # ./dashboard → HA
 //   node scripts/sync.mjs watch   # push once, then push on every save
 //
-// Config comes from .env.local (same as `npm run dev`):
-//   VITE_HASS_URL=http://homeassistant.local:8123
-//   VITE_HASS_TOKEN=<long-lived access token>
+// Config: .env.local (same as `npm run dev`).
 
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
-import { dirname, join, relative, sep } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WebSocket from 'ws';
+import {
+  DASHBOARD_DIR,
+  ENTRY_DEFAULT,
+  listLocalFiles,
+  readEntry,
+  writeEntry,
+  writeLocalFiles,
+} from './dashboard-local.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DASHBOARD_DIR = join(ROOT, 'dashboard');
-const META_FILE = join(DASHBOARD_DIR, '.studio.json'); // remembers the entry file
-const STORAGE_KEY = 'homeassistant_dashboard_studio'; // must match src/studio/storage.ts
-const ENTRY_DEFAULT = 'dashboard.tsx';
-const CODE_RE = /\.(tsx?|jsx?)$/;
+const STORAGE_KEY = 'homeassistant_dashboard_studio';
 
-// ── Config ───────────────────────────────────────────────────────────────────
 function loadEnv() {
   const env = { ...process.env };
   const file = join(ROOT, '.env.local');
@@ -59,7 +47,6 @@ if (!HASS_URL || !TOKEN) {
 }
 const WS_URL = HASS_URL.replace(/^http/, 'ws') + '/api/websocket';
 
-// ── Home Assistant WebSocket ─────────────────────────────────────────────────
 function connect() {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(WS_URL);
@@ -113,41 +100,6 @@ function connect() {
   });
 }
 
-// ── Local files ──────────────────────────────────────────────────────────────
-function listLocalFiles(dir = DASHBOARD_DIR, base = DASHBOARD_DIR) {
-  const out = {};
-  if (!existsSync(dir)) return out;
-  for (const name of readdirSync(dir)) {
-    if (name.startsWith('.')) continue; // skip .studio.json, dotfiles
-    const full = join(dir, name);
-    if (statSync(full).isDirectory()) Object.assign(out, listLocalFiles(full, base));
-    else if (CODE_RE.test(name)) {
-      const rel = relative(base, full).split(sep).join('/');
-      out[rel] = readFileSync(full, 'utf8');
-    }
-  }
-  return out;
-}
-
-function writeLocalFiles(files) {
-  for (const [path, content] of Object.entries(files)) {
-    const full = join(DASHBOARD_DIR, path);
-    mkdirSync(dirname(full), { recursive: true });
-    writeFileSync(full, content);
-  }
-}
-
-const readEntry = () =>
-  existsSync(META_FILE)
-    ? JSON.parse(readFileSync(META_FILE, 'utf8')).entry || ENTRY_DEFAULT
-    : ENTRY_DEFAULT;
-
-function writeEntry(entry) {
-  mkdirSync(DASHBOARD_DIR, { recursive: true });
-  writeFileSync(META_FILE, JSON.stringify({ entry }, null, 2) + '\n');
-}
-
-// ── Commands ─────────────────────────────────────────────────────────────────
 async function pull(conn) {
   const res = await conn.call({ type: 'frontend/get_user_data', key: STORAGE_KEY });
   const value = res?.value;
@@ -198,7 +150,6 @@ async function watch(conn) {
   }, 800);
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
 const cmd = process.argv[2] || 'watch';
 if (!['pull', 'push', 'watch'].includes(cmd)) {
   console.error('Nutzung: node scripts/sync.mjs <pull|push|watch>');
@@ -216,7 +167,7 @@ try {
 try {
   if (cmd === 'pull') await pull(conn);
   else if (cmd === 'push') await push(conn);
-  else await watch(conn); // stays running
+  else await watch(conn);
 } catch (err) {
   console.error(err.message);
   conn.close();
