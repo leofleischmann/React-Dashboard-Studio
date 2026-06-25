@@ -6,6 +6,7 @@ import {
   entityActionSnippet,
   entityDomain,
   entityIdSnippet,
+  entityTemplateSnippet,
   entityValueSnippet,
 } from '../sdk/entityActions';
 import { entityWidgetSnippet, widgetForDomain } from '../lib/entityWidgets';
@@ -13,7 +14,7 @@ import type { HassEntity } from '../sdk/hass/types';
 
 import { WidgetGallery } from './WidgetGallery';
 
-type Mode = 'value' | 'action' | 'id' | 'widget';
+type Mode = 'value' | 'template' | 'action' | 'id' | 'widget';
 type WidgetView = 'list' | 'gallery';
 
 const LIST_LIMIT = 300;
@@ -40,6 +41,7 @@ const DOMAIN_FILTERS = [
 function snippetFor(mode: Mode, id: string): string {
   if (mode === 'widget') return entityWidgetSnippet(id);
   if (mode === 'id') return entityIdSnippet(id);
+  if (mode === 'template') return entityTemplateSnippet(id);
   if (mode === 'value') return entityValueSnippet(id);
   return entityActionSnippet(id);
 }
@@ -211,6 +213,7 @@ export function EntityInserter({
         {(
           [
             ['value', 'Wert'],
+            ['template', 'Template'],
             ['action', 'Aktion'],
             ['id', 'nur ID'],
             ['widget', 'Widget'],

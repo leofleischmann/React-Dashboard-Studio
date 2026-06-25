@@ -22,6 +22,7 @@ import {
   useIsMobile,
   useLabels,
   useSun,
+  useTemplate,
   useTheme,
   useTime,
 } from '@ha';
@@ -47,6 +48,17 @@ export function HooksPage() {
 
   const sample = entities[0];
   const sampleId = sample?.entity_id ?? 'sensor.example';
+  const tempEntityId = tempSensors[0]?.entity_id ?? sampleId;
+  const tempTemplate = useTemplate(
+    `{{ states('${tempEntityId}') | float | round(1) }}`,
+  );
+  const sunGreeting = useTemplate(
+    "{% if is_state('sun.sun', 'above_horizon') %}Tag{% else %}Abend{% endif %}",
+  );
+  const sunIsDay = useTemplate("{{ is_state('sun.sun', 'above_horizon') }}", {
+    parse: 'boolean',
+  });
+
   const entity = useEntity(sampleId);
   const sampleState = useEntityState(sampleId);
   const registryEntry = useEntityRegistry(sampleId as never);
@@ -128,6 +140,68 @@ export function HooksPage() {
             {lights.filter((l) => l.state === 'on').length} an
           </HookDemoCard>
         </ResponsiveGrid>
+      </Section>
+
+      <Section title="Templates (HA Jinja)">
+        <ResponsiveGrid min={270}>
+          <HookDemoCard
+            module="@ha"
+            name="useTemplate(template)"
+            hint="serverseitige HA-Engine via WebSocket"
+          >
+            {tempTemplate.loading ? (
+              <span className="rd-empty">Template lädt…</span>
+            ) : tempTemplate.error ? (
+              <span className="rd-empty">{tempTemplate.error}</span>
+            ) : (
+              <>
+                <strong>{tempTemplate.value ?? '–'}</strong>
+                <small>{tempEntityId}</small>
+              </>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useTemplate(…, { parse: 'boolean' })"
+            hint="Bedingungen auswerten"
+          >
+            {sunIsDay.loading ? (
+              <span className="rd-empty">…</span>
+            ) : sunIsDay.error ? (
+              <span className="rd-empty">{sunIsDay.error}</span>
+            ) : (
+              <>
+                <strong>{sunIsDay.value ? '☀️ Tag' : '🌙 Nacht'}</strong>
+                <small>raw: {sunIsDay.raw ?? '–'}</small>
+              </>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useTemplate (Jinja if/else)"
+            hint="{% if is_state('sun.sun', …) %}"
+          >
+            {sunGreeting.loading ? (
+              <span className="rd-empty">…</span>
+            ) : sunGreeting.error ? (
+              <span className="rd-empty">{sunGreeting.error}</span>
+            ) : (
+              <>
+                <strong>Guten {sunGreeting.value ?? '–'}</strong>
+                <small>
+                  {sunGreeting.listeners?.entities?.length ?? 0} Entity-Listener
+                </small>
+              </>
+            )}
+          </HookDemoCard>
+        </ResponsiveGrid>
+        <p className="rd-dd-lead" style={{ marginTop: 14 }}>
+          HA Jinja2 live auswerten — Bedingungen, Berechnungen, Formatierung.
+          Für einfache Entity-Werte weiterhin <code>useEntity</code> bevorzugen
+          (schneller, typsicher). Im Entity-Inserter: Modus <strong>Template</strong>.
+        </p>
       </Section>
 
       <Section title="Registry, Räume & Labels">

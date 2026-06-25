@@ -52,6 +52,10 @@ export function entityValueSnippet(entityId: string): string {
   return `useEntity('${entityId}')?.state`;
 }
 
+export function entityTemplateSnippet(entityId: string): string {
+  return `useTemplate("{{ states('${entityId}') }}").value`;
+}
+
 export function entityIdSnippet(entityId: string): string {
   return `'${entityId}'`;
 }
