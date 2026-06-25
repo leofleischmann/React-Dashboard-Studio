@@ -63,12 +63,3 @@ export function WidgetCatalogGrid({
     </ResponsiveGrid>
   );
 }
-
-export {
-  WIDGET_CATALOG,
-  catalogSnippet,
-  catalogSnippetDisplay,
-  catalogByCategory,
-  widgetNameForDomain,
-} from './catalog';
-export type { WidgetCatalogEntry, WidgetCategory } from './catalog';
