@@ -90,16 +90,14 @@ function formatReading(entity: HassEntity | undefined): string {
   return unit ? `${num(v, 1)} ${unit}` : num(v, 1);
 }
 
-const WIRE_RINGS = [
-  { key: 'eq', transform: 'rotateX(90deg)' },
-  { key: 'm0', transform: 'rotateY(0deg) rotateX(90deg)' },
-  { key: 'm1', transform: 'rotateY(60deg) rotateX(90deg)' },
-  { key: 'm2', transform: 'rotateY(120deg) rotateX(90deg)' },
-] as const;
+/** Inner lava sphere diameter relative to the glass shell (0.26 … 0.94). */
+function lavaScale(intensity: number): number {
+  return 0.26 + intensity * 0.68;
+}
 
 /**
- * Minimal luminous orb — numeric entity state mapped to 0…1 via min/max.
- * Pure CSS 3D (no WebGL).
+ * Glass orb with a lava core — entity value controls how large the inner sphere grows.
+ * Pure CSS (no WebGL).
  */
 export function ValueOrb3D({
   entityId,
@@ -119,7 +117,7 @@ export function ValueOrb3D({
   const label = entityDisplayName(entity, entityId);
   const level = intensityLevelLabel(intensity);
   const rawValue = stateNumber(entity);
-  const baseScale = 0.88 + intensity * 0.2;
+  const innerScale = lavaScale(intensity);
 
   useEffect(() => {
     console.log('[Debug ValueOrb3D]:', {
@@ -129,15 +127,16 @@ export function ValueOrb3D({
       max,
       curve,
       intensity: intensity.toFixed(2),
+      lavaScale: innerScale.toFixed(2),
       level,
-      renderer: 'css-3d',
+      renderer: 'css-glass-lava',
     });
-  }, [entityId, rawValue, min, max, curve, intensity, level]);
+  }, [entityId, rawValue, min, max, curve, intensity, innerScale, level]);
 
   const style = {
     '--vorb-accent': theme.primary,
     '--vorb-intensity': String(intensity),
-    '--vorb-base-scale': String(baseScale),
+    '--vorb-lava-scale': String(innerScale),
   } as CSSProperties;
 
   const reading = formatReading(entity);
@@ -146,22 +145,15 @@ export function ValueOrb3D({
   return (
     <div className={`rd-value-orb${dark ? ' rd-value-orb--dark' : ''}`} style={style}>
       <div className="rd-value-orb__canvas" title={title}>
-        <div className="rd-value-orb__vignette" aria-hidden />
+        <div className="rd-value-orb__glow" aria-hidden />
         <div className="rd-value-orb__stage">
-          <div className="rd-value-orb__orb" aria-hidden>
-            <div className="rd-value-orb__halo" />
-            <div className="rd-value-orb__core">
-              <span className="rd-value-orb__specular" />
+          <div className="rd-value-orb__glass" aria-hidden>
+            <div className="rd-value-orb__lava">
+              <span className="rd-value-orb__lava-hot" />
+              <span className="rd-value-orb__lava-bloom" />
             </div>
-            <div className="rd-value-orb__wire">
-              {WIRE_RINGS.map((ring) => (
-                <span
-                  key={ring.key}
-                  className="rd-value-orb__ring"
-                  style={{ transform: ring.transform }}
-                />
-              ))}
-            </div>
+            <span className="rd-value-orb__glass-shine" />
+            <span className="rd-value-orb__glass-rim" />
           </div>
         </div>
       </div>
