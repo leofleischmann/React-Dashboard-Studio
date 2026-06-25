@@ -21,7 +21,7 @@ import {
   stateLabel,
   weatherIcon,
 } from '@ha/format';
-import { LightTile, SparkChart, SunArc, LiveClock } from '@ha/ui';
+import { LightTile, SparkChart, SunArc, LiveClock, EnergyScene3D } from '@ha/ui';
 import type { ExampleTab } from '../types';
 import { homeContext } from '../lib/pickers';
 
@@ -257,6 +257,12 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
           onClick={() => onNavigate('hooks')}
         />
       </div>
+
+      {primaryPower && (
+        <Panel title="3D Energie-Kern" icon="🌐" span>
+          <EnergyScene3D entityId={primaryPower.entity_id} />
+        </Panel>
+      )}
 
       {/* ── MAIN GRID ────────────────────────────────────────── */}
       <div className="rd-home__grid">

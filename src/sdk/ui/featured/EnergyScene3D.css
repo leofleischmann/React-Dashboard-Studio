@@ -1,0 +1,44 @@
+.rd-energy3d {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rd-energy3d__canvas {
+  width: 100%;
+  height: 236px;
+  border-radius: calc(var(--rd-radius) - 2px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--es3d-accent, var(--primary-color)) 22%, var(--rd-border));
+  background: color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
+}
+
+.rd-energy3d__canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.rd-energy3d__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.rd-energy3d__footer strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--es3d-accent, var(--primary-color, #4f7cff));
+}
+
+.rd-energy3d__footer small {
+  font-size: 0.68rem;
+  color: var(--rd-text-2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -2,6 +2,7 @@ import type { HassEntity } from '../../hass/types';
 import type { WidgetCatalogEntry } from './types';
 import { LiveClockDemo } from './demos';
 import { HoloCore } from '../featured/HoloCore';
+import { EnergyScene3D } from '../featured/EnergyScene3D';
 import { SunArc } from '../featured/SunArc';
 
 function pickPowerSensor(entities: readonly HassEntity[]): string | undefined {
@@ -38,6 +39,15 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     pickExample: pickPowerSensor,
     snippet: (id) => `<HoloCore entityId="${id}" />`,
     Demo: HoloCore,
+  },
+  {
+    name: 'EnergyScene3D',
+    label: '3D Energie-Kern',
+    category: 'featured',
+    domains: ['sensor'],
+    pickExample: pickPowerSensor,
+    snippet: (id) => `<EnergyScene3D entityId="${id}" />`,
+    Demo: EnergyScene3D,
   },
   {
     name: 'LiveClock',
