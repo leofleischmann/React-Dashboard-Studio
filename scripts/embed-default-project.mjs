@@ -24,5 +24,5 @@ export const DEFAULT_PROJECT: Project = {
 };
 `;
 
-writeFileSync(outPath, body);
+writeFileSync(outPath, body.replace(/\r\n/g, '\n'), 'utf8');
 console.log(`✓ embedded default-dashboard/ → ${outPath.replace(/\\/g, '/')} (${Object.keys(project.files).length} files)`);

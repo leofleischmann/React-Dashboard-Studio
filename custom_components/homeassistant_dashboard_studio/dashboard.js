@@ -25411,920 +25411,920 @@ const YR = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
 ), sa = {
   entry: "dashboard.tsx",
   files: {
-    "components/HookDemoCard.tsx": `import type { ReactNode } from 'react';\r
-\r
-export function HookDemoCard({\r
-  module,\r
-  name,\r
-  hint,\r
-  children,\r
-}: {\r
-  module: '@ha' | '@ha/ui' | '@ha/layout' | '@ha/format';\r
-  name: string;\r
-  hint?: string;\r
-  children: ReactNode;\r
-}) {\r
-  return (\r
-    <article className="rd-card rd-sdk-hook">\r
-      <header className="rd-sdk-hook__head">\r
-        <span className="rd-sdk-hook__module">{module}</span>\r
-        <code className="rd-sdk-hook__name">{name}</code>\r
-        {hint && <p className="rd-sdk-hook__hint">{hint}</p>}\r
-      </header>\r
-      <div className="rd-sdk-hook__live">{children}</div>\r
-    </article>\r
-  );\r
-}\r
+    "components/HookDemoCard.tsx": `import type { ReactNode } from 'react';
+
+export function HookDemoCard({
+  module,
+  name,
+  hint,
+  children,
+}: {
+  module: '@ha' | '@ha/ui' | '@ha/layout' | '@ha/format';
+  name: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <article className="rd-card rd-sdk-hook">
+      <header className="rd-sdk-hook__head">
+        <span className="rd-sdk-hook__module">{module}</span>
+        <code className="rd-sdk-hook__name">{name}</code>
+        {hint && <p className="rd-sdk-hook__hint">{hint}</p>}
+      </header>
+      <div className="rd-sdk-hook__live">{children}</div>
+    </article>
+  );
+}
 `,
-    "components/LiveClock.tsx": `import { useTime } from '@ha';\r
-import { greeting } from '@ha/format';\r
-\r
-/** Isolated clock — verhindert 1-Sekunden-Re-Renders der ganzen Overview-Seite. */\r
-export function LiveClock() {\r
-  const now = useTime(1000);\r
-\r
-  return (\r
-    <div className="rd-sdk-showcase__clock">\r
-      <strong>{now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</strong>\r
-      <span>\r
-        {greeting(now)} ·{' '}\r
-        {now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}\r
-      </span>\r
-    </div>\r
-  );\r
-}\r
+    "components/LiveClock.tsx": `import { useTime } from '@ha';
+import { greeting } from '@ha/format';
+
+/** Isolated clock — verhindert 1-Sekunden-Re-Renders der ganzen Overview-Seite. */
+export function LiveClock() {
+  const now = useTime(1000);
+
+  return (
+    <div className="rd-sdk-showcase__clock">
+      <strong>{now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</strong>
+      <span>
+        {greeting(now)} ·{' '}
+        {now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
+      </span>
+    </div>
+  );
+}
 `,
-    "dashboard.tsx": `import { PageShell, Tabs, useHashRoute, type TabItem } from '@ha/layout';\r
-import { OverviewPage } from './pages/OverviewPage';\r
-import { WidgetReference } from './pages/WidgetReference';\r
-import { ChartsPage } from './pages/ChartsPage';\r
-import { HooksPage } from './pages/HooksPage';\r
-import { LayoutDemo } from './pages/LayoutDemo';\r
-import { FormatPage } from './pages/FormatPage';\r
-\r
-type Page = 'overview' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';\r
-\r
-const TABS: TabItem<Page>[] = [\r
-  { id: 'overview', label: 'Overview', icon: '✨' },\r
-  { id: 'widgets', label: 'Widgets', icon: '🧩' },\r
-  { id: 'charts', label: 'Charts', icon: '📈' },\r
-  { id: 'hooks', label: 'Hooks', icon: '⚡' },\r
-  { id: 'layout', label: 'Layout', icon: '📐' },\r
-  { id: 'format', label: 'Format', icon: '🔤' },\r
-];\r
-\r
-const VALID_PAGES = [\r
-  'overview',\r
-  'widgets',\r
-  'charts',\r
-  'hooks',\r
-  'layout',\r
-  'format',\r
-] as const satisfies readonly Page[];\r
-\r
-/** SDK-Referenz — bei Erstinstallation in Home Assistant. Jederzeit via ✎ Bearbeiten anpassbar. */\r
-export default function Dashboard() {\r
-  const [page, setPage] = useHashRoute<Page>('overview', VALID_PAGES);\r
-\r
-  return (\r
-    <div className="rd-root rd-sdk-ref rd-sdk-showcase">\r
-      <PageShell\r
-        nav={<Tabs tabs={TABS} value={page} onChange={setPage} ariaLabel="SDK Showcase" />}\r
-      >\r
-        {page === 'overview' && <OverviewPage onNavigate={setPage} />}\r
-        {page === 'widgets' && <WidgetReference />}\r
-        {page === 'charts' && <ChartsPage />}\r
-        {page === 'hooks' && <HooksPage />}\r
-        {page === 'layout' && <LayoutDemo />}\r
-        {page === 'format' && <FormatPage />}\r
-      </PageShell>\r
-    </div>\r
-  );\r
-}\r
+    "dashboard.tsx": `import { PageShell, Tabs, useHashRoute, type TabItem } from '@ha/layout';
+import { OverviewPage } from './pages/OverviewPage';
+import { WidgetReference } from './pages/WidgetReference';
+import { ChartsPage } from './pages/ChartsPage';
+import { HooksPage } from './pages/HooksPage';
+import { LayoutDemo } from './pages/LayoutDemo';
+import { FormatPage } from './pages/FormatPage';
+
+type Page = 'overview' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';
+
+const TABS: TabItem<Page>[] = [
+  { id: 'overview', label: 'Overview', icon: '✨' },
+  { id: 'widgets', label: 'Widgets', icon: '🧩' },
+  { id: 'charts', label: 'Charts', icon: '📈' },
+  { id: 'hooks', label: 'Hooks', icon: '⚡' },
+  { id: 'layout', label: 'Layout', icon: '📐' },
+  { id: 'format', label: 'Format', icon: '🔤' },
+];
+
+const VALID_PAGES = [
+  'overview',
+  'widgets',
+  'charts',
+  'hooks',
+  'layout',
+  'format',
+] as const satisfies readonly Page[];
+
+/** SDK-Referenz — bei Erstinstallation in Home Assistant. Jederzeit via ✎ Bearbeiten anpassbar. */
+export default function Dashboard() {
+  const [page, setPage] = useHashRoute<Page>('overview', VALID_PAGES);
+
+  return (
+    <div className="rd-root rd-sdk-ref rd-sdk-showcase">
+      <PageShell
+        nav={<Tabs tabs={TABS} value={page} onChange={setPage} ariaLabel="SDK Showcase" />}
+      >
+        {page === 'overview' && <OverviewPage onNavigate={setPage} />}
+        {page === 'widgets' && <WidgetReference />}
+        {page === 'charts' && <ChartsPage />}
+        {page === 'hooks' && <HooksPage />}
+        {page === 'layout' && <LayoutDemo />}
+        {page === 'format' && <FormatPage />}
+      </PageShell>
+    </div>
+  );
+}
 `,
-    "pages/ChartsPage.tsx": `import { useEntities, useEntityHistory, useEntityStatistics } from '@ha';\r
-import { entityDisplayName, num } from '@ha/format';\r
-import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';\r
-import { ResponsiveGrid } from '@ha/layout';\r
-\r
-const CHART_COLORS = ['#6ea8fe', '#34d399', '#fbbf24', '#f87171'];\r
-\r
-function pickChartSensors(entities: ReturnType<typeof useEntities>, limit = 4) {\r
-  const numeric = entities.filter(\r
-    (e) =>\r
-      e.entity_id.startsWith('sensor.') &&\r
-      !Number.isNaN(Number.parseFloat(e.state)) &&\r
-      e.state !== 'unavailable' &&\r
-      e.state !== 'unknown',\r
-  );\r
-  const temp = numeric.filter((e) => e.attributes.device_class === 'temperature');\r
-  const pool = temp.length >= 2 ? temp : numeric;\r
-  return pool.slice(0, limit);\r
-}\r
-\r
-export function ChartsPage() {\r
-  const entities = useEntities();\r
-  const sensors = pickChartSensors(entities);\r
-  const ids = sensors.map((s) => s.entity_id);\r
-  const history = useEntityHistory(ids, { hours: 48 });\r
-  const primaryId = ids[0];\r
-  const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });\r
-  const stats = primaryId ? statsMap[primaryId] : undefined;\r
-\r
-  const series = sensors.map((s, i) => ({\r
-    label: entityDisplayName(s, s.entity_id),\r
-    color: CHART_COLORS[i % CHART_COLORS.length],\r
-    points: history[s.entity_id] ?? [],\r
-  }));\r
-\r
-  return (\r
-    <div className="rd-sdk-charts">\r
-      <header className="rd-sdk-showcase__page-head">\r
-        <h2>Charts & History</h2>\r
-        <p>\r
-          SparkChart, HistoryChart, useEntityHistory und useEntityStatistics — Echtzeit-Verläufe\r
-          aus deiner HA-Instanz.\r
-        </p>\r
-      </header>\r
-\r
-      {sensors.length === 0 ? (\r
-        <Card>\r
-          <p className="rd-empty">Keine numerischen Sensoren für Charts gefunden.</p>\r
-        </Card>\r
-      ) : (\r
-        <>\r
-          <Section title="SparkChart · Multi-Series (48 h)">\r
-            <div className="rd-sdk-chart-card">\r
-              <SparkChart series={series} height={120} />\r
-            </div>\r
-          </Section>\r
-\r
-          <Section title="HistoryChart · Einzelverlauf">\r
-            <div className="rd-sdk-chart-card">\r
-              <HistoryChart\r
-                series={[\r
-                  {\r
-                    label: entityDisplayName(sensors[0], sensors[0].entity_id),\r
-                    color: '#6ea8fe',\r
-                    points: history[sensors[0].entity_id] ?? [],\r
-                  },\r
-                ]}\r
-                height={160}\r
-                showLegend\r
-              />\r
-            </div>\r
-          </Section>\r
-\r
-          {primaryId && stats && (\r
-            <Section title="useEntityStatistics · 24 h">\r
-              <ResponsiveGrid min={140}>\r
-                <Stat label="Min" value={num(stats.min)} />\r
-                <Stat label="Max" value={num(stats.max)} />\r
-                <Stat label="Mean" value={num(stats.mean)} accent />\r
-                <Stat label="Sum" value={num(stats.sum)} />\r
-              </ResponsiveGrid>\r
-              <p className="rd-sdk-ref__lead">\r
-                Entity: <code>{primaryId}</code>\r
-              </p>\r
-            </Section>\r
-          )}\r
-\r
-          <Section title="Ausgewählte Sensoren">\r
-            <ResponsiveGrid min={160}>\r
-              {sensors.map((s) => (\r
-                <Stat\r
-                  key={s.entity_id}\r
-                  label={entityDisplayName(s, s.entity_id)}\r
-                  value={num(s.state)}\r
-                  unit={s.attributes.unit_of_measurement as string | undefined}\r
-                />\r
-              ))}\r
-            </ResponsiveGrid>\r
-          </Section>\r
-        </>\r
-      )}\r
-    </div>\r
-  );\r
-}\r
+    "pages/ChartsPage.tsx": `import { useEntities, useEntityHistory, useEntityStatistics } from '@ha';
+import { entityDisplayName, num } from '@ha/format';
+import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';
+import { ResponsiveGrid } from '@ha/layout';
+
+const CHART_COLORS = ['#6ea8fe', '#34d399', '#fbbf24', '#f87171'];
+
+function pickChartSensors(entities: ReturnType<typeof useEntities>, limit = 4) {
+  const numeric = entities.filter(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      !Number.isNaN(Number.parseFloat(e.state)) &&
+      e.state !== 'unavailable' &&
+      e.state !== 'unknown',
+  );
+  const temp = numeric.filter((e) => e.attributes.device_class === 'temperature');
+  const pool = temp.length >= 2 ? temp : numeric;
+  return pool.slice(0, limit);
+}
+
+export function ChartsPage() {
+  const entities = useEntities();
+  const sensors = pickChartSensors(entities);
+  const ids = sensors.map((s) => s.entity_id);
+  const history = useEntityHistory(ids, { hours: 48 });
+  const primaryId = ids[0];
+  const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });
+  const stats = primaryId ? statsMap[primaryId] : undefined;
+
+  const series = sensors.map((s, i) => ({
+    label: entityDisplayName(s, s.entity_id),
+    color: CHART_COLORS[i % CHART_COLORS.length],
+    points: history[s.entity_id] ?? [],
+  }));
+
+  return (
+    <div className="rd-sdk-charts">
+      <header className="rd-sdk-showcase__page-head">
+        <h2>Charts & History</h2>
+        <p>
+          SparkChart, HistoryChart, useEntityHistory und useEntityStatistics — Echtzeit-Verläufe
+          aus deiner HA-Instanz.
+        </p>
+      </header>
+
+      {sensors.length === 0 ? (
+        <Card>
+          <p className="rd-empty">Keine numerischen Sensoren für Charts gefunden.</p>
+        </Card>
+      ) : (
+        <>
+          <Section title="SparkChart · Multi-Series (48 h)">
+            <div className="rd-sdk-chart-card">
+              <SparkChart series={series} height={120} />
+            </div>
+          </Section>
+
+          <Section title="HistoryChart · Einzelverlauf">
+            <div className="rd-sdk-chart-card">
+              <HistoryChart
+                series={[
+                  {
+                    label: entityDisplayName(sensors[0], sensors[0].entity_id),
+                    color: '#6ea8fe',
+                    points: history[sensors[0].entity_id] ?? [],
+                  },
+                ]}
+                height={160}
+                showLegend
+              />
+            </div>
+          </Section>
+
+          {primaryId && stats && (
+            <Section title="useEntityStatistics · 24 h">
+              <ResponsiveGrid min={140}>
+                <Stat label="Min" value={num(stats.min)} />
+                <Stat label="Max" value={num(stats.max)} />
+                <Stat label="Mean" value={num(stats.mean)} accent />
+                <Stat label="Sum" value={num(stats.sum)} />
+              </ResponsiveGrid>
+              <p className="rd-sdk-ref__lead">
+                Entity: <code>{primaryId}</code>
+              </p>
+            </Section>
+          )}
+
+          <Section title="Ausgewählte Sensoren">
+            <ResponsiveGrid min={160}>
+              {sensors.map((s) => (
+                <Stat
+                  key={s.entity_id}
+                  label={entityDisplayName(s, s.entity_id)}
+                  value={num(s.state)}
+                  unit={s.attributes.unit_of_measurement as string | undefined}
+                />
+              ))}
+            </ResponsiveGrid>
+          </Section>
+        </>
+      )}
+    </div>
+  );
+}
 `,
-    "pages/FormatPage.tsx": `import { useEntities, useEntity } from '@ha';\r
-import {\r
-  brightness,\r
-  colorTemp,\r
-  deviceClassIcon,\r
-  duration,\r
-  energy,\r
-  entityDisplayName,\r
-  euro,\r
-  greeting,\r
-  num,\r
-  pct,\r
-  power,\r
-  relativeTime,\r
-  stateColor,\r
-  stateLabel,\r
-  temp,\r
-  weatherIcon,\r
-} from '@ha/format';\r
-import { Card, Section } from '@ha/ui';\r
-\r
-type FormatRow = { fn: string; result: string };\r
-\r
-function FormatDemo({ rows }: { rows: FormatRow[] }) {\r
-  return (\r
-    <div className="rd-sdk-format-table">\r
-      {rows.map((row) => (\r
-        <div key={row.fn} className="rd-sdk-format-row">\r
-          <code>{row.fn}</code>\r
-          <span>{row.result}</span>\r
-        </div>\r
-      ))}\r
-    </div>\r
-  );\r
-}\r
-\r
-export function FormatPage() {\r
-  const entities = useEntities();\r
-  const sensor = entities.find((e) => e.entity_id.startsWith('sensor.'));\r
-  const light = entities.find((e) => e.entity_id.startsWith('light.'));\r
-  const weather = entities.find((e) => e.entity_id.startsWith('weather.'));\r
-  const sample = useEntity(sensor?.entity_id ?? 'sensor.example');\r
-  const lightEntity = useEntity(light?.entity_id ?? 'light.example');\r
-\r
-  const rows: FormatRow[] = [\r
-    { fn: 'greeting()', result: greeting() },\r
-    { fn: \`num('\${sample?.state ?? '23.4'}')\`, result: num(sample?.state ?? '23.4') },\r
-    { fn: 'temp(state)', result: temp(sample?.state ?? 21.5) },\r
-    { fn: 'pct(72)', result: pct(72) },\r
-    { fn: 'power(450)', result: power(450) },\r
-    { fn: 'energy(12.3)', result: energy(12.3) },\r
-    { fn: 'euro(4.56)', result: euro(4.56) },\r
-    { fn: 'duration(3665)', result: duration(3665) },\r
-    {\r
-      fn: 'relativeTime(now)',\r
-      result: relativeTime(new Date(Date.now() - 3600_000)),\r
-    },\r
-    {\r
-      fn: 'entityDisplayName(entity)',\r
-      result: sample\r
-        ? entityDisplayName(sample, sample.entity_id)\r
-        : '–',\r
-    },\r
-    {\r
-      fn: 'stateLabel(state, domain)',\r
-      result: sample\r
-        ? stateLabel(sample.state, sample.entity_id.split('.')[0])\r
-        : '–',\r
-    },\r
-    {\r
-      fn: 'stateColor(state)',\r
-      result: sample ? stateColor(sample.state) : '–',\r
-    },\r
-    {\r
-      fn: 'deviceClassIcon(device_class)',\r
-      result: deviceClassIcon(sample?.attributes.device_class as string | undefined),\r
-    },\r
-  ];\r
-\r
-  if (lightEntity) {\r
-    rows.push(\r
-      {\r
-        fn: 'brightness(attr)',\r
-        result: brightness(lightEntity.attributes.brightness as number | undefined),\r
-      },\r
-      {\r
-        fn: 'colorTemp(attr)',\r
-        result: colorTemp(lightEntity.attributes.color_temp as number | undefined),\r
-      },\r
-    );\r
-  }\r
-\r
-  if (weather) {\r
-    rows.push({\r
-      fn: 'weatherIcon(condition)',\r
-      result: weatherIcon(weather.state),\r
-    });\r
-  }\r
-\r
-  return (\r
-    <div className="rd-sdk-format">\r
-      <header className="rd-sdk-showcase__page-head">\r
-        <h2>Format-Helfer (@ha/format)</h2>\r
-        <p>\r
-          Einheitliche Darstellung von Werten, Zuständen und Zeiten — mit Live-Beispielen\r
-          aus deinen Entities.\r
-        </p>\r
-      </header>\r
-\r
-      <Section title="Alle Formatter">\r
-        <FormatDemo rows={rows} />\r
-      </Section>\r
-\r
-      <Section title="Import">\r
-        <Card>\r
-          <code>{\`import { num, temp, stateLabel, relativeTime, entityDisplayName } from '@ha/format';\`}</code>\r
-        </Card>\r
-      </Section>\r
-    </div>\r
-  );\r
-}\r
+    "pages/FormatPage.tsx": `import { useEntities, useEntity } from '@ha';
+import {
+  brightness,
+  colorTemp,
+  deviceClassIcon,
+  duration,
+  energy,
+  entityDisplayName,
+  euro,
+  greeting,
+  num,
+  pct,
+  power,
+  relativeTime,
+  stateColor,
+  stateLabel,
+  temp,
+  weatherIcon,
+} from '@ha/format';
+import { Card, Section } from '@ha/ui';
+
+type FormatRow = { fn: string; result: string };
+
+function FormatDemo({ rows }: { rows: FormatRow[] }) {
+  return (
+    <div className="rd-sdk-format-table">
+      {rows.map((row) => (
+        <div key={row.fn} className="rd-sdk-format-row">
+          <code>{row.fn}</code>
+          <span>{row.result}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function FormatPage() {
+  const entities = useEntities();
+  const sensor = entities.find((e) => e.entity_id.startsWith('sensor.'));
+  const light = entities.find((e) => e.entity_id.startsWith('light.'));
+  const weather = entities.find((e) => e.entity_id.startsWith('weather.'));
+  const sample = useEntity(sensor?.entity_id ?? 'sensor.example');
+  const lightEntity = useEntity(light?.entity_id ?? 'light.example');
+
+  const rows: FormatRow[] = [
+    { fn: 'greeting()', result: greeting() },
+    { fn: \`num('\${sample?.state ?? '23.4'}')\`, result: num(sample?.state ?? '23.4') },
+    { fn: 'temp(state)', result: temp(sample?.state ?? 21.5) },
+    { fn: 'pct(72)', result: pct(72) },
+    { fn: 'power(450)', result: power(450) },
+    { fn: 'energy(12.3)', result: energy(12.3) },
+    { fn: 'euro(4.56)', result: euro(4.56) },
+    { fn: 'duration(3665)', result: duration(3665) },
+    {
+      fn: 'relativeTime(now)',
+      result: relativeTime(new Date(Date.now() - 3600_000)),
+    },
+    {
+      fn: 'entityDisplayName(entity)',
+      result: sample
+        ? entityDisplayName(sample, sample.entity_id)
+        : '–',
+    },
+    {
+      fn: 'stateLabel(state, domain)',
+      result: sample
+        ? stateLabel(sample.state, sample.entity_id.split('.')[0])
+        : '–',
+    },
+    {
+      fn: 'stateColor(state)',
+      result: sample ? stateColor(sample.state) : '–',
+    },
+    {
+      fn: 'deviceClassIcon(device_class)',
+      result: deviceClassIcon(sample?.attributes.device_class as string | undefined),
+    },
+  ];
+
+  if (lightEntity) {
+    rows.push(
+      {
+        fn: 'brightness(attr)',
+        result: brightness(lightEntity.attributes.brightness as number | undefined),
+      },
+      {
+        fn: 'colorTemp(attr)',
+        result: colorTemp(lightEntity.attributes.color_temp as number | undefined),
+      },
+    );
+  }
+
+  if (weather) {
+    rows.push({
+      fn: 'weatherIcon(condition)',
+      result: weatherIcon(weather.state),
+    });
+  }
+
+  return (
+    <div className="rd-sdk-format">
+      <header className="rd-sdk-showcase__page-head">
+        <h2>Format-Helfer (@ha/format)</h2>
+        <p>
+          Einheitliche Darstellung von Werten, Zuständen und Zeiten — mit Live-Beispielen
+          aus deinen Entities.
+        </p>
+      </header>
+
+      <Section title="Alle Formatter">
+        <FormatDemo rows={rows} />
+      </Section>
+
+      <Section title="Import">
+        <Card>
+          <code>{\`import { num, temp, stateLabel, relativeTime, entityDisplayName } from '@ha/format';\`}</code>
+        </Card>
+      </Section>
+    </div>
+  );
+}
 `,
-    "pages/HooksPage.tsx": `import {\r
-  useAreas,\r
-  useCalendarEvents,\r
-  useDarkMode,\r
-  useEntities,\r
-  useEntitiesByDomain,\r
-  useEntity,\r
-  useEntityAttribute,\r
-  useEntityRegistry,\r
-  useEntityStatistics,\r
-  useHassReady,\r
-  useSun,\r
-  useTime,\r
-} from '@ha';\r
-import { entityDisplayName, num, stateLabel } from '@ha/format';\r
-import { Section } from '@ha/ui';\r
-import { ResponsiveGrid } from '@ha/layout';\r
-import { HookDemoCard } from '../components/HookDemoCard';\r
-\r
-export function HooksPage() {\r
-  const ready = useHassReady();\r
-  const now = useTime(1000);\r
-  const sun = useSun();\r
-  const dark = useDarkMode();\r
-  const entities = useEntities();\r
-  const areas = useAreas();\r
-  const lights = useEntitiesByDomain('light');\r
-  const filtered = useEntities({ domain: 'sensor', deviceClass: 'temperature' });\r
-  const sample = entities[0];\r
-  const sampleId = sample?.entity_id ?? 'sensor.example';\r
-  const entity = useEntity(sampleId);\r
-  const registryEntry = useEntityRegistry(sampleId as never);\r
-  const attr = useEntityAttribute<string>(sampleId, 'friendly_name');\r
-  const calendar = useEntitiesByDomain('calendar')[0];\r
-  const events = useCalendarEvents(calendar?.entity_id ?? '', 7);\r
-  const stats = useEntityStatistics(\r
-    filtered[0] ? [filtered[0].entity_id] : [],\r
-    { days: 7 },\r
-  );\r
-\r
-  return (\r
-    <div className="rd-sdk-hooks">\r
-      <header className="rd-sdk-showcase__page-head">\r
-        <h2>Hooks & API (@ha)</h2>\r
-        <p>\r
-          Reaktive Hooks — jede Karte zeigt Live-Daten aus deiner Installation.\r
-          Komponenten re-rendern nur, wenn sich relevante Entities ändern.\r
-        </p>\r
-      </header>\r
-\r
-      <Section title="Core">\r
-        <ResponsiveGrid min={280}>\r
-          <HookDemoCard module="@ha" name="useHassReady()" hint="Verbindung zu HA bereit?">\r
-            <strong>{ready ? '✓ verbunden' : '… verbindet'}</strong>\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useEntity(id)" hint={\`Beispiel: \${sampleId}\`}>\r
-            {entity ? (\r
-              <>\r
-                <strong>{entity.state}</strong>\r
-                <small>{entityDisplayName(entity, sampleId)}</small>\r
-              </>\r
-            ) : (\r
-              <span className="rd-empty">Keine Entity</span>\r
-            )}\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useEntityAttribute(id, attr)">\r
-            <strong>{attr ?? '–'}</strong>\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useEntities()">\r
-            <strong>{entities.length}</strong> Entities gesamt\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard\r
-            module="@ha"\r
-            name="useEntities({ filter })"\r
-            hint="domain: sensor, deviceClass: temperature"\r
-          >\r
-            <strong>{filtered.length}</strong> Temperatur-Sensoren\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useEntitiesByDomain('light')">\r
-            <strong>{lights.length}</strong> Lichter ·{' '}\r
-            {lights.filter((l) => l.state === 'on').length} an\r
-          </HookDemoCard>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-\r
-      <Section title="Registry & Räume">\r
-        <ResponsiveGrid min={280}>\r
-          <HookDemoCard module="@ha" name="useAreas()">\r
-            <ul className="rd-sdk-hook-list">\r
-              {areas.slice(0, 6).map((a) => (\r
-                <li key={a.area_id}>{a.name}</li>\r
-              ))}\r
-              {areas.length === 0 && <li className="rd-empty">Keine Areas</li>}\r
-            </ul>\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useEntityRegistry(id)" hint={sampleId}>\r
-            {registryEntry ? (\r
-              <>\r
-                <strong>{registryEntry.entity_id}</strong>\r
-                <small>Area: {registryEntry.area_id ?? '–'}</small>\r
-              </>\r
-            ) : (\r
-              <span className="rd-empty">Kein Registry-Eintrag</span>\r
-            )}\r
-          </HookDemoCard>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-\r
-      <Section title="Zeit, Sonne & Theme">\r
-        <ResponsiveGrid min={280}>\r
-          <HookDemoCard module="@ha" name="useTime(tickMs)">\r
-            <strong>{now.toLocaleTimeString('de-DE')}</strong>\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useSun()">\r
-            {sun.entity ? (\r
-              <>\r
-                <strong>{stateLabel(sun.state, 'sun')}</strong>\r
-                <small>\r
-                  Elev. {num(sun.elevation)}° · Azimut {num(sun.azimuth)}°\r
-                </small>\r
-              </>\r
-            ) : (\r
-              <span className="rd-empty">sun.sun nicht verfügbar</span>\r
-            )}\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard module="@ha" name="useDarkMode()">\r
-            <strong>{dark ? 'Dark Mode' : 'Light Mode'}</strong>\r
-          </HookDemoCard>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-\r
-      <Section title="History, Statistics & Kalender">\r
-        <ResponsiveGrid min={280}>\r
-          <HookDemoCard\r
-            module="@ha"\r
-            name="useEntityStatistics(ids, { days: 7 })"\r
-            hint={filtered[0]?.entity_id}\r
-          >\r
-            {filtered[0] && stats[filtered[0].entity_id] ? (\r
-              <>\r
-                min {num(stats[filtered[0].entity_id].min)} · max{' '}\r
-                {num(stats[filtered[0].entity_id].max)} · mean{' '}\r
-                {num(stats[filtered[0].entity_id].mean)}\r
-              </>\r
-            ) : (\r
-              <span className="rd-empty">Statistik nicht verfügbar</span>\r
-            )}\r
-          </HookDemoCard>\r
-\r
-          <HookDemoCard\r
-            module="@ha"\r
-            name="useCalendarEvents(id, days)"\r
-            hint={calendar?.entity_id ?? 'calendar.*'}\r
-          >\r
-            {calendar ? (\r
-              <ul className="rd-sdk-hook-list">\r
-                {events.slice(0, 4).map((ev) => (\r
-                  <li key={ev.summary + ev.start}>\r
-                    {ev.summary}{' '}\r
-                    <small>{new Date(ev.start).toLocaleDateString('de-DE')}</small>\r
-                  </li>\r
-                ))}\r
-                {events.length === 0 && <li className="rd-empty">Keine Termine</li>}\r
-              </ul>\r
-            ) : (\r
-              <span className="rd-empty">Kein calendar.* gefunden</span>\r
-            )}\r
-          </HookDemoCard>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-\r
-      <Section title="Weitere Hooks">\r
-        <p className="rd-sdk-ref__lead">\r
-          Auch verfügbar: <code>useEntityHistory</code> (Tab Charts),{' '}\r
-          <code>useAreaEntities</code>, <code>useEntitiesByLabel</code>,{' '}\r
-          <code>useAreaName</code>, <code>callService</code>,{' '}\r
-          <code>callServiceWithTarget</code>, <code>getAppHass()</code>,{' '}\r
-          <code>useTheme()</code>, <code>applyThemeVars()</code>\r
-        </p>\r
-      </Section>\r
-    </div>\r
-  );\r
-}\r
+    "pages/HooksPage.tsx": `import {
+  useAreas,
+  useCalendarEvents,
+  useDarkMode,
+  useEntities,
+  useEntitiesByDomain,
+  useEntity,
+  useEntityAttribute,
+  useEntityRegistry,
+  useEntityStatistics,
+  useHassReady,
+  useSun,
+  useTime,
+} from '@ha';
+import { entityDisplayName, num, stateLabel } from '@ha/format';
+import { Section } from '@ha/ui';
+import { ResponsiveGrid } from '@ha/layout';
+import { HookDemoCard } from '../components/HookDemoCard';
+
+export function HooksPage() {
+  const ready = useHassReady();
+  const now = useTime(1000);
+  const sun = useSun();
+  const dark = useDarkMode();
+  const entities = useEntities();
+  const areas = useAreas();
+  const lights = useEntitiesByDomain('light');
+  const filtered = useEntities({ domain: 'sensor', deviceClass: 'temperature' });
+  const sample = entities[0];
+  const sampleId = sample?.entity_id ?? 'sensor.example';
+  const entity = useEntity(sampleId);
+  const registryEntry = useEntityRegistry(sampleId as never);
+  const attr = useEntityAttribute<string>(sampleId, 'friendly_name');
+  const calendar = useEntitiesByDomain('calendar')[0];
+  const events = useCalendarEvents(calendar?.entity_id ?? '', 7);
+  const stats = useEntityStatistics(
+    filtered[0] ? [filtered[0].entity_id] : [],
+    { days: 7 },
+  );
+
+  return (
+    <div className="rd-sdk-hooks">
+      <header className="rd-sdk-showcase__page-head">
+        <h2>Hooks & API (@ha)</h2>
+        <p>
+          Reaktive Hooks — jede Karte zeigt Live-Daten aus deiner Installation.
+          Komponenten re-rendern nur, wenn sich relevante Entities ändern.
+        </p>
+      </header>
+
+      <Section title="Core">
+        <ResponsiveGrid min={280}>
+          <HookDemoCard module="@ha" name="useHassReady()" hint="Verbindung zu HA bereit?">
+            <strong>{ready ? '✓ verbunden' : '… verbindet'}</strong>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntity(id)" hint={\`Beispiel: \${sampleId}\`}>
+            {entity ? (
+              <>
+                <strong>{entity.state}</strong>
+                <small>{entityDisplayName(entity, sampleId)}</small>
+              </>
+            ) : (
+              <span className="rd-empty">Keine Entity</span>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntityAttribute(id, attr)">
+            <strong>{attr ?? '–'}</strong>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntities()">
+            <strong>{entities.length}</strong> Entities gesamt
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useEntities({ filter })"
+            hint="domain: sensor, deviceClass: temperature"
+          >
+            <strong>{filtered.length}</strong> Temperatur-Sensoren
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntitiesByDomain('light')">
+            <strong>{lights.length}</strong> Lichter ·{' '}
+            {lights.filter((l) => l.state === 'on').length} an
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="Registry & Räume">
+        <ResponsiveGrid min={280}>
+          <HookDemoCard module="@ha" name="useAreas()">
+            <ul className="rd-sdk-hook-list">
+              {areas.slice(0, 6).map((a) => (
+                <li key={a.area_id}>{a.name}</li>
+              ))}
+              {areas.length === 0 && <li className="rd-empty">Keine Areas</li>}
+            </ul>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntityRegistry(id)" hint={sampleId}>
+            {registryEntry ? (
+              <>
+                <strong>{registryEntry.entity_id}</strong>
+                <small>Area: {registryEntry.area_id ?? '–'}</small>
+              </>
+            ) : (
+              <span className="rd-empty">Kein Registry-Eintrag</span>
+            )}
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="Zeit, Sonne & Theme">
+        <ResponsiveGrid min={280}>
+          <HookDemoCard module="@ha" name="useTime(tickMs)">
+            <strong>{now.toLocaleTimeString('de-DE')}</strong>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useSun()">
+            {sun.entity ? (
+              <>
+                <strong>{stateLabel(sun.state, 'sun')}</strong>
+                <small>
+                  Elev. {num(sun.elevation)}° · Azimut {num(sun.azimuth)}°
+                </small>
+              </>
+            ) : (
+              <span className="rd-empty">sun.sun nicht verfügbar</span>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useDarkMode()">
+            <strong>{dark ? 'Dark Mode' : 'Light Mode'}</strong>
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="History, Statistics & Kalender">
+        <ResponsiveGrid min={280}>
+          <HookDemoCard
+            module="@ha"
+            name="useEntityStatistics(ids, { days: 7 })"
+            hint={filtered[0]?.entity_id}
+          >
+            {filtered[0] && stats[filtered[0].entity_id] ? (
+              <>
+                min {num(stats[filtered[0].entity_id].min)} · max{' '}
+                {num(stats[filtered[0].entity_id].max)} · mean{' '}
+                {num(stats[filtered[0].entity_id].mean)}
+              </>
+            ) : (
+              <span className="rd-empty">Statistik nicht verfügbar</span>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useCalendarEvents(id, days)"
+            hint={calendar?.entity_id ?? 'calendar.*'}
+          >
+            {calendar ? (
+              <ul className="rd-sdk-hook-list">
+                {events.slice(0, 4).map((ev) => (
+                  <li key={ev.summary + ev.start}>
+                    {ev.summary}{' '}
+                    <small>{new Date(ev.start).toLocaleDateString('de-DE')}</small>
+                  </li>
+                ))}
+                {events.length === 0 && <li className="rd-empty">Keine Termine</li>}
+              </ul>
+            ) : (
+              <span className="rd-empty">Kein calendar.* gefunden</span>
+            )}
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="Weitere Hooks">
+        <p className="rd-sdk-ref__lead">
+          Auch verfügbar: <code>useEntityHistory</code> (Tab Charts),{' '}
+          <code>useAreaEntities</code>, <code>useEntitiesByLabel</code>,{' '}
+          <code>useAreaName</code>, <code>callService</code>,{' '}
+          <code>callServiceWithTarget</code>, <code>getAppHass()</code>,{' '}
+          <code>useTheme()</code>, <code>applyThemeVars()</code>
+        </p>
+      </Section>
+    </div>
+  );
+}
 `,
-    "pages/LayoutDemo.tsx": `import { useState } from 'react';\r
-import { Card, Section } from '@ha/ui';\r
-import {\r
-  ResponsiveGrid,\r
-  Row,\r
-  Stack,\r
-  Tabs,\r
-  type TabItem,\r
-} from '@ha/layout';\r
-\r
-type LayoutTab = 'grid' | 'stack' | 'row' | 'shell';\r
-\r
-const LAYOUT_TABS: TabItem<LayoutTab>[] = [\r
-  { id: 'grid', label: 'Grid', icon: '▦' },\r
-  { id: 'stack', label: 'Stack', icon: '☰' },\r
-  { id: 'row', label: 'Row', icon: '↔' },\r
-  { id: 'shell', label: 'Shell', icon: '📱' },\r
-];\r
-\r
-export function LayoutDemo() {\r
-  // Local state — kein useHashRoute, damit der Hash nicht mit dashboard.tsx kollidiert.\r
-  const [tab, setTab] = useState<LayoutTab>('grid');\r
-\r
-  return (\r
-    <div className="rd-sdk-layout">\r
-      <header className="rd-sdk-showcase__page-head">\r
-        <h2>Layout (@ha/layout)</h2>\r
-        <p>\r
-          ResponsiveGrid, Stack, Row, PageShell, Tabs, useHashRoute und RoutedPageShell —\r
-          baue Multi-Page-Dashboards wie diese Referenz.\r
-        </p>\r
-      </header>\r
-\r
-      <Section title="Layout-Komponenten">\r
-        <Tabs\r
-          tabs={LAYOUT_TABS}\r
-          value={tab}\r
-          onChange={(id) => setTab(id)}\r
-          variant="segment"\r
-          ariaLabel="Layout Demo"\r
-        />\r
-\r
-        {tab === 'grid' && (\r
-          <ResponsiveGrid min={140}>\r
-            <Card><strong>ResponsiveGrid</strong><p>auto-fill Spalten, min-Breite konfigurierbar</p></Card>\r
-            <Card><strong>Card</strong><p>Basis-Karte aus @ha/ui</p></Card>\r
-            <Card><strong>Card</strong><p>passt sich der Viewport-Breite an</p></Card>\r
-            <Card><strong>Card</strong><p>ideal für Widget-Raster</p></Card>\r
-          </ResponsiveGrid>\r
-        )}\r
-\r
-        {tab === 'stack' && (\r
-          <Stack gap={10}>\r
-            <Card>Stack — vertikal, gleichmäßiger gap</Card>\r
-            <Card>Element 2</Card>\r
-            <Card>Element 3</Card>\r
-          </Stack>\r
-        )}\r
-\r
-        {tab === 'row' && (\r
-          <Row gap={10}>\r
-            <Card style={{ flex: 1 }}>Row — horizontal</Card>\r
-            <Card style={{ flex: 1 }}>mit Wrap</Card>\r
-            <Card style={{ flex: 1 }}>und gap</Card>\r
-          </Row>\r
-        )}\r
-\r
-        {tab === 'shell' && (\r
-          <Card>\r
-            <strong>RoutedPageShell</strong>\r
-            <p className="rd-sdk-ref__lead">\r
-              Kombiniert PageShell + Tabs + useHashRoute in einer Komponente:\r
-            </p>\r
-            <pre className="rd-sdk-code">{\`import { RoutedPageShell } from '@ha/layout';\r
-\r
-<RoutedPageShell\r
-  tabs={[\r
-    { id: 'home', label: 'Home', icon: '🏠' },\r
-    { id: 'energy', label: 'Energie', icon: '⚡' },\r
-  ]}\r
-  defaultRoute="home"\r
-  pages={{\r
-    home: <HomePage />,\r
-    energy: <EnergyPage />,\r
-  }}\r
-/>\`}</pre>\r
-            <p className="rd-sdk-ref__lead" style={{ marginBottom: 0 }}>\r
-              Dieses Showcase nutzt <code>useHashRoute</code> nur in <code>dashboard.tsx</code> —\r
-              Deep-Links wie <code>#overview</code>, <code>#widgets</code>, …\r
-            </p>\r
-          </Card>\r
-        )}\r
-      </Section>\r
-    </div>\r
-  );\r
-}\r
+    "pages/LayoutDemo.tsx": `import { useState } from 'react';
+import { Card, Section } from '@ha/ui';
+import {
+  ResponsiveGrid,
+  Row,
+  Stack,
+  Tabs,
+  type TabItem,
+} from '@ha/layout';
+
+type LayoutTab = 'grid' | 'stack' | 'row' | 'shell';
+
+const LAYOUT_TABS: TabItem<LayoutTab>[] = [
+  { id: 'grid', label: 'Grid', icon: '▦' },
+  { id: 'stack', label: 'Stack', icon: '☰' },
+  { id: 'row', label: 'Row', icon: '↔' },
+  { id: 'shell', label: 'Shell', icon: '📱' },
+];
+
+export function LayoutDemo() {
+  // Local state — kein useHashRoute, damit der Hash nicht mit dashboard.tsx kollidiert.
+  const [tab, setTab] = useState<LayoutTab>('grid');
+
+  return (
+    <div className="rd-sdk-layout">
+      <header className="rd-sdk-showcase__page-head">
+        <h2>Layout (@ha/layout)</h2>
+        <p>
+          ResponsiveGrid, Stack, Row, PageShell, Tabs, useHashRoute und RoutedPageShell —
+          baue Multi-Page-Dashboards wie diese Referenz.
+        </p>
+      </header>
+
+      <Section title="Layout-Komponenten">
+        <Tabs
+          tabs={LAYOUT_TABS}
+          value={tab}
+          onChange={(id) => setTab(id)}
+          variant="segment"
+          ariaLabel="Layout Demo"
+        />
+
+        {tab === 'grid' && (
+          <ResponsiveGrid min={140}>
+            <Card><strong>ResponsiveGrid</strong><p>auto-fill Spalten, min-Breite konfigurierbar</p></Card>
+            <Card><strong>Card</strong><p>Basis-Karte aus @ha/ui</p></Card>
+            <Card><strong>Card</strong><p>passt sich der Viewport-Breite an</p></Card>
+            <Card><strong>Card</strong><p>ideal für Widget-Raster</p></Card>
+          </ResponsiveGrid>
+        )}
+
+        {tab === 'stack' && (
+          <Stack gap={10}>
+            <Card>Stack — vertikal, gleichmäßiger gap</Card>
+            <Card>Element 2</Card>
+            <Card>Element 3</Card>
+          </Stack>
+        )}
+
+        {tab === 'row' && (
+          <Row gap={10}>
+            <Card style={{ flex: 1 }}>Row — horizontal</Card>
+            <Card style={{ flex: 1 }}>mit Wrap</Card>
+            <Card style={{ flex: 1 }}>und gap</Card>
+          </Row>
+        )}
+
+        {tab === 'shell' && (
+          <Card>
+            <strong>RoutedPageShell</strong>
+            <p className="rd-sdk-ref__lead">
+              Kombiniert PageShell + Tabs + useHashRoute in einer Komponente:
+            </p>
+            <pre className="rd-sdk-code">{\`import { RoutedPageShell } from '@ha/layout';
+
+<RoutedPageShell
+  tabs={[
+    { id: 'home', label: 'Home', icon: '🏠' },
+    { id: 'energy', label: 'Energie', icon: '⚡' },
+  ]}
+  defaultRoute="home"
+  pages={{
+    home: <HomePage />,
+    energy: <EnergyPage />,
+  }}
+/>\`}</pre>
+            <p className="rd-sdk-ref__lead" style={{ marginBottom: 0 }}>
+              Dieses Showcase nutzt <code>useHashRoute</code> nur in <code>dashboard.tsx</code> —
+              Deep-Links wie <code>#overview</code>, <code>#widgets</code>, …
+            </p>
+          </Card>
+        )}
+      </Section>
+    </div>
+  );
+}
 `,
-    "pages/OverviewPage.tsx": `import {\r
-  useAreas,\r
-  useDarkMode,\r
-  useEntities,\r
-  useEntitiesByDomain,\r
-  useHassReady,\r
-  useSun,\r
-} from '@ha';\r
-import { num, relativeTime, weatherIcon } from '@ha/format';\r
-import { Card, Section, Stat } from '@ha/ui';\r
-import { ResponsiveGrid, Row } from '@ha/layout';\r
-import type { ShowcasePage } from '../types';\r
-import { LiveClock } from '../components/LiveClock';\r
-\r
-const DOMAIN_COLORS = [\r
-  '#6ea8fe',\r
-  '#a78bfa',\r
-  '#34d399',\r
-  '#fbbf24',\r
-  '#f87171',\r
-  '#fb923c',\r
-  '#38bdf8',\r
-  '#e879f9',\r
-];\r
-\r
-function domainCounts(entities: ReturnType<typeof useEntities>) {\r
-  const map = new Map<string, number>();\r
-  for (const e of entities) {\r
-    const d = e.entity_id.split('.')[0] ?? 'other';\r
-    map.set(d, (map.get(d) ?? 0) + 1);\r
-  }\r
-  return [...map.entries()].sort((a, b) => b[1] - a[1]);\r
-}\r
-\r
-export function OverviewPage({ onNavigate }: { onNavigate: (p: ShowcasePage) => void }) {\r
-  const ready = useHassReady();\r
-  const sun = useSun();\r
-  const dark = useDarkMode();\r
-  const entities = useEntities();\r
-  const areas = useAreas();\r
-  const lights = useEntitiesByDomain('light');\r
-  const weather = useEntitiesByDomain('weather')[0];\r
-  const people = useEntitiesByDomain('person');\r
-\r
-  const lightsOn = lights.filter((l) => l.state === 'on').length;\r
-  const peopleHome = people.filter((p) => p.state === 'home').length;\r
-  const domains = domainCounts(entities).slice(0, 12);\r
-\r
-  return (\r
-    <div className="rd-sdk-overview">\r
-      <header className="rd-sdk-showcase__hero">\r
-        <div className="rd-sdk-showcase__hero-main">\r
-          <p className="rd-sdk-showcase__eyebrow">Home Assistant Dashboard Studio · SDK Showcase</p>\r
-          <h1>Dein Zuhause als Code</h1>\r
-          <p className="rd-sdk-showcase__tagline">\r
-            Live-SDK-Showcase — jede Karte hier nutzt deine echten Home-Assistant-Entities.\r
-            Alles, was du siehst, kannst du kopieren und anpassen.\r
-          </p>\r
-          {!ready && (\r
-            <p className="rd-sdk-start__hint">Verbinde mit Home Assistant …</p>\r
-          )}\r
-        </div>\r
-        <div className="rd-sdk-showcase__hero-aside">\r
-          <LiveClock />\r
-          {sun.entity && (\r
-            <div className="rd-sdk-showcase__sun">\r
-              <span>{sun.isDay ? '☀️' : '🌙'}</span>\r
-              <div>\r
-                <strong>{sun.isDay ? 'Tag' : 'Nacht'}</strong>\r
-                <small>\r
-                  {sun.rising && \`Aufgang \${relativeTime(sun.rising)}\`}\r
-                  {sun.setting && \` · Untergang \${relativeTime(sun.setting)}\`}\r
-                </small>\r
-              </div>\r
-            </div>\r
-          )}\r
-          <div className="rd-sdk-showcase__theme-pill">\r
-            Theme: <strong>{dark ? 'Dark' : 'Light'}</strong>\r
-          </div>\r
-        </div>\r
-      </header>\r
-\r
-      <div className="rd-sdk-showcase__stats-wrap">\r
-        <ResponsiveGrid min={150}>\r
-          <Stat label="Entities" value={String(entities.length)} accent />\r
-          <Stat label="Domains" value={String(domainCounts(entities).length)} />\r
-          <Stat label="Areas" value={String(areas.length)} />\r
-          <Stat label="Lichter an" value={\`\${lightsOn}/\${lights.length}\`} />\r
-          <Stat label="Personen da" value={String(peopleHome)} />\r
-          {weather && (\r
-            <Stat\r
-              label="Wetter"\r
-              value={\`\${weatherIcon(weather.state)} \${num(weather.attributes.temperature as string | number)}\`}\r
-              unit="°C"\r
-            />\r
-          )}\r
-        </ResponsiveGrid>\r
-      </div>\r
-\r
-      <Section title="SDK-Module — alles importierbar">\r
-        <ResponsiveGrid min={220}>\r
-          <div className="rd-card rd-sdk-module-card">\r
-            <h3>@ha</h3>\r
-            <p>useEntity, useEntityHistory, useAreas, useSun, useTheme, callService, …</p>\r
-            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('hooks')}>\r
-              Hooks ansehen →\r
-            </button>\r
-          </div>\r
-          <div className="rd-card rd-sdk-module-card">\r
-            <h3>@ha/ui</h3>\r
-            <p>30+ Widgets: Stat, LightTile, ClimateCard, SparkChart, LockCard, …</p>\r
-            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('widgets')}>\r
-              Galerie →\r
-            </button>\r
-          </div>\r
-          <div className="rd-card rd-sdk-module-card">\r
-            <h3>@ha/layout</h3>\r
-            <p>PageShell, Tabs, Stack, Row, ResponsiveGrid, useHashRoute</p>\r
-            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('layout')}>\r
-              Layout →\r
-            </button>\r
-          </div>\r
-          <div className="rd-card rd-sdk-module-card">\r
-            <h3>@ha/format</h3>\r
-            <p>num, temp, stateLabel, relativeTime, entityDisplayName, …</p>\r
-            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('format')}>\r
-              Format →\r
-            </button>\r
-          </div>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-\r
-      <Section title="Domains in deiner Installation">\r
-        <div className="rd-sdk-domain-row">\r
-          <Row gap={8}>\r
-            {domains.map(([domain, count], i) => (\r
-              <span\r
-                key={domain}\r
-                className="rd-sdk-domain-pill"\r
-                style={{ borderColor: DOMAIN_COLORS[i % DOMAIN_COLORS.length] }}\r
-              >\r
-                <strong>{domain}</strong>\r
-                <small>{count}</small>\r
-              </span>\r
-            ))}\r
-          </Row>\r
-        </div>\r
-      </Section>\r
-\r
-      {areas.length > 0 && (\r
-        <Section title={\`Areas (\${areas.length})\`}>\r
-          <ResponsiveGrid min={180}>\r
-            {areas.slice(0, 8).map((area) => (\r
-              <Card key={area.area_id}>\r
-                <strong>{area.name}</strong>\r
-                <br />\r
-                <small>{area.area_id}</small>\r
-              </Card>\r
-            ))}\r
-          </ResponsiveGrid>\r
-        </Section>\r
-      )}\r
-\r
-      <Section title="Charts & Verlauf">\r
-        <p className="rd-sdk-ref__lead">\r
-          SparkChart, HistoryChart, useEntityHistory und useEntityStatistics — mit deinen Sensoren.\r
-        </p>\r
-        <button type="button" className="rd-sdk-cta" onClick={() => onNavigate('charts')}>\r
-          Charts entdecken →\r
-        </button>\r
-      </Section>\r
-    </div>\r
-  );\r
-}\r
+    "pages/OverviewPage.tsx": `import {
+  useAreas,
+  useDarkMode,
+  useEntities,
+  useEntitiesByDomain,
+  useHassReady,
+  useSun,
+} from '@ha';
+import { num, relativeTime, weatherIcon } from '@ha/format';
+import { Card, Section, Stat } from '@ha/ui';
+import { ResponsiveGrid, Row } from '@ha/layout';
+import type { ShowcasePage } from '../types';
+import { LiveClock } from '../components/LiveClock';
+
+const DOMAIN_COLORS = [
+  '#6ea8fe',
+  '#a78bfa',
+  '#34d399',
+  '#fbbf24',
+  '#f87171',
+  '#fb923c',
+  '#38bdf8',
+  '#e879f9',
+];
+
+function domainCounts(entities: ReturnType<typeof useEntities>) {
+  const map = new Map<string, number>();
+  for (const e of entities) {
+    const d = e.entity_id.split('.')[0] ?? 'other';
+    map.set(d, (map.get(d) ?? 0) + 1);
+  }
+  return [...map.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+export function OverviewPage({ onNavigate }: { onNavigate: (p: ShowcasePage) => void }) {
+  const ready = useHassReady();
+  const sun = useSun();
+  const dark = useDarkMode();
+  const entities = useEntities();
+  const areas = useAreas();
+  const lights = useEntitiesByDomain('light');
+  const weather = useEntitiesByDomain('weather')[0];
+  const people = useEntitiesByDomain('person');
+
+  const lightsOn = lights.filter((l) => l.state === 'on').length;
+  const peopleHome = people.filter((p) => p.state === 'home').length;
+  const domains = domainCounts(entities).slice(0, 12);
+
+  return (
+    <div className="rd-sdk-overview">
+      <header className="rd-sdk-showcase__hero">
+        <div className="rd-sdk-showcase__hero-main">
+          <p className="rd-sdk-showcase__eyebrow">Home Assistant Dashboard Studio · SDK Showcase</p>
+          <h1>Dein Zuhause als Code</h1>
+          <p className="rd-sdk-showcase__tagline">
+            Live-SDK-Showcase — jede Karte hier nutzt deine echten Home-Assistant-Entities.
+            Alles, was du siehst, kannst du kopieren und anpassen.
+          </p>
+          {!ready && (
+            <p className="rd-sdk-start__hint">Verbinde mit Home Assistant …</p>
+          )}
+        </div>
+        <div className="rd-sdk-showcase__hero-aside">
+          <LiveClock />
+          {sun.entity && (
+            <div className="rd-sdk-showcase__sun">
+              <span>{sun.isDay ? '☀️' : '🌙'}</span>
+              <div>
+                <strong>{sun.isDay ? 'Tag' : 'Nacht'}</strong>
+                <small>
+                  {sun.rising && \`Aufgang \${relativeTime(sun.rising)}\`}
+                  {sun.setting && \` · Untergang \${relativeTime(sun.setting)}\`}
+                </small>
+              </div>
+            </div>
+          )}
+          <div className="rd-sdk-showcase__theme-pill">
+            Theme: <strong>{dark ? 'Dark' : 'Light'}</strong>
+          </div>
+        </div>
+      </header>
+
+      <div className="rd-sdk-showcase__stats-wrap">
+        <ResponsiveGrid min={150}>
+          <Stat label="Entities" value={String(entities.length)} accent />
+          <Stat label="Domains" value={String(domainCounts(entities).length)} />
+          <Stat label="Areas" value={String(areas.length)} />
+          <Stat label="Lichter an" value={\`\${lightsOn}/\${lights.length}\`} />
+          <Stat label="Personen da" value={String(peopleHome)} />
+          {weather && (
+            <Stat
+              label="Wetter"
+              value={\`\${weatherIcon(weather.state)} \${num(weather.attributes.temperature as string | number)}\`}
+              unit="°C"
+            />
+          )}
+        </ResponsiveGrid>
+      </div>
+
+      <Section title="SDK-Module — alles importierbar">
+        <ResponsiveGrid min={220}>
+          <div className="rd-card rd-sdk-module-card">
+            <h3>@ha</h3>
+            <p>useEntity, useEntityHistory, useAreas, useSun, useTheme, callService, …</p>
+            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('hooks')}>
+              Hooks ansehen →
+            </button>
+          </div>
+          <div className="rd-card rd-sdk-module-card">
+            <h3>@ha/ui</h3>
+            <p>30+ Widgets: Stat, LightTile, ClimateCard, SparkChart, LockCard, …</p>
+            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('widgets')}>
+              Galerie →
+            </button>
+          </div>
+          <div className="rd-card rd-sdk-module-card">
+            <h3>@ha/layout</h3>
+            <p>PageShell, Tabs, Stack, Row, ResponsiveGrid, useHashRoute</p>
+            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('layout')}>
+              Layout →
+            </button>
+          </div>
+          <div className="rd-card rd-sdk-module-card">
+            <h3>@ha/format</h3>
+            <p>num, temp, stateLabel, relativeTime, entityDisplayName, …</p>
+            <button type="button" className="rd-sdk-chip" onClick={() => onNavigate('format')}>
+              Format →
+            </button>
+          </div>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="Domains in deiner Installation">
+        <div className="rd-sdk-domain-row">
+          <Row gap={8}>
+            {domains.map(([domain, count], i) => (
+              <span
+                key={domain}
+                className="rd-sdk-domain-pill"
+                style={{ borderColor: DOMAIN_COLORS[i % DOMAIN_COLORS.length] }}
+              >
+                <strong>{domain}</strong>
+                <small>{count}</small>
+              </span>
+            ))}
+          </Row>
+        </div>
+      </Section>
+
+      {areas.length > 0 && (
+        <Section title={\`Areas (\${areas.length})\`}>
+          <ResponsiveGrid min={180}>
+            {areas.slice(0, 8).map((area) => (
+              <Card key={area.area_id}>
+                <strong>{area.name}</strong>
+                <br />
+                <small>{area.area_id}</small>
+              </Card>
+            ))}
+          </ResponsiveGrid>
+        </Section>
+      )}
+
+      <Section title="Charts & Verlauf">
+        <p className="rd-sdk-ref__lead">
+          SparkChart, HistoryChart, useEntityHistory und useEntityStatistics — mit deinen Sensoren.
+        </p>
+        <button type="button" className="rd-sdk-cta" onClick={() => onNavigate('charts')}>
+          Charts entdecken →
+        </button>
+      </Section>
+    </div>
+  );
+}
 `,
-    "pages/WidgetReference.tsx": `import { useEntities } from '@ha';\r
-import { entityDisplayName } from '@ha/format';\r
-import {\r
-  BatteryRow,\r
-  Card,\r
-  DeviceCard,\r
-  Grid,\r
-  RoomCard,\r
-  Section,\r
-  Stat,\r
-  WidgetCatalogGrid,\r
-} from '@ha/ui';\r
-import { ResponsiveGrid } from '@ha/layout';\r
-\r
-function findBatterySensor(entities: ReturnType<typeof useEntities>) {\r
-  return entities.find(\r
-    (e) =>\r
-      e.entity_id.startsWith('sensor.') &&\r
-      e.attributes.device_class === 'battery',\r
-  );\r
-}\r
-\r
-function findRoomPattern(entities: ReturnType<typeof useEntities>) {\r
-  const match = entities.find((e) =>\r
-    /^sensor\\.sensor_(.+)_temperature$/.test(e.entity_id),\r
-  );\r
-  if (!match) return null;\r
-  const key = match.entity_id.match(/^sensor\\.sensor_(.+)_temperature$/)?.[1];\r
-  return key ?? null;\r
-}\r
-\r
-function findDeviceSet(entities: ReturnType<typeof useEntities>) {\r
-  const power = entities.find(\r
-    (e) =>\r
-      e.entity_id.startsWith('sensor.') &&\r
-      (e.attributes.device_class === 'power' ||\r
-        e.attributes.unit_of_measurement === 'W'),\r
-  );\r
-  const sw = entities.find((e) => e.entity_id.startsWith('switch.'));\r
-  if (!power || !sw) return null;\r
-  return {\r
-    name: entityDisplayName(power, power.entity_id),\r
-    powerId: power.entity_id,\r
-    kwhId: power.entity_id,\r
-    costId: power.entity_id,\r
-    switchId: sw.entity_id,\r
-  };\r
-}\r
-\r
-export function WidgetReference() {\r
-  const entities = useEntities();\r
-  const battery = findBatterySensor(entities);\r
-  const roomKey = findRoomPattern(entities);\r
-  const deviceSet = findDeviceSet(entities);\r
-  const sampleLight = entities.find((e) => e.entity_id.startsWith('light.'));\r
-\r
-  return (\r
-    <div className="rd-sdk-widgets">\r
-      <header className="rd-sdk-showcase__page-head">\r
-        <h2>Widget-Galerie</h2>\r
-        <p>\r
-          Alle 30+ Domain-Widgets — live mit der ersten passenden Entity deiner Installation.\r
-          Klick im Studio unter <strong>⚡ Entities → Galerie</strong> zum Kopieren.\r
-        </p>\r
-      </header>\r
-\r
-      <Section title="Domain-Widgets (@ha/ui)">\r
-        <WidgetCatalogGrid />\r
-      </Section>\r
-\r
-      <Section title="Composite-Widgets">\r
-        <p className="rd-sdk-ref__lead">\r
-          Zusammengesetzte Karten — RoomCard, DeviceCard, BatteryRow und Grid.\r
-        </p>\r
-        <ResponsiveGrid min={260}>\r
-          {roomKey ? (\r
-            <RoomCard\r
-              name={\`Raum (\${roomKey})\`}\r
-              sensorKey={roomKey}\r
-              lightId={sampleLight?.entity_id}\r
-            />\r
-          ) : (\r
-            <Card>\r
-              <strong>RoomCard</strong>\r
-              <p className="rd-empty">\r
-                Kein sensor.sensor_*_temperature-Muster gefunden. Beispiel:\r
-                <code>{' <RoomCard name="Wohnzimmer" sensorKey="wohnzimmer" lightId="light.…" />'}</code>\r
-              </p>\r
-            </Card>\r
-          )}\r
-\r
-          {deviceSet ? (\r
-            <DeviceCard {...deviceSet} />\r
-          ) : (\r
-            <Card>\r
-              <strong>DeviceCard</strong>\r
-              <p className="rd-empty">\r
-                Kein Power-Sensor + Switch-Paar gefunden. Ideal für Energie-Monitoring.\r
-              </p>\r
-            </Card>\r
-          )}\r
-\r
-          {battery ? (\r
-            <div className="rd-card">\r
-              <strong className="rd-sdk-ref-card__head">BatteryRow</strong>\r
-              <BatteryRow\r
-                name={entityDisplayName(battery, battery.entity_id)}\r
-                entityId={battery.entity_id}\r
-              />\r
-            </div>\r
-          ) : (\r
-            <Card>\r
-              <strong>BatteryRow</strong>\r
-              <p className="rd-empty">Kein sensor mit device_class=battery.</p>\r
-            </Card>\r
-          )}\r
-\r
-          <div className="rd-card">\r
-            <strong>Grid</strong>\r
-            <Grid min={100}>\r
-              <Stat label="A" value="1" />\r
-              <Stat label="B" value="2" accent />\r
-              <Stat label="C" value="3" />\r
-            </Grid>\r
-          </div>\r
-        </ResponsiveGrid>\r
-      </Section>\r
-    </div>\r
-  );\r
-}\r
+    "pages/WidgetReference.tsx": `import { useEntities } from '@ha';
+import { entityDisplayName } from '@ha/format';
+import {
+  BatteryRow,
+  Card,
+  DeviceCard,
+  Grid,
+  RoomCard,
+  Section,
+  Stat,
+  WidgetCatalogGrid,
+} from '@ha/ui';
+import { ResponsiveGrid } from '@ha/layout';
+
+function findBatterySensor(entities: ReturnType<typeof useEntities>) {
+  return entities.find(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      e.attributes.device_class === 'battery',
+  );
+}
+
+function findRoomPattern(entities: ReturnType<typeof useEntities>) {
+  const match = entities.find((e) =>
+    /^sensor\\.sensor_(.+)_temperature$/.test(e.entity_id),
+  );
+  if (!match) return null;
+  const key = match.entity_id.match(/^sensor\\.sensor_(.+)_temperature$/)?.[1];
+  return key ?? null;
+}
+
+function findDeviceSet(entities: ReturnType<typeof useEntities>) {
+  const power = entities.find(
+    (e) =>
+      e.entity_id.startsWith('sensor.') &&
+      (e.attributes.device_class === 'power' ||
+        e.attributes.unit_of_measurement === 'W'),
+  );
+  const sw = entities.find((e) => e.entity_id.startsWith('switch.'));
+  if (!power || !sw) return null;
+  return {
+    name: entityDisplayName(power, power.entity_id),
+    powerId: power.entity_id,
+    kwhId: power.entity_id,
+    costId: power.entity_id,
+    switchId: sw.entity_id,
+  };
+}
+
+export function WidgetReference() {
+  const entities = useEntities();
+  const battery = findBatterySensor(entities);
+  const roomKey = findRoomPattern(entities);
+  const deviceSet = findDeviceSet(entities);
+  const sampleLight = entities.find((e) => e.entity_id.startsWith('light.'));
+
+  return (
+    <div className="rd-sdk-widgets">
+      <header className="rd-sdk-showcase__page-head">
+        <h2>Widget-Galerie</h2>
+        <p>
+          Alle 30+ Domain-Widgets — live mit der ersten passenden Entity deiner Installation.
+          Klick im Studio unter <strong>⚡ Entities → Galerie</strong> zum Kopieren.
+        </p>
+      </header>
+
+      <Section title="Domain-Widgets (@ha/ui)">
+        <WidgetCatalogGrid />
+      </Section>
+
+      <Section title="Composite-Widgets">
+        <p className="rd-sdk-ref__lead">
+          Zusammengesetzte Karten — RoomCard, DeviceCard, BatteryRow und Grid.
+        </p>
+        <ResponsiveGrid min={260}>
+          {roomKey ? (
+            <RoomCard
+              name={\`Raum (\${roomKey})\`}
+              sensorKey={roomKey}
+              lightId={sampleLight?.entity_id}
+            />
+          ) : (
+            <Card>
+              <strong>RoomCard</strong>
+              <p className="rd-empty">
+                Kein sensor.sensor_*_temperature-Muster gefunden. Beispiel:
+                <code>{' <RoomCard name="Wohnzimmer" sensorKey="wohnzimmer" lightId="light.…" />'}</code>
+              </p>
+            </Card>
+          )}
+
+          {deviceSet ? (
+            <DeviceCard {...deviceSet} />
+          ) : (
+            <Card>
+              <strong>DeviceCard</strong>
+              <p className="rd-empty">
+                Kein Power-Sensor + Switch-Paar gefunden. Ideal für Energie-Monitoring.
+              </p>
+            </Card>
+          )}
+
+          {battery ? (
+            <div className="rd-card">
+              <strong className="rd-sdk-ref-card__head">BatteryRow</strong>
+              <BatteryRow
+                name={entityDisplayName(battery, battery.entity_id)}
+                entityId={battery.entity_id}
+              />
+            </div>
+          ) : (
+            <Card>
+              <strong>BatteryRow</strong>
+              <p className="rd-empty">Kein sensor mit device_class=battery.</p>
+            </Card>
+          )}
+
+          <div className="rd-card">
+            <strong>Grid</strong>
+            <Grid min={100}>
+              <Stat label="A" value="1" />
+              <Stat label="B" value="2" accent />
+              <Stat label="C" value="3" />
+            </Grid>
+          </div>
+        </ResponsiveGrid>
+      </Section>
+    </div>
+  );
+}
 `,
-    "types.ts": `export type ShowcasePage = 'overview' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';\r
+    "types.ts": `export type ShowcasePage = 'overview' | 'widgets' | 'charts' | 'hooks' | 'layout' | 'format';
 `
   }
 };

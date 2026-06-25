@@ -11,6 +11,11 @@ export const PERSONAL_DASHBOARD_DIR = join(ROOT, 'dashboard');
 export const ENTRY_DEFAULT = 'dashboard.tsx';
 export const CODE_RE = /\.(tsx?|jsx?)$/;
 
+/** Normalize to LF so embed output is identical on Windows and Linux CI. */
+export function normalizeLineEndings(text) {
+  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
 /** Dashboard source only — excludes VS Code helpers like `ha-entities.d.ts`. */
 export function isDashboardCodeFile(name) {
   return CODE_RE.test(name) && !name.endsWith('.d.ts');
@@ -31,7 +36,7 @@ export function listProjectFiles(dir) {
       }
       if (!isDashboardCodeFile(name)) continue;
       const rel = relative(base, full).split(sep).join('/');
-      out[rel] = readFileSync(full, 'utf8');
+      out[rel] = normalizeLineEndings(readFileSync(full, 'utf8'));
     }
   }
 
