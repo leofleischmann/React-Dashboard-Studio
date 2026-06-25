@@ -33,7 +33,8 @@ export interface TemplateSubscriptionOptions {
 
 /** Successful push from HA WebSocket `render_template`. */
 export interface RenderTemplateResult {
-  result: string;
+  /** HA may send strings, booleans, numbers, etc. */
+  result: unknown;
   listeners: TemplateListeners;
 }
 
@@ -48,6 +49,15 @@ export type RenderTemplateMessage = RenderTemplateResult | RenderTemplateError;
 /** Stable snapshot singletons for useSyncExternalStore. */
 export const IDLE_TEMPLATE_SNAPSHOT: TemplateSnapshot = { status: 'idle' };
 export const LOADING_TEMPLATE_SNAPSHOT: TemplateSnapshot = { status: 'loading' };
+
+/** Normalize HA template output to a string (Jinja booleans -> True/False). */
+export function normalizeTemplateResult(raw: unknown): string {
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'boolean') return raw ? 'True' : 'False';
+  if (typeof raw === 'number') return String(raw);
+  if (raw == null) return '';
+  return String(raw);
+}
 
 export function templateSnapshotsEqual(
   a: TemplateSnapshot,

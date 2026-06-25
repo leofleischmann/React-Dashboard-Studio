@@ -8,6 +8,7 @@ import type {
 import {
   IDLE_TEMPLATE_SNAPSHOT,
   LOADING_TEMPLATE_SNAPSHOT,
+  normalizeTemplateResult,
   templateSnapshotsEqual,
 } from './templateTypes';
 
@@ -218,16 +219,17 @@ class TemplateStore {
         error: { message: msg.error, level: msg.level },
       });
     } else {
+      const value = normalizeTemplateResult(msg.result);
       console.log(
         '[Debug templateStore]: template result',
-        msg.result.slice(0, 80),
+        value.slice(0, 80),
         'entities=',
         msg.listeners?.entities?.length ?? 0,
       );
       setBucketSnapshot(bucket, {
         status: 'ready',
         result: {
-          value: msg.result,
+          value,
           listeners: msg.listeners,
         },
       });
