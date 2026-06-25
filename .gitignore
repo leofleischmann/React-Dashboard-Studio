@@ -12,7 +12,7 @@ __pycache__/
 *.pyo
 
 # Local working copy created by scripts/sync.mjs (your dashboard, not this repo)
-dashboard/
+/dashboard/
 
 # Optional local entity union from gen:types (dashboard/ha-entities.d.ts is enough)
 src/sdk/hass/entities.generated.ts
