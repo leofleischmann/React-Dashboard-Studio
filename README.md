@@ -38,7 +38,7 @@ export default function Dashboard() {
 | Thema | Kurz |
 | --- | --- |
 | **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
-| **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (JSX), Domain-Filter |
+| **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (Entities + **Galerie**), Domain-Filter |
 | **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
 | **Mobil** | Nur Anzeige, kein Editor |
 
@@ -57,6 +57,8 @@ npm run sync:pull                  # Dashboard aus HA → ./dashboard/ (+ gen:ty
 ```
 
 Token: HA → Profil → **Sicherheit** → **Long-Lived Access Tokens** → erstellen.
+
+**Windows:** `studio.bat` — interaktives Menü für alle npm-Befehle.
 
 | Befehl | Wann |
 | --- | --- |
