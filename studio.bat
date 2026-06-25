@@ -41,11 +41,12 @@ echo   Entwickler ^(Integration selbst erweitern^)
 echo   -----------------------------------------
 echo   A  build             Panel bauen ^(dashboard.js^)
 echo   B  check:default     Demo-Dashboard pruefen ^(CI^)
+echo   C  dev:default       Demo-Dashboard live ^(default-dashboard/^)
 echo.
 echo   0  Beenden
 echo.
 set "choice="
-set /p choice="Auswahl (1-6, A-B, 0): "
+set /p choice="Auswahl (1-6, A-C, 0): "
 
 if "%choice%"=="1"  goto run_dev
 if "%choice%"=="2"  goto run_sync_pull
@@ -55,6 +56,7 @@ if "%choice%"=="5"  goto run_gen_types
 if "%choice%"=="6"  goto run_check_dashboard
 if /i "%choice%"=="A"  goto run_build
 if /i "%choice%"=="B"  goto run_check_default
+if /i "%choice%"=="C"  goto run_dev_default
 if "%choice%"=="0"  exit /b 0
 
 echo.
@@ -92,6 +94,10 @@ goto after
 
 :run_check_default
 call npm run check:default
+goto after
+
+:run_dev_default
+call npm run dev:default
 goto after
 
 :after
