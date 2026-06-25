@@ -5,6 +5,11 @@ import type {
   TemplateSnapshot,
   TemplateSubscriptionOptions,
 } from './templateTypes';
+import {
+  IDLE_TEMPLATE_SNAPSHOT,
+  LOADING_TEMPLATE_SNAPSHOT,
+  templateSnapshotsEqual,
+} from './templateTypes';
 
 type Listener = () => void;
 
@@ -21,6 +26,15 @@ function notifyBucket(bucket: TemplateBucket): void {
   for (const listener of bucket.reactListeners) listener();
 }
 
+function setBucketSnapshot(
+  bucket: TemplateBucket,
+  next: TemplateSnapshot,
+): void {
+  if (templateSnapshotsEqual(bucket.snapshot, next)) return;
+  bucket.snapshot = next;
+  notifyBucket(bucket);
+}
+
 function defaultReportErrors(): boolean {
   return Boolean(import.meta.env.DEV);
 }
@@ -33,9 +47,14 @@ class TemplateStore {
     hassStore.subscribeHassMeta(() => {
       const connection = hassStore.getHass()?.connection;
       if (connection === this.lastConnection) return;
-      console.log('[Debug templateStore]: connection changed, resubscribing active templates');
+      const hadConnection = this.lastConnection !== undefined;
       this.lastConnection = connection;
-      this.resubscribeAll();
+      if (hadConnection && this.buckets.size > 0) {
+        console.log(
+          '[Debug templateStore]: connection changed, resubscribing active templates',
+        );
+        this.resubscribeAll();
+      }
     });
   }
 
@@ -60,7 +79,7 @@ class TemplateStore {
   }
 
   getSnapshot(key: string): TemplateSnapshot {
-    return this.buckets.get(key)?.snapshot ?? { status: 'idle' };
+    return this.buckets.get(key)?.snapshot ?? IDLE_TEMPLATE_SNAPSHOT;
   }
 
   subscribe(
@@ -73,7 +92,7 @@ class TemplateStore {
       bucket = {
         key,
         options,
-        snapshot: { status: 'loading' },
+        snapshot: LOADING_TEMPLATE_SNAPSHOT,
         reactListeners: new Set(),
         wsUnsub: null,
         wsPending: false,
@@ -116,8 +135,7 @@ class TemplateStore {
       bucket.wsUnsub?.();
       bucket.wsUnsub = null;
       bucket.wsPending = false;
-      bucket.snapshot = { status: 'loading' };
-      notifyBucket(bucket);
+      setBucketSnapshot(bucket, LOADING_TEMPLATE_SNAPSHOT);
       void this.ensureWsSubscribe(bucket);
     }
   }
@@ -127,21 +145,19 @@ class TemplateStore {
 
     const connection = hassStore.getHass()?.connection;
     if (!connection?.subscribeMessage) {
-      bucket.snapshot = {
+      setBucketSnapshot(bucket, {
         status: 'error',
         error: {
           message: 'WebSocket-Verbindung nicht verfügbar',
           level: 'ERROR',
         },
-      };
-      notifyBucket(bucket);
+      });
       return;
     }
 
     bucket.wsPending = true;
     if (bucket.snapshot.status !== 'ready') {
-      bucket.snapshot = { status: 'loading' };
-      notifyBucket(bucket);
+      setBucketSnapshot(bucket, LOADING_TEMPLATE_SNAPSHOT);
     }
 
     const reportErrors =
@@ -182,11 +198,10 @@ class TemplateStore {
       const message =
         err instanceof Error ? err.message : 'Template-Subscription fehlgeschlagen';
       console.log('[Debug templateStore]: ws error', message);
-      bucket.snapshot = {
+      setBucketSnapshot(bucket, {
         status: 'error',
         error: { message, level: 'ERROR' },
-      };
-      notifyBucket(bucket);
+      });
     } finally {
       bucket.wsPending = false;
     }
@@ -198,10 +213,10 @@ class TemplateStore {
   ): void {
     if ('error' in msg) {
       console.log('[Debug templateStore]: template error', msg.error);
-      bucket.snapshot = {
+      setBucketSnapshot(bucket, {
         status: 'error',
         error: { message: msg.error, level: msg.level },
-      };
+      });
     } else {
       console.log(
         '[Debug templateStore]: template result',
@@ -209,15 +224,14 @@ class TemplateStore {
         'entities=',
         msg.listeners?.entities?.length ?? 0,
       );
-      bucket.snapshot = {
+      setBucketSnapshot(bucket, {
         status: 'ready',
         result: {
           value: msg.result,
           listeners: msg.listeners,
         },
-      };
+      });
     }
-    notifyBucket(bucket);
   }
 }
 

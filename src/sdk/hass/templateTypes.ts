@@ -44,3 +44,28 @@ export interface RenderTemplateError {
 }
 
 export type RenderTemplateMessage = RenderTemplateResult | RenderTemplateError;
+
+/** Stable snapshot singletons for useSyncExternalStore. */
+export const IDLE_TEMPLATE_SNAPSHOT: TemplateSnapshot = { status: 'idle' };
+export const LOADING_TEMPLATE_SNAPSHOT: TemplateSnapshot = { status: 'loading' };
+
+export function templateSnapshotsEqual(
+  a: TemplateSnapshot,
+  b: TemplateSnapshot,
+): boolean {
+  if (a === b) return true;
+  if (a.status !== b.status) return false;
+  if (a.status === 'idle' || a.status === 'loading') return true;
+  if (a.status === 'error' && b.status === 'error') {
+    return (
+      a.error.message === b.error.message && a.error.level === b.error.level
+    );
+  }
+  if (a.status === 'ready' && b.status === 'ready') {
+    return (
+      a.result.value === b.result.value &&
+      a.result.listeners === b.result.listeners
+    );
+  }
+  return false;
+}

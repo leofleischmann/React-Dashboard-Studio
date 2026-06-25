@@ -42,6 +42,10 @@ import type {
   TemplateListeners,
   TemplateSnapshot,
 } from './templateTypes';
+import {
+  IDLE_TEMPLATE_SNAPSHOT,
+  templateSnapshotsEqual,
+} from './templateTypes';
 
 export type { HassEntity } from './types';
 export type { EntityFilter } from './entityFilter';
@@ -533,6 +537,13 @@ const EMPTY_TEMPLATE_RESULT: UseTemplateResult = {
   raw: undefined,
 };
 
+const LOADING_TEMPLATE_RESULT: UseTemplateResult = {
+  value: undefined,
+  loading: true,
+  error: undefined,
+  raw: undefined,
+};
+
 function stableEntityIdsKey(entityIds?: string[]): string {
   if (!entityIds?.length) return '';
   return [...entityIds].sort().join(',');
@@ -575,12 +586,7 @@ function mapTemplateSnapshot<T>(
 ): UseTemplateResult<T> {
   if (snapshot.status === 'idle') return EMPTY_TEMPLATE_RESULT as UseTemplateResult<T>;
   if (snapshot.status === 'loading') {
-    return {
-      value: undefined,
-      loading: true,
-      error: undefined,
-      raw: undefined,
-    } as UseTemplateResult<T>;
+    return LOADING_TEMPLATE_RESULT as UseTemplateResult<T>;
   }
   if (snapshot.status === 'error') {
     return {
@@ -649,9 +655,15 @@ export function useTemplate<T = string>(
     [trimmed, entityIdsKey, variablesKey, strict, report_errors, timeout],
   );
 
+  const snapshotCacheRef = useRef<TemplateSnapshot>(IDLE_TEMPLATE_SNAPSHOT);
+
   const getSnapshot = useCallback(() => {
-    if (!ready || !trimmed) return { status: 'idle' } as TemplateSnapshot;
-    return getTemplateSnapshot(subscriptionOptions);
+    if (!ready || !trimmed) return IDLE_TEMPLATE_SNAPSHOT;
+    const next = getTemplateSnapshot(subscriptionOptions);
+    const prev = snapshotCacheRef.current;
+    if (templateSnapshotsEqual(prev, next)) return prev;
+    snapshotCacheRef.current = next;
+    return next;
   }, [ready, trimmed, subscriptionOptions]);
 
   const subscribe = useCallback(
@@ -665,7 +677,7 @@ export function useTemplate<T = string>(
   const snapshot = useSyncExternalStore(
     subscribe,
     getSnapshot,
-    () => ({ status: 'idle' }) as TemplateSnapshot,
+    () => IDLE_TEMPLATE_SNAPSHOT,
   );
 
   const result = useMemo(
@@ -674,12 +686,7 @@ export function useTemplate<T = string>(
   );
 
   if (!ready && trimmed) {
-    return {
-      value: undefined,
-      loading: true,
-      error: undefined,
-      raw: undefined,
-    } as UseTemplateResult<T>;
+    return LOADING_TEMPLATE_RESULT as UseTemplateResult<T>;
   }
 
   return result;
