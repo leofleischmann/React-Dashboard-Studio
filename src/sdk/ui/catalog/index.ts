@@ -1,3 +1,4 @@
+import type { HassEntity } from '../../hass/types';
 import type { WidgetCatalogEntry, WidgetCategory } from './types';
 import { COMPOSITE_WIDGET_CATALOG } from './composite';
 import { DOMAIN_WIDGET_CATALOG } from './domain';
@@ -51,4 +52,37 @@ export function catalogByCategory(
   category: WidgetCategory,
 ): WidgetCatalogEntry[] {
   return WIDGET_CATALOG.filter((e) => (e.category ?? 'domain') === category);
+}
+
+/** First matching entity id per domain — shared by gallery grids. */
+export function buildCatalogExampleMap(
+  entities: readonly HassEntity[],
+): Map<string, string> {
+  const byDomain = new Map<string, string>();
+  for (const entry of WIDGET_CATALOG) {
+    for (const domain of entry.domains) {
+      if (byDomain.has(domain)) continue;
+      const match = entities.find((e) => e.entity_id.startsWith(`${domain}.`));
+      if (match) byDomain.set(domain, match.entity_id);
+    }
+  }
+  return byDomain;
+}
+
+export function resolveCatalogEntityId(
+  entry: WidgetCatalogEntry,
+  entities: readonly HassEntity[],
+  examplesByDomain: Map<string, string>,
+): string | undefined {
+  return (
+    entry.pickExample?.(entities) ??
+    entry.domains.map((d) => examplesByDomain.get(d)).find(Boolean)
+  );
+}
+
+export function canShowCatalogDemo(
+  entry: WidgetCatalogEntry,
+  entityId: string | undefined,
+): boolean {
+  return Boolean(entityId || entry.optionalEntity);
 }
