@@ -15,5 +15,8 @@ __pycache__/
 # Local working copy created by scripts/sync.mjs (your dashboard, not this repo)
 /dashboard/
 
+# Auto-generated SDK reference (npm run gen:sdk-reference)
+/docs/
+
 # Optional local entity union from gen:types (dashboard/ha-entities.d.ts is enough)
 src/sdk/hass/entities.generated.ts
