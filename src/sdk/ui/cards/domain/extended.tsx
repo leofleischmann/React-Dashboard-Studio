@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { callService, useCalendarEvents, useEntity } from '../hass/hooks';
-import { entityDomain } from '../entityActions';
+import { callService, useCalendarEvents, useEntity } from '../../../hass/hooks';
+import { entityDomain } from '../../../entityActions';
 import {
   duration,
   entityDisplayName,
@@ -10,7 +10,7 @@ import {
   stateColor,
   stateLabel,
   temp,
-} from '../format';
+} from '../../../format';
 
 function cameraProxyUrl(entityId: string, cacheBust: number): string {
   const base =

@@ -13,7 +13,7 @@ export const ENTITY_ACTION: Record<string, string> = {
   scene: 'turn_on',
   automation: 'trigger',
   vacuum: 'start',
-  valve: 'open',
+  valve: 'toggle',
   siren: 'toggle',
   humidifier: 'toggle',
   water_heater: 'toggle',

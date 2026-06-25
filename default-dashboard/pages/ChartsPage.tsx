@@ -1,33 +1,89 @@
-import { useMemo } from 'react';
-import { useEntities, useEntityHistory, useEntityHistoryPending, useEntityStatistics } from '@ha';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  aggregateHistoryByDay,
+  aggregateHistoryDelta,
+  fetchEntityHistory,
+  useEntities,
+  useEntityHistory,
+  useEntityHistoryPending,
+  useEntityStatistics,
+  type HistoryPoint,
+} from '@ha';
 import { entityDisplayName, num } from '@ha/format';
 import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
+import { PageHead } from '../components/PageHead';
+import { energySensor, numericSensors } from '../lib/pickers';
 
 const CHART_COLORS = ['#6ea8fe', '#34d399', '#fbbf24', '#f87171'];
 
-function pickChartSensors(entities: ReturnType<typeof useEntities>, limit = 4) {
-  const numeric = entities.filter(
-    (e) =>
-      e.entity_id.startsWith('sensor.') &&
-      !Number.isNaN(Number.parseFloat(e.state)) &&
-      e.state !== 'unavailable' &&
-      e.state !== 'unknown',
+/** Demonstrates aggregateHistoryByDay / aggregateHistoryDelta on an energy sensor. */
+function EnergyAggregation({ entityId, label }: { entityId: string; label: string }) {
+  const [points, setPoints] = useState<HistoryPoint[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+    // fetchEntityHistory — the imperative, promise-based recorder API.
+    fetchEntityHistory([entityId], 168)
+      .then((res) => {
+        if (alive) setPoints(res[entityId] ?? []);
+      })
+      .catch(() => {
+        /* recorder unavailable */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [entityId]);
+
+  const byDay = useMemo(() => aggregateHistoryByDay(points), [points]);
+  const total = useMemo(() => aggregateHistoryDelta(points), [points]);
+  const days = Object.entries(byDay).slice(-7);
+  const peak = Math.max(1, ...days.map(([, v]) => v));
+
+  return (
+    <div>
+      {days.length === 0 ? (
+        <p className="rd-empty">Kein kumulativer Verlauf für {label}.</p>
+      ) : (
+        <>
+          <div className="rd-aggbars">
+            {days.map(([day, v]) => (
+              <div key={day} className="rd-aggbar">
+                <span className="rd-aggbar__val">{num(v, 1)}</span>
+                <div className="rd-aggbar__fill" style={{ height: `${(v / peak) * 100}%` }} />
+                <span className="rd-aggbar__label">
+                  {new Date(day).toLocaleDateString('de-DE', { weekday: 'short' })}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="rd-agg-total">
+            <span>
+              <small>aggregateHistoryDelta · 7 Tage</small>
+              <strong>{num(total, 1)} {(/kwh/i.test(label) ? 'kWh' : '')}</strong>
+            </span>
+            <span>
+              <small>aggregateHistoryByDay · Tage</small>
+              <strong>{Object.keys(byDay).length}</strong>
+            </span>
+          </div>
+        </>
+      )}
+    </div>
   );
-  const temp = numeric.filter((e) => e.attributes.device_class === 'temperature');
-  const pool = temp.length >= 2 ? temp : numeric;
-  return pool.slice(0, limit);
 }
 
 export function ChartsPage() {
   const entities = useEntities();
-  const sensors = useMemo(() => pickChartSensors(entities), [entities]);
+  const sensors = useMemo(() => numericSensors(entities), [entities]);
   const ids = useMemo(() => sensors.map((s) => s.entity_id), [sensors]);
   const history = useEntityHistory(ids, { hours: 48 });
   const historyLoading = useEntityHistoryPending(ids, { hours: 48 });
   const primaryId = ids[0];
   const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });
   const stats = primaryId ? statsMap[primaryId] : undefined;
+  const energy = useMemo(() => energySensor(entities), [entities]);
 
   const series = sensors.map((s, i) => ({
     label: entityDisplayName(s, s.entity_id),
@@ -37,13 +93,10 @@ export function ChartsPage() {
 
   return (
     <div className="rd-sdk-charts">
-      <header className="rd-sdk-showcase__page-head">
-        <h2>Charts & History</h2>
-        <p>
-          SparkChart, HistoryChart, useEntityHistory und useEntityStatistics — Echtzeit-Verläufe
-          aus deiner HA-Instanz.
-        </p>
-      </header>
+      <PageHead icon="📈" module="@ha · @ha/ui" title="Charts, Verlauf & Statistik">
+        SparkChart, HistoryChart, useEntityHistory, useEntityStatistics und die
+        aggregateHistory-Helfer — Echtzeit-Verläufe direkt aus deinem Recorder.
+      </PageHead>
 
       {sensors.length === 0 ? (
         <Card>
@@ -52,13 +105,13 @@ export function ChartsPage() {
       ) : (
         <>
           <Section title="SparkChart · Multi-Series (48 h)">
-            <div className="rd-sdk-chart-card">
-              <SparkChart series={series} height={120} loading={historyLoading} />
+            <div className="rd-glass rd-chart-panel">
+              <SparkChart series={series} height={130} loading={historyLoading} />
             </div>
           </Section>
 
-          <Section title="HistoryChart · Einzelverlauf">
-            <div className="rd-sdk-chart-card">
+          <Section title="HistoryChart · Einzelverlauf mit Achse">
+            <div className="rd-glass rd-chart-panel">
               <HistoryChart
                 loading={historyLoading}
                 series={[
@@ -68,27 +121,44 @@ export function ChartsPage() {
                     points: history[sensors[0].entity_id] ?? [],
                   },
                 ]}
-                height={160}
+                height={170}
                 showLegend
               />
             </div>
           </Section>
 
           {primaryId && stats && (
-            <Section title="useEntityStatistics · 24 h">
+            <Section title="useEntityStatistics · 7 Tage">
               <ResponsiveGrid min={140}>
                 <Stat label="Min" value={num(stats.min)} />
                 <Stat label="Max" value={num(stats.max)} />
-                <Stat label="Mean" value={num(stats.mean)} accent />
-                <Stat label="Sum" value={num(stats.sum)} />
+                <Stat label="Mittel" value={num(stats.mean)} accent />
+                <Stat label="Summe" value={num(stats.sum)} />
               </ResponsiveGrid>
-              <p className="rd-sdk-ref__lead">
-                Entity: <code>{primaryId}</code>
+              <p className="rd-sdk-ref__lead" style={{ marginTop: 10 }}>
+                Entity: <code>{primaryId}</code> · geladen über WebSocket
+                (<code>recorder/statistics_during_period</code>).
               </p>
             </Section>
           )}
 
-          <Section title="Ausgewählte Sensoren">
+          {energy && (
+            <Section title="aggregateHistory · Tagesverbrauch">
+              <div className="rd-glass rd-chart-panel">
+                <p className="rd-sdk-ref__lead">
+                  Aus dem kumulativen Zähler{' '}
+                  <code>{entityDisplayName(energy, energy.entity_id)}</code> werden über
+                  <code> aggregateHistoryByDay</code> Tages-Deltas berechnet:
+                </p>
+                <EnergyAggregation
+                  entityId={energy.entity_id}
+                  label={entityDisplayName(energy, energy.entity_id)}
+                />
+              </div>
+            </Section>
+          )}
+
+          <Section title="Live-Werte der Chart-Sensoren">
             <ResponsiveGrid min={160}>
               {sensors.map((s) => (
                 <Stat
