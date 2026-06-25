@@ -54,6 +54,7 @@ export default function Studio() {
   const [localMode, setLocalMode] = useState(false);
   const [mode, setMode] = useState<Mode>('view');
   const [inserterOpen, setInserterOpen] = useState(false);
+  const [entityBrowserOpen, setEntityBrowserOpen] = useState(false);
 
   const [Dashboard, setDashboard] = useState<ComponentType | null>(null);
   const [version, setVersion] = useState(0);
@@ -255,6 +256,12 @@ export default function Studio() {
               📁 dashboard/
             </span>
           )}
+          <button
+            className={`rd-studio__btn ${entityBrowserOpen ? 'is-active' : ''}`}
+            onClick={() => setEntityBrowserOpen((o) => !o)}
+          >
+            ⚡ Entities
+          </button>
           <span
             className={`rd-studio__status ${error ? 'is-error' : 'is-ok'}`}
             title={error ?? 'Vorschau aktuell'}
@@ -262,7 +269,7 @@ export default function Studio() {
             {error ? '● Fehler' : '● Live'}
           </span>
           <span className="rd-studio__spacer" />
-          <span className="rd-studio__hint">Bearbeiten in VS Code · Speichern aktualisiert die Vorschau</span>
+          <span className="rd-studio__hint">VS Code · Snippet kopieren und einfügen</span>
         </div>
         <div className="rd-studio__preview rd-studio__preview--full">
           <Preview Dashboard={Dashboard} version={version} onRuntimeError={setError} />
@@ -272,6 +279,12 @@ export default function Studio() {
             </div>
           )}
         </div>
+        {entityBrowserOpen && (
+          <EntityInserter
+            copyToClipboard
+            onClose={() => setEntityBrowserOpen(false)}
+          />
+        )}
       </div>
     );
   }

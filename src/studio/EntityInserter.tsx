@@ -69,20 +69,24 @@ function useEntityMatches(query: string, domain: string): HassEntity[] {
 function EntityRow({
   entity,
   mode,
-  onInsert,
+  onPick,
+  copied,
+  pickLabel,
 }: {
   entity: HassEntity;
   mode: Mode;
-  onInsert: (snippet: string) => void;
+  onPick: (snippet: string) => void;
+  copied?: boolean;
+  pickLabel: string;
 }) {
   const snippet = snippetFor(mode, entity.entity_id);
   const unit = entity.attributes.unit_of_measurement;
 
   return (
     <div
-      className="rd-inserter__item"
-      onClick={() => onInsert(snippet)}
-      title={`Einfügen: ${snippet}`}
+      className={`rd-inserter__item ${copied ? 'is-copied' : ''}`}
+      onClick={() => onPick(snippet)}
+      title={`${pickLabel}: ${snippet}`}
     >
       <span className="rd-inserter__name">
         {entity.attributes.friendly_name ?? entity.entity_id}
@@ -91,6 +95,7 @@ function EntityRow({
       <span className="rd-inserter__state">
         {entity.state}
         {unit ? ` ${unit}` : ''}
+        {copied && <small className="rd-inserter__copied"> · Kopiert</small>}
         {mode === 'action' && (
           <small className="rd-inserter__svc"> · {entityDomain(entity.entity_id)}</small>
         )}
@@ -105,14 +110,46 @@ function EntityRow({
 export function EntityInserter({
   onInsert,
   onClose,
+  copyToClipboard = false,
+  className = '',
 }: {
-  onInsert: (snippet: string) => void;
+  onInsert?: (snippet: string) => void;
   onClose: () => void;
+  /** Dev preview: copy snippet to clipboard instead of inserting into the editor. */
+  copyToClipboard?: boolean;
+  className?: string;
 }) {
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<Mode>('value');
   const [domain, setDomain] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pickLabel = copyToClipboard ? 'Kopieren' : 'Einfügen';
+
+  const handlePick = useCallback(
+    (snippet: string, entityId: string) => {
+      if (copyToClipboard) {
+        void navigator.clipboard.writeText(snippet).catch(() => {
+          window.prompt('Snippet manuell kopieren:', snippet);
+        });
+        setCopiedId(entityId);
+        if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = setTimeout(() => setCopiedId(null), 1600);
+        return;
+      }
+      onInsert?.(snippet);
+    },
+    [copyToClipboard, onInsert],
+  );
+
+  useEffect(
+    () => () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    },
+    [],
+  );
 
   const matches = useEntityMatches(query, domain);
   const hasQuery = query.trim().length > 0;
@@ -141,7 +178,7 @@ export function EntityInserter({
   }, [matches.length]); // virtualizer is stable enough; remeasure when result count changes
 
   return (
-    <div className="rd-inserter">
+    <div className={`rd-inserter ${copyToClipboard ? 'rd-inserter--clipboard' : ''} ${className}`.trim()}>
       <div className="rd-inserter__head">
         <input
           className="rd-inserter__search"
@@ -197,7 +234,13 @@ export function EntityInserter({
         </div>
       </div>
 
-      {mode === 'widget' && (
+      {copyToClipboard && (
+        <p className="rd-inserter__hint">
+          Klick kopiert das Snippet — in VS Code einfügen (Strg/⌘ + V).
+        </p>
+      )}
+
+      {mode === 'widget' && !copyToClipboard && (
         <p className="rd-inserter__hint">
           Fügt JSX ein — ggf.{' '}
           <code>{`import { … } from '@ha/ui'`}</code> ergänzen.
@@ -236,7 +279,13 @@ export function EntityInserter({
                     transform: `translateY(${row.start}px)`,
                   }}
                 >
-                  <EntityRow entity={entity} mode={mode} onInsert={onInsert} />
+                  <EntityRow
+                    entity={entity}
+                    mode={mode}
+                    onPick={(snippet) => handlePick(snippet, entity.entity_id)}
+                    copied={copiedId === entity.entity_id}
+                    pickLabel={pickLabel}
+                  />
                 </div>
               );
             })}
