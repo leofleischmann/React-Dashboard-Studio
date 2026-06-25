@@ -1,5 +1,14 @@
 .rd-value-orb {
-  --vorb-glow: color-mix(in srgb, var(--vorb-accent, var(--primary-color)) calc(var(--vorb-pulse, 0.35) * 42%), transparent);
+  --vorb-glow: color-mix(
+    in srgb,
+    var(--vorb-accent, var(--primary-color)) calc(var(--vorb-pulse, 0.35) * 42%),
+    transparent
+  );
+  --vorb-ring-color: color-mix(
+    in srgb,
+    var(--vorb-accent, var(--primary-color)) calc((1 - var(--vorb-intensity, 0.2)) * 100%),
+    #e8a060 calc(var(--vorb-intensity, 0.2) * 45%)
+  );
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -17,10 +26,93 @@
     color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
 }
 
-.rd-value-orb__canvas canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
+.rd-value-orb__stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 720px;
+  perspective-origin: 50% 46%;
+}
+
+.rd-value-orb__orb {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  transform-style: preserve-3d;
+  transform: scale(var(--vorb-base-scale, 1));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: rd-vorb-breathe 4.8s ease-in-out infinite;
+}
+
+.rd-value-orb__shell {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.rd-value-orb__shell--outer {
+  animation: rd-vorb-spin 22s linear infinite;
+}
+
+.rd-value-orb__shell--inner {
+  inset: 22%;
+  animation: rd-vorb-spin-rev 14s linear infinite;
+}
+
+.rd-value-orb__ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--vorb-ring-color);
+  opacity: calc(0.42 + var(--vorb-intensity, 0.2) * 0.48);
+  box-shadow: 0 0 calc(6px + var(--vorb-intensity, 0.2) * 14px) var(--vorb-glow);
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  transition:
+    opacity 0.55s ease,
+    border-color 0.55s ease,
+    box-shadow 0.55s ease;
+}
+
+.rd-value-orb__shell--inner .rd-value-orb__ring {
+  opacity: calc(0.18 + var(--vorb-intensity, 0.2) * 0.32);
+  border-width: 1px;
+}
+
+.rd-value-orb__ring--equator {
+  transform: rotateX(90deg);
+}
+
+@keyframes rd-vorb-spin {
+  from {
+    transform: rotateX(12deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(12deg) rotateY(360deg);
+  }
+}
+
+@keyframes rd-vorb-spin-rev {
+  from {
+    transform: rotateX(-18deg) rotateY(0deg) rotateZ(8deg);
+  }
+  to {
+    transform: rotateX(-18deg) rotateY(-360deg) rotateZ(8deg);
+  }
+}
+
+@keyframes rd-vorb-breathe {
+  0%,
+  100% {
+    transform: scale(var(--vorb-base-scale, 1));
+  }
+  50% {
+    transform: scale(calc(var(--vorb-base-scale, 1) * 1.028));
+  }
 }
 
 .rd-value-orb__footer {
@@ -57,7 +149,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rd-value-orb__canvas {
-    background: color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
+  .rd-value-orb__orb,
+  .rd-value-orb__shell--outer,
+  .rd-value-orb__shell--inner {
+    animation: none;
+  }
+
+  .rd-value-orb__orb {
+    transform: scale(var(--vorb-base-scale, 1));
+  }
+
+  .rd-value-orb__shell--outer {
+    transform: rotateX(12deg) rotateY(24deg);
+  }
+
+  .rd-value-orb__shell--inner {
+    transform: rotateX(-18deg) rotateY(-32deg) rotateZ(8deg);
   }
 }

@@ -1,23 +1,11 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from 'react';
-import {
-  Clock,
-  Color,
-  EdgesGeometry,
-  Group,
-  IcosahedronGeometry,
-  LineBasicMaterial,
-  LineSegments,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-} from 'three';
+import { useEffect, useMemo, type CSSProperties } from 'react';
 import { useDarkMode, useEntity } from '../../hass/hooks';
 import { useTheme } from '../../hass/theme';
 import type { HassEntity } from '../../hass/types';
 import { entityDisplayName, num, power, stateNumber } from '../../format';
 import './ValueOrb3D.css';
 
-const CANVAS_HEIGHT = 220;
+const MERIDIAN_ANGLES = [0, 36, 72, 108, 144] as const;
 
 export type OrbCurve = 'linear' | 'sqrt';
 
@@ -104,32 +92,26 @@ function formatReading(entity: HassEntity | undefined): string {
   return unit ? `${num(v, 1)} ${unit}` : num(v, 1);
 }
 
-type SceneState = {
-  intensity: number;
-  dark: boolean;
-  primary: string;
-};
-
-function wireOrb(
-  radius: number,
-  detail: number,
-  color: number,
-  opacity: number,
-): { mesh: LineSegments; geo: IcosahedronGeometry; edges: EdgesGeometry; mat: LineBasicMaterial } {
-  const geo = new IcosahedronGeometry(radius, detail);
-  const edges = new EdgesGeometry(geo, 12);
-  const mat = new LineBasicMaterial({
-    color,
-    transparent: true,
-    opacity,
-    depthWrite: false,
-  });
-  const mesh = new LineSegments(edges, mat);
-  return { mesh, geo, edges, mat };
+function OrbShell({ variant }: { variant: 'outer' | 'inner' }) {
+  return (
+    <div className={`rd-value-orb__shell rd-value-orb__shell--${variant}`} aria-hidden>
+      {MERIDIAN_ANGLES.map((deg) => (
+        <span
+          key={`m-${variant}-${deg}`}
+          className="rd-value-orb__ring"
+          style={{ transform: `rotateY(${deg}deg) rotateX(90deg)` }}
+        />
+      ))}
+      <span className="rd-value-orb__ring rd-value-orb__ring--equator" />
+      <span className="rd-value-orb__ring" style={{ transform: 'rotateX(90deg)' }} />
+      <span className="rd-value-orb__ring" style={{ transform: 'rotateZ(90deg) rotateX(90deg)' }} />
+    </div>
+  );
 }
 
 /**
- * Calm wireframe orb — any numeric entity state mapped to 0…1 via min/max.
+ * Calm wireframe-style orb — any numeric entity state mapped to 0…1 via min/max.
+ * Pure CSS 3D (no WebGL).
  */
 export function ValueOrb3D({
   entityId,
@@ -141,9 +123,6 @@ export function ValueOrb3D({
   const entity = useEntity(entityId);
   const dark = useDarkMode();
   const theme = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stateRef = useRef<SceneState>({ intensity: 0.2, dark: false, primary: '#4f7cff' });
-  const smoothIntensityRef = useRef(0.2);
 
   const intensity = useMemo(
     () => intensityFromEntity(entity, min, max, curve),
@@ -152,10 +131,7 @@ export function ValueOrb3D({
   const label = entityDisplayName(entity, entityId);
   const level = intensityLevelLabel(intensity);
   const rawValue = stateNumber(entity);
-
-  useEffect(() => {
-    stateRef.current = { intensity, dark, primary: theme.primary };
-  }, [intensity, dark, theme.primary]);
+  const baseScale = 0.94 + intensity * 0.14;
 
   useEffect(() => {
     console.log('[Debug ValueOrb3D]:', {
@@ -166,122 +142,32 @@ export function ValueOrb3D({
       curve,
       intensity: intensity.toFixed(2),
       level,
+      renderer: 'css-3d',
     });
   }, [entityId, rawValue, min, max, curve, intensity, level]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const width = Math.max(container.clientWidth, 1);
-    const scene = new Scene();
-
-    const camera = new PerspectiveCamera(40, width / CANVAS_HEIGHT, 0.1, 20);
-    camera.position.set(0, 0.05, 2.5);
-    camera.lookAt(0, 0, 0);
-
-    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, CANVAS_HEIGHT);
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
-
-    const accent = new Color(stateRef.current.primary);
-    const outer = wireOrb(0.7, 2, accent.getHex(), 0.72);
-    const inner = wireOrb(0.38, 1, accent.getHex(), 0.38);
-
-    const orbGroup = new Group();
-    orbGroup.add(outer.mesh, inner.mesh);
-    scene.add(orbGroup);
-
-    const clock = new Clock();
-    let raf = 0;
-    let disposed = false;
-    const tint = new Color();
-    const warm = new Color(0xe8a060);
-    smoothIntensityRef.current = stateRef.current.intensity;
-
-    const animate = () => {
-      if (disposed) return;
-      raf = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
-
-      smoothIntensityRef.current +=
-        (stateRef.current.intensity - smoothIntensityRef.current) * 0.035;
-      const i = smoothIntensityRef.current;
-      const { primary } = stateRef.current;
-
-      tint.set(primary).lerp(warm, i * 0.45);
-
-      const baseScale = 0.94 + i * 0.14;
-
-      if (reducedMotion) {
-        orbGroup.scale.setScalar(baseScale);
-        outer.mat.color.copy(tint);
-        outer.mat.opacity = 0.5 + i * 0.4;
-        inner.mat.color.copy(tint);
-        inner.mat.opacity = 0.22 + i * 0.25;
-      } else {
-        const breatheHz = 0.28 + i * 0.38;
-        const breathe = Math.sin(elapsed * breatheHz * Math.PI * 2);
-        const scale = baseScale + breathe * (0.012 + i * 0.028);
-
-        orbGroup.scale.setScalar(scale);
-        orbGroup.rotation.y = elapsed * 0.07;
-        inner.mesh.rotation.y = -elapsed * 0.11;
-        inner.mesh.rotation.x = elapsed * 0.05;
-
-        outer.mat.color.copy(tint);
-        outer.mat.opacity = 0.48 + i * 0.38 + breathe * 0.05;
-        inner.mat.color.copy(tint);
-        inner.mat.opacity = 0.2 + i * 0.22 + breathe * 0.04;
-      }
-
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    const onResize = () => {
-      const w = Math.max(container.clientWidth, 1);
-      camera.aspect = w / CANVAS_HEIGHT;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, CANVAS_HEIGHT);
-    };
-    const ro = new ResizeObserver(onResize);
-    ro.observe(container);
-
-    console.log('[Debug ValueOrb3D]: wireframe orb initialized', { reducedMotion, min, max });
-
-    return () => {
-      disposed = true;
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      renderer.domElement.remove();
-      for (const layer of [outer, inner]) {
-        layer.geo.dispose();
-        layer.edges.dispose();
-        layer.mat.dispose();
-      }
-      renderer.dispose();
-    };
-  }, [entityId, min, max]);
 
   const style = {
     '--vorb-accent': theme.primary,
     '--vorb-pulse': String(0.2 + intensity * 0.5),
+    '--vorb-intensity': String(intensity),
+    '--vorb-base-scale': String(baseScale),
   } as CSSProperties;
+
+  const reading = formatReading(entity);
+  const title = showLevel ? `${reading} — ${level}` : reading;
 
   return (
     <div className={`rd-value-orb${dark ? ' rd-value-orb--dark' : ''}`} style={style}>
-      <div
-        ref={containerRef}
-        className="rd-value-orb__canvas"
-        aria-hidden
-        title={showLevel ? `${formatReading(entity)} — ${level}` : formatReading(entity)}
-      />
+      <div className="rd-value-orb__canvas" title={title}>
+        <div className="rd-value-orb__stage">
+          <div className="rd-value-orb__orb">
+            <OrbShell variant="outer" />
+            <OrbShell variant="inner" />
+          </div>
+        </div>
+      </div>
       <div className="rd-value-orb__footer">
-        <strong>{formatReading(entity)}</strong>
+        <strong>{reading}</strong>
         {showLevel && <span className="rd-value-orb__level">{level}</span>}
         <small>{label}</small>
       </div>
