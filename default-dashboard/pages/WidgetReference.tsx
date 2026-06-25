@@ -1,8 +1,42 @@
+import { useState } from 'react';
 import { Section, WidgetCatalogGrid, ErrorBoundary } from '@ha/ui';
 import { PageHead } from '../components/PageHead';
 
-function BrokenWidgetDemo(): never {
-  throw new Error('Demo: absichtlicher Render-Fehler');
+function BrokenWidgetDemo({ armed }: { armed: boolean }) {
+  if (armed) throw new Error('Demo: absichtlicher Render-Fehler');
+  return (
+    <p className="rd-dd-lead" style={{ margin: 0 }}>
+      Widget läuft normal — klicke „Fehler auslösen“, um die Fehlerkachel zu sehen.
+    </p>
+  );
+}
+
+function ErrorBoundaryDemo() {
+  const [armed, setArmed] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+
+  return (
+    <div className="rd-error-boundary-demo">
+      <div className="rd-row" style={{ marginBottom: 12 }}>
+        <button type="button" className="rd-action-btn" onClick={() => setArmed(true)}>
+          Fehler auslösen
+        </button>
+        <button
+          type="button"
+          className="rd-action-btn"
+          onClick={() => {
+            setArmed(false);
+            setResetKey((k) => k + 1);
+          }}
+        >
+          Zurücksetzen
+        </button>
+      </div>
+      <ErrorBoundary key={resetKey}>
+        <BrokenWidgetDemo armed={armed} />
+      </ErrorBoundary>
+    </div>
+  );
 }
 
 export function WidgetReference() {
@@ -39,9 +73,7 @@ export function WidgetReference() {
           Ein kaputtes Widget sprengt nicht das ganze Dashboard — Fehler bleiben in der
           Kachel eingegrenzt.
         </p>
-        <ErrorBoundary>
-          <BrokenWidgetDemo />
-        </ErrorBoundary>
+        <ErrorBoundaryDemo />
       </Section>
     </>
   );

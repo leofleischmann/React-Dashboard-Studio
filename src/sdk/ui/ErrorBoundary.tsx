@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('[Debug ErrorBoundary]:', error.message, info.componentStack);
+    console.warn('[Debug ErrorBoundary]:', error.message, info.componentStack);
     this.props.onError?.(error, info);
   }
 
