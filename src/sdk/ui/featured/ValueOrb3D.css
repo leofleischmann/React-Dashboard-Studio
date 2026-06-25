@@ -1,15 +1,8 @@
 .rd-value-orb {
-  --vorb-accent-soft: color-mix(in srgb, var(--vorb-accent, var(--primary-color)) 72%, white);
-  --vorb-accent-deep: color-mix(in srgb, var(--vorb-accent, var(--primary-color)) 55%, #0a1020);
-  --vorb-glow: color-mix(
+  --vorb-lava-glow: color-mix(
     in srgb,
-    var(--vorb-accent, var(--primary-color)) calc(28% + var(--vorb-intensity, 0.2) * 42%),
+    #ff6a28 calc(35% + var(--vorb-intensity, 0.2) * 50%),
     transparent
-  );
-  --vorb-ring: color-mix(
-    in srgb,
-    var(--vorb-accent-soft) calc(55% + var(--vorb-intensity, 0.2) * 35%),
-    rgba(255, 255, 255, 0.92)
   );
   display: flex;
   flex-direction: column;
@@ -22,21 +15,24 @@
   height: 220px;
   border-radius: var(--rd-radius);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--vorb-accent) 14%, var(--rd-border));
-  background: color-mix(in srgb, var(--rd-text) 5%, var(--rd-card-bg));
+  border: 1px solid var(--rd-border);
+  background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
 }
 
 .rd-value-orb--dark .rd-value-orb__canvas {
-  background: color-mix(in srgb, var(--rd-text) 10%, var(--rd-card-bg));
+  background: color-mix(in srgb, var(--rd-text) 9%, var(--rd-card-bg));
 }
 
-.rd-value-orb__vignette {
+.rd-value-orb__glow {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 42%, var(--vorb-glow) 0%, transparent 58%),
-    radial-gradient(ellipse 90% 70% at 50% 115%, color-mix(in srgb, var(--rd-text) 10%, transparent), transparent 72%);
+  background: radial-gradient(
+    circle at 50% 48%,
+    var(--vorb-lava-glow) 0%,
+    transparent calc(42% + var(--vorb-intensity, 0.2) * 18%)
+  );
+  transition: background 0.7s ease;
 }
 
 .rd-value-orb__stage {
@@ -44,110 +40,127 @@
   inset: 0;
   display: grid;
   place-items: center;
-  perspective: 640px;
-  perspective-origin: 50% 44%;
 }
 
-.rd-value-orb__orb {
+.rd-value-orb__glass {
   position: relative;
-  width: 156px;
-  height: 156px;
-  transform-style: preserve-3d;
-  transform: rotateX(14deg) scale(var(--vorb-base-scale, 1));
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  animation: rd-vorb-float 5.5s ease-in-out infinite;
-}
-
-.rd-value-orb__halo {
-  position: absolute;
-  inset: -18%;
+  width: 148px;
+  height: 148px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--vorb-accent) calc(22% + var(--vorb-intensity, 0.2) * 38%), transparent) 0%,
-    transparent 68%
-  );
-  filter: blur(10px);
-  opacity: calc(0.55 + var(--vorb-intensity, 0.2) * 0.45);
-  transition: opacity 0.65s ease;
-}
-
-.rd-value-orb__core {
-  position: absolute;
-  inset: 14%;
-  border-radius: 50%;
+  overflow: hidden;
   background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.82) 0%, transparent 38%),
-    radial-gradient(
-      circle at 50% 58%,
-      var(--vorb-accent-soft) 0%,
-      var(--vorb-accent, var(--primary-color)) 42%,
-      var(--vorb-accent-deep) 100%
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.5) 0%, transparent 42%),
+    radial-gradient(circle at 72% 78%, rgba(255, 255, 255, 0.1) 0%, transparent 38%),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, white 28%, transparent) 0%,
+      color-mix(in srgb, white 6%, transparent) 45%,
+      color-mix(in srgb, var(--rd-text) 8%, transparent) 100%
     );
-  opacity: calc(0.62 + var(--vorb-intensity, 0.2) * 0.34);
+  border: 1px solid color-mix(in srgb, white 55%, transparent);
   box-shadow:
-    0 0 calc(18px + var(--vorb-intensity, 0.2) * 36px) var(--vorb-glow),
-    inset 0 -10px 22px color-mix(in srgb, var(--vorb-accent-deep) 35%, transparent),
-    inset 0 8px 14px rgba(255, 255, 255, 0.18);
-  transition:
-    opacity 0.65s ease,
-    box-shadow 0.65s ease;
+    inset 0 -14px 28px color-mix(in srgb, var(--rd-text) 12%, transparent),
+    inset 0 10px 18px rgba(255, 255, 255, 0.28),
+    0 10px 28px color-mix(in srgb, var(--rd-text) 14%, transparent),
+    0 0 calc(12px + var(--vorb-intensity, 0.2) * 28px) var(--vorb-lava-glow);
+  backdrop-filter: blur(2px);
+  animation: rd-vorb-float 5s ease-in-out infinite;
 }
 
-.rd-value-orb__specular {
-  position: absolute;
-  top: 16%;
-  left: 22%;
-  width: 34%;
-  height: 22%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.72), transparent 72%);
-  filter: blur(0.4px);
+.rd-value-orb--dark .rd-value-orb__glass {
+  border-color: color-mix(in srgb, white 38%, transparent);
+  box-shadow:
+    inset 0 -14px 28px rgba(0, 0, 0, 0.28),
+    inset 0 10px 18px rgba(255, 255, 255, 0.14),
+    0 10px 32px rgba(0, 0, 0, 0.35),
+    0 0 calc(16px + var(--vorb-intensity, 0.2) * 32px) var(--vorb-lava-glow);
 }
 
-.rd-value-orb__wire {
+.rd-value-orb__lava {
   position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  animation: rd-vorb-spin 26s linear infinite;
-}
-
-.rd-value-orb__ring {
-  position: absolute;
-  inset: 0;
-  margin: auto;
+  top: 50%;
+  left: 50%;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 1.5px solid var(--vorb-ring);
-  opacity: calc(0.5 + var(--vorb-intensity, 0.2) * 0.42);
-  transform-style: preserve-3d;
-  backface-visibility: visible;
-  transition:
-    opacity 0.65s ease,
-    border-color 0.65s ease;
+  transform: translate(-50%, -50%) scale(var(--vorb-lava-scale, 0.4));
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
-.rd-value-orb__ring:nth-child(1) {
-  opacity: calc(0.62 + var(--vorb-intensity, 0.2) * 0.3);
+.rd-value-orb__lava-hot,
+.rd-value-orb__lava-bloom {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
 }
 
-@keyframes rd-vorb-spin {
-  from {
-    transform: rotateX(0deg) rotateY(0deg);
+.rd-value-orb__lava-hot {
+  background:
+    radial-gradient(circle at 38% 32%, #fff6b8 0%, transparent 36%),
+    radial-gradient(circle at 62% 68%, #ff8c2a 0%, #e63a12 52%, #6b1208 100%);
+  animation: rd-vorb-lava-pulse 4.2s ease-in-out infinite;
+}
+
+.rd-value-orb__lava-bloom {
+  background: radial-gradient(circle at 50% 55%, rgba(255, 120, 40, 0.55) 0%, transparent 62%);
+  filter: blur(6px);
+  opacity: calc(0.45 + var(--vorb-intensity, 0.2) * 0.45);
+  animation: rd-vorb-lava-drift 7s ease-in-out infinite;
+}
+
+.rd-value-orb__glass-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 30% at 26% 20%, rgba(255, 255, 255, 0.78) 0%, transparent 58%),
+    radial-gradient(ellipse 28% 18% at 68% 28%, rgba(255, 255, 255, 0.22) 0%, transparent 70%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 42%);
+}
+
+.rd-value-orb__glass-rim {
+  position: absolute;
+  inset: 3%;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, white 22%, transparent);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+@keyframes rd-vorb-lava-pulse {
+  0%,
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
   }
-  to {
-    transform: rotateX(0deg) rotateY(360deg);
+  50% {
+    filter: brightness(1.1) saturate(1.12);
+    transform: scale(1.03);
+  }
+}
+
+@keyframes rd-vorb-lava-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-2%, 1.5%) scale(1.04);
+  }
+  66% {
+    transform: translate(1.5%, -1%) scale(0.98);
   }
 }
 
 @keyframes rd-vorb-float {
   0%,
   100% {
-    transform: rotateX(14deg) scale(var(--vorb-base-scale, 1)) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: rotateX(14deg) scale(calc(var(--vorb-base-scale, 1) * 1.03)) translateY(-3px);
+    transform: translateY(-4px);
   }
 }
 
@@ -185,16 +198,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rd-value-orb__orb,
-  .rd-value-orb__wire {
+  .rd-value-orb__glass,
+  .rd-value-orb__lava-hot,
+  .rd-value-orb__lava-bloom {
     animation: none;
-  }
-
-  .rd-value-orb__orb {
-    transform: rotateX(14deg) scale(var(--vorb-base-scale, 1));
-  }
-
-  .rd-value-orb__wire {
-    transform: rotateX(0deg) rotateY(28deg);
   }
 }
