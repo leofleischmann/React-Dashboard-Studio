@@ -7,7 +7,7 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import data_entry_flow
-from homeassistant.config_entries import OptionsFlow
+from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.helpers import config_validation as cv
 
 from .const import CONF_CONFIRM_RESET
@@ -16,6 +16,9 @@ from .user_data import async_reset_all_dashboard_projects
 
 class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
     """Integration options — restore bundled default dashboard."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        self.config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None

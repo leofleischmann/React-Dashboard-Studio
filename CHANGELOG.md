@@ -4,6 +4,10 @@ Alle wesentlichen Änderungen an Home Assistant Dashboard Studio. HACS-Updates z
 
 ## 0.4.2
 
+### Performance
+
+- **REST-Cache:** `useEntityHistory` und `useEntityStatistics` teilen sich Anfragen und Refresh-Timer pro Entity-Set (weniger parallele HA-API-Calls in Charts/Galerie)
+
 ### Fixes
 
 - **Integration:** Config Flow lädt wieder zuverlässig („Invalid handler specified“) — Options-Flow wird lazy importiert, Schema ohne `BooleanSelector`
