@@ -47,23 +47,13 @@ function writeEntityTypeFiles(root, states) {
   console.log(`✓ ${ids.length} Entities → dashboard/ha-entities.d.ts`);
 
   const tsconfigOut = `{
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "noEmit": true,
     "strict": false,
-    "skipLibCheck": true,
-    "paths": {
-      "@ha": ["../src/sdk/hass/hooks.ts"],
-      "@ha/ui": ["../src/sdk/ui/index.ts"],
-      "@ha/layout": ["../src/sdk/ui/layout.tsx"],
-      "@ha/format": ["../src/sdk/format.ts"]
-    }
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
-  "include": ["./**/*.ts", "./**/*.tsx", "ha-entities.d.ts"]
+  "include": ["./**/*.ts", "./**/*.tsx", "ha-entities.d.ts", "../src/vite-env.d.ts"]
 }
 `;
   writeFileSync(path.join(DASHBOARD_DIR, 'tsconfig.json'), tsconfigOut);

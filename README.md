@@ -40,7 +40,7 @@ export default function Dashboard() {
 | **Mehrere Dateien** | Im Datei-Panel anlegen, z. B. `components/Karte.tsx`, per `./…` importieren. ⌂ = Einstiegsdatei |
 | **Entities einfügen** | **⚡ Sensor / Aktion** — Wert / Aktion / ID / **Widget** (Entities + **Galerie**), Domain-Filter |
 | **Importierbare Module** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` — keine beliebigen npm-Pakete |
-| **Erstinstallation** | SDK-Referenz aus `default-dashboard/` (Tabs: Start, Widgets, Layout) — ersetzbar via ✎ Bearbeiten |
+| **Erstinstallation** | SDK-Showcase aus `default-dashboard/` (Overview, Widgets, Charts, Hooks, Layout, Format) — ersetzbar via ✎ Bearbeiten |
 | **Mobil** | Nur Anzeige, kein Editor |
 
 ---
