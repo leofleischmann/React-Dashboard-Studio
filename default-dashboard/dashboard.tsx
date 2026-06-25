@@ -17,16 +17,18 @@ const TABS: TabItem<Page>[] = [
   { id: 'format', label: 'Format', icon: '🔤' },
 ];
 
+const VALID_PAGES = [
+  'overview',
+  'widgets',
+  'charts',
+  'hooks',
+  'layout',
+  'format',
+] as const satisfies readonly Page[];
+
 /** SDK-Referenz — bei Erstinstallation in Home Assistant. Jederzeit via ✎ Bearbeiten anpassbar. */
 export default function Dashboard() {
-  const [page, setPage] = useHashRoute<Page>('overview', [
-    'overview',
-    'widgets',
-    'charts',
-    'hooks',
-    'layout',
-    'format',
-  ]);
+  const [page, setPage] = useHashRoute<Page>('overview', VALID_PAGES);
 
   return (
     <div className="rd-root rd-sdk-ref rd-sdk-showcase">

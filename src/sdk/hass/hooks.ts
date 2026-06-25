@@ -126,17 +126,26 @@ export function useEntitiesByLabel(labelId: string): HassEntity[] {
 /** All areas from the HA area registry. */
 export function useAreas(): AreaEntry[] {
   const ready = useHassReady();
+  const cacheRef = useRef<AreaEntry[]>([]);
 
   useEffect(() => {
     if (ready) registryStore.ensureLoaded();
   }, [ready]);
 
-  const getSnapshot = useCallback(() => registryStore.getAreas(), []);
-
-  const subscribe = useCallback((listener: () => void) => {
-    const unsub = registryStore.subscribe(listener);
-    return unsub;
+  const getSnapshot = useCallback(() => {
+    const next = registryStore.getAreas();
+    const prev = cacheRef.current;
+    if (prev.length === next.length && prev.every((a, i) => a === next[i])) {
+      return prev;
+    }
+    cacheRef.current = next;
+    return next;
   }, []);
+
+  const subscribe = useCallback(
+    (listener: () => void) => registryStore.subscribe(listener),
+    [],
+  );
 
   return useSyncExternalStore(subscribe, getSnapshot, () => []);
 }

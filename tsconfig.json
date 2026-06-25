@@ -23,5 +23,5 @@
       "@ha/format": ["src/sdk/format.ts"]
     }
   },
-  "include": ["src", "default-dashboard"]
+  "include": ["src"]
 }

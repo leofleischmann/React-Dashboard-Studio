@@ -1,10 +1,10 @@
+import { useState } from 'react';
 import { Card, Section } from '@ha/ui';
 import {
   ResponsiveGrid,
   Row,
   Stack,
   Tabs,
-  useHashRoute,
   type TabItem,
 } from '@ha/layout';
 
@@ -18,7 +18,8 @@ const LAYOUT_TABS: TabItem<LayoutTab>[] = [
 ];
 
 export function LayoutDemo() {
-  const [tab, setTab] = useHashRoute<LayoutTab>('grid', ['grid', 'stack', 'row', 'shell']);
+  // Local state — kein useHashRoute, damit der Hash nicht mit dashboard.tsx kollidiert.
+  const [tab, setTab] = useState<LayoutTab>('grid');
 
   return (
     <div className="rd-sdk-layout">
@@ -31,7 +32,13 @@ export function LayoutDemo() {
       </header>
 
       <Section title="Layout-Komponenten">
-        <Tabs tabs={LAYOUT_TABS} value={tab} onChange={setTab} ariaLabel="Layout Demo" />
+        <Tabs
+          tabs={LAYOUT_TABS}
+          value={tab}
+          onChange={(id) => setTab(id)}
+          variant="segment"
+          ariaLabel="Layout Demo"
+        />
 
         {tab === 'grid' && (
           <ResponsiveGrid min={140}>
@@ -78,8 +85,8 @@ export function LayoutDemo() {
   }}
 />`}</pre>
             <p className="rd-sdk-ref__lead" style={{ marginBottom: 0 }}>
-              Dieses Showcase nutzt dieselben Bausteine manuell in <code>dashboard.tsx</code> —
-              Hash-Routing für Deep-Links (<code>#overview</code>, <code>#widgets</code>, …).
+              Dieses Showcase nutzt <code>useHashRoute</code> nur in <code>dashboard.tsx</code> —
+              Deep-Links wie <code>#overview</code>, <code>#widgets</code>, …
             </p>
           </Card>
         )}

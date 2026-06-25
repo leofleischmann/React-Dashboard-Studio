@@ -5,12 +5,12 @@ import {
   useEntitiesByDomain,
   useHassReady,
   useSun,
-  useTime,
 } from '@ha';
-import { greeting, num, relativeTime, weatherIcon } from '@ha/format';
+import { num, relativeTime, weatherIcon } from '@ha/format';
 import { Card, Section, Stat } from '@ha/ui';
 import { ResponsiveGrid, Row } from '@ha/layout';
 import type { ShowcasePage } from '../types';
+import { LiveClock } from '../components/LiveClock';
 
 const DOMAIN_COLORS = [
   '#6ea8fe',
@@ -34,7 +34,6 @@ function domainCounts(entities: ReturnType<typeof useEntities>) {
 
 export function OverviewPage({ onNavigate }: { onNavigate: (p: ShowcasePage) => void }) {
   const ready = useHassReady();
-  const now = useTime(1000);
   const sun = useSun();
   const dark = useDarkMode();
   const entities = useEntities();
@@ -51,7 +50,7 @@ export function OverviewPage({ onNavigate }: { onNavigate: (p: ShowcasePage) => 
     <div className="rd-sdk-overview">
       <header className="rd-sdk-showcase__hero">
         <div className="rd-sdk-showcase__hero-main">
-          <p className="rd-sdk-showcase__eyebrow">{greeting(now)} · Home Assistant Dashboard Studio</p>
+          <p className="rd-sdk-showcase__eyebrow">Home Assistant Dashboard Studio · SDK Showcase</p>
           <h1>Dein Zuhause als Code</h1>
           <p className="rd-sdk-showcase__tagline">
             Live-SDK-Showcase — jede Karte hier nutzt deine echten Home-Assistant-Entities.
@@ -62,18 +61,7 @@ export function OverviewPage({ onNavigate }: { onNavigate: (p: ShowcasePage) => 
           )}
         </div>
         <div className="rd-sdk-showcase__hero-aside">
-          <div className="rd-sdk-showcase__clock">
-            <strong>
-              {now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
-            </strong>
-            <span>
-              {now.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })}
-            </span>
-          </div>
+          <LiveClock />
           {sun.entity && (
             <div className="rd-sdk-showcase__sun">
               <span>{sun.isDay ? '☀️' : '🌙'}</span>

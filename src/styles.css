@@ -1572,6 +1572,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
 }
 .rd-sdk-ref-card__head {
   display: flex;
@@ -1583,14 +1585,38 @@
   color: var(--rd-text-2);
   word-break: break-all;
 }
+.rd-tabs--segment {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin-bottom: 16px;
+  background: transparent;
+  backdrop-filter: none;
+  border-top: none;
+  z-index: auto;
+  grid-auto-flow: unset;
+  grid-auto-columns: unset;
+}
+.rd-tabs--segment .rd-tabs__item {
+  flex-direction: row;
+  gap: 6px;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+  border: 1px solid var(--rd-border);
+  border-radius: 999px;
+}
+.rd-tabs--segment .rd-tabs__icon {
+  font-size: 1rem;
+}
 
 /* ── SDK showcase (impressive default dashboard) ─────────── */
-.rd-sdk-showcase .rd-tabs {
+.rd-sdk-showcase > .rd-page-shell > .rd-tabs {
   overflow-x: auto;
-  flex-wrap: nowrap;
   scrollbar-width: none;
 }
-.rd-sdk-showcase .rd-tabs::-webkit-scrollbar {
+.rd-sdk-showcase > .rd-page-shell > .rd-tabs::-webkit-scrollbar {
   display: none;
 }
 .rd-sdk-showcase__hero {
