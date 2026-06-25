@@ -14,6 +14,7 @@ import {
   useEntitiesByDomain,
   useEntitiesByLabel,
   useEntity,
+  useEntityAge,
   useEntityAttribute,
   useEntityRegistry,
   useEntityState,
@@ -61,6 +62,14 @@ export function HooksPage() {
 
   const entity = useEntity(sampleId);
   const sampleState = useEntityState(sampleId);
+
+  const ageCandidates = useEntities({ domain: 'binary_sensor' });
+  const ageEntityId = ageCandidates[0]?.entity_id ?? sampleId;
+  const entityAge = useEntityAge(ageEntityId as never, {
+    style: 'since',
+    tickMs: 1000,
+  });
+
   const registryEntry = useEntityRegistry(sampleId as never);
   const friendly = useEntityAttribute<string>(sampleId, 'friendly_name');
 
@@ -121,6 +130,20 @@ export function HooksPage() {
 
           <HookDemoCard module="@ha" name="useEntityState(id)" hint="nur der State-String">
             <strong>{sampleState ?? '–'}</strong>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha" name="useEntityAge(id)" hint={`${ageEntityId} · seit …`}>
+            {entityAge.entity ? (
+              <>
+                <strong>{entityAge.label}</strong>
+                <small>
+                  {stateLabel(entityAge.state)} · seit{' '}
+                  {entityAge.changedAt?.toLocaleTimeString('de-DE') ?? '–'}
+                </small>
+              </>
+            ) : (
+              <span className="rd-empty">Keine Entity</span>
+            )}
           </HookDemoCard>
 
           <HookDemoCard module="@ha" name="useEntityAttribute(id, attr)" hint="friendly_name">

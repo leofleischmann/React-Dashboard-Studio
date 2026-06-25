@@ -255,6 +255,35 @@ export function relativeTime(
   return diffSec >= 0 ? `vor ${d} Tag${d === 1 ? '' : 'en'}` : `in ${d} Tag${d === 1 ? '' : 'en'}`;
 }
 
+export type EntityAgeStyle = 'relative' | 'since';
+
+/** How long an entity has been in its current state (uses `last_changed`). */
+export function entityAgeLabel(
+  entity: HassEntity | undefined,
+  options: { style?: EntityAgeStyle; nowMs?: number } = {},
+): string {
+  if (!entity?.last_changed) return '–';
+  const relative = relativeTime(entity.last_changed, options.nowMs);
+  if (relative === '–') return '–';
+  if (options.style === 'since') {
+    if (relative === 'gerade eben') return 'seit eben';
+    if (relative.startsWith('vor ')) return `seit ${relative.slice(4)}`;
+    return relative;
+  }
+  return relative;
+}
+
+/** Milliseconds since the entity entered its current state. */
+export function entityAgeMs(
+  entity: HassEntity | undefined,
+  nowMs = Date.now(),
+): number | undefined {
+  if (!entity?.last_changed) return undefined;
+  const ts = new Date(entity.last_changed).getTime();
+  if (!Number.isFinite(ts)) return undefined;
+  return Math.max(0, nowMs - ts);
+}
+
 /** Format seconds as H:MM:SS or M:SS. */
 export function duration(totalSeconds: number | undefined): string {
   if (totalSeconds === undefined || !Number.isFinite(totalSeconds)) return '–';

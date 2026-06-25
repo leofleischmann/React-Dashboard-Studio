@@ -8,6 +8,7 @@ import {
   energy,
   entityDisplayName,
   entityDisplayNameForId,
+  entityAgeLabel,
   euro,
   greeting,
   isAvailable,
@@ -60,6 +61,10 @@ export function FormatPage() {
     { fn: 'euro(4.56)', result: euro(4.56) },
     { fn: 'duration(3665)', result: duration(3665) },
     { fn: 'relativeTime(-1h)', result: relativeTime(new Date(Date.now() - 3600_000)) },
+    {
+      fn: 'entityAgeLabel(entity, { style: "since" })',
+      result: sample ? entityAgeLabel(sample, { style: 'since' }) : '–',
+    },
     { fn: 'entityDisplayName(entity)', result: sample ? entityDisplayName(sample, sample.entity_id) : '–' },
     { fn: 'entityDisplayNameForId(id)', result: sensor ? entityDisplayNameForId(sensor.entity_id) : '–' },
     { fn: 'stateNumber(entity)', result: sample ? String(stateNumber(sample) ?? '–') : '–' },
