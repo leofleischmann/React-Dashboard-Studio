@@ -1,11 +1,11 @@
-.rd-energy3d {
-  --es3d-glow: color-mix(in srgb, var(--es3d-accent, var(--primary-color)) calc(var(--es3d-pulse, 0.35) * 42%), transparent);
+.rd-value-orb {
+  --vorb-glow: color-mix(in srgb, var(--vorb-accent, var(--primary-color)) calc(var(--vorb-pulse, 0.35) * 42%), transparent);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.rd-energy3d__canvas {
+.rd-value-orb__canvas {
   position: relative;
   width: 100%;
   height: 220px;
@@ -13,17 +13,17 @@
   overflow: hidden;
   border: 1px solid var(--rd-border);
   background:
-    radial-gradient(ellipse 70% 65% at 50% 48%, var(--es3d-glow), transparent 68%),
+    radial-gradient(ellipse 70% 65% at 50% 48%, var(--vorb-glow), transparent 68%),
     color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
 }
 
-.rd-energy3d__canvas canvas {
+.rd-value-orb__canvas canvas {
   display: block;
   width: 100% !important;
   height: 100% !important;
 }
 
-.rd-energy3d__footer {
+.rd-value-orb__footer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,7 +31,7 @@
   text-align: center;
 }
 
-.rd-energy3d__load {
+.rd-value-orb__level {
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -40,14 +40,14 @@
   opacity: 0.85;
 }
 
-.rd-energy3d__footer strong {
+.rd-value-orb__footer strong {
   font-size: 1.05rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--es3d-accent, var(--primary-color, #4f7cff));
+  color: var(--vorb-accent, var(--primary-color, #4f7cff));
 }
 
-.rd-energy3d__footer small {
+.rd-value-orb__footer small {
   font-size: 0.68rem;
   color: var(--rd-text-2);
   max-width: 100%;
@@ -57,7 +57,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rd-energy3d__canvas {
+  .rd-value-orb__canvas {
     background: color-mix(in srgb, var(--rd-text) 3%, var(--rd-card-bg));
   }
 }

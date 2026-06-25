@@ -15,7 +15,7 @@ import { useDarkMode, useEntity } from '../../hass/hooks';
 import { useTheme } from '../../hass/theme';
 import type { HassEntity } from '../../hass/types';
 import { entityDisplayName, num, power, stateNumber } from '../../format';
-import './EnergyScene3D.css';
+import './ValueOrb3D.css';
 
 const CANVAS_HEIGHT = 220;
 
@@ -83,7 +83,7 @@ export function suggestOrbRange(entity?: HassEntity): { min: number; max: number
   return { min: 0, max: 100 };
 }
 
-export type EnergyScene3DProps = {
+export type ValueOrb3DProps = {
   entityId: string;
   /** Lower bound of the value range mapped to the orb (default 0). */
   min?: number;
@@ -131,13 +131,13 @@ function wireOrb(
 /**
  * Calm wireframe orb — any numeric entity state mapped to 0…1 via min/max.
  */
-export function EnergyScene3D({
+export function ValueOrb3D({
   entityId,
   min = 0,
   max = 100,
   curve = 'sqrt',
   showLevel = true,
-}: EnergyScene3DProps) {
+}: ValueOrb3DProps) {
   const entity = useEntity(entityId);
   const dark = useDarkMode();
   const theme = useTheme();
@@ -158,7 +158,7 @@ export function EnergyScene3D({
   }, [intensity, dark, theme.primary]);
 
   useEffect(() => {
-    console.log('[Debug EnergyScene3D]:', {
+    console.log('[Debug ValueOrb3D]:', {
       entityId,
       raw: rawValue,
       min,
@@ -251,7 +251,7 @@ export function EnergyScene3D({
     const ro = new ResizeObserver(onResize);
     ro.observe(container);
 
-    console.log('[Debug EnergyScene3D]: wireframe orb initialized', { reducedMotion, min, max });
+    console.log('[Debug ValueOrb3D]: wireframe orb initialized', { reducedMotion, min, max });
 
     return () => {
       disposed = true;
@@ -268,21 +268,21 @@ export function EnergyScene3D({
   }, [entityId, min, max]);
 
   const style = {
-    '--es3d-accent': theme.primary,
-    '--es3d-pulse': String(0.2 + intensity * 0.5),
+    '--vorb-accent': theme.primary,
+    '--vorb-pulse': String(0.2 + intensity * 0.5),
   } as CSSProperties;
 
   return (
-    <div className={`rd-energy3d${dark ? ' rd-energy3d--dark' : ''}`} style={style}>
+    <div className={`rd-value-orb${dark ? ' rd-value-orb--dark' : ''}`} style={style}>
       <div
         ref={containerRef}
-        className="rd-energy3d__canvas"
+        className="rd-value-orb__canvas"
         aria-hidden
         title={showLevel ? `${formatReading(entity)} — ${level}` : formatReading(entity)}
       />
-      <div className="rd-energy3d__footer">
+      <div className="rd-value-orb__footer">
         <strong>{formatReading(entity)}</strong>
-        {showLevel && <span className="rd-energy3d__load">{level}</span>}
+        {showLevel && <span className="rd-value-orb__level">{level}</span>}
         <small>{label}</small>
       </div>
     </div>

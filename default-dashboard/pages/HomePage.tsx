@@ -21,7 +21,7 @@ import {
   stateLabel,
   weatherIcon,
 } from '@ha/format';
-import { LightTile, SparkChart, SunArc, LiveClock, EnergyScene3D } from '@ha/ui';
+import { LightTile, SparkChart, SunArc, LiveClock, ValueOrb3D } from '@ha/ui';
 import type { ExampleTab } from '../types';
 import { homeContext } from '../lib/pickers';
 
@@ -259,8 +259,8 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
       </div>
 
       {primaryPower && (
-        <Panel title="Energie-Orb" icon="⚡" span>
-          <EnergyScene3D entityId={primaryPower.entity_id} min={0} max={4500} />
+        <Panel title="Wert-Orb" icon="⚡" span>
+          <ValueOrb3D entityId={primaryPower.entity_id} min={0} max={4500} />
         </Panel>
       )}
 

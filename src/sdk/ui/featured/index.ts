@@ -1,10 +1,10 @@
 export { SunArc } from './SunArc';
 export { LiveClock } from './LiveClock';
 export {
-  EnergyScene3D,
+  ValueOrb3D,
   mapToIntensity,
   suggestOrbRange,
   intensityLevelLabel,
-  type EnergyScene3DProps,
+  type ValueOrb3DProps,
   type OrbCurve,
-} from './EnergyScene3D';
+} from './ValueOrb3D';
