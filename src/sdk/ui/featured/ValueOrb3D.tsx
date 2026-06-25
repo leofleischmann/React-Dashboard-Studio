@@ -69,6 +69,17 @@ export function suggestOrbRange(entity?: HassEntity): { min: number; max: number
   return { min: 0, max: 100 };
 }
 
+export type ValueOrb3DColors = {
+  /** Main lava tone (default warm orange). */
+  core?: string;
+  mid?: string;
+  deep?: string;
+  hot?: string;
+  bloom?: string;
+  /** Outer canvas glow; intensity still modulates opacity via CSS. */
+  glow?: string;
+};
+
 export type ValueOrb3DProps = {
   entityId: string;
   /** Lower bound of the value range mapped to the orb (default 0). */
@@ -79,6 +90,15 @@ export type ValueOrb3DProps = {
   curve?: OrbCurve;
   /** Show intensity tier under the reading (default true). */
   showLevel?: boolean;
+  /**
+   * Primary lava / glow color — e.g. `#3b82f6` (energy) or `#e63a12` (heat).
+   * Tints the inner gradient when `colors` is omitted.
+   */
+  color?: string;
+  /** Fine-grained gradient stops (override parts of `color`). */
+  colors?: ValueOrb3DColors;
+  /** Footer reading color (default: HA theme primary, then `color`). */
+  accent?: string;
 };
 
 function formatReading(entity: HassEntity | undefined): string {
@@ -105,6 +125,9 @@ export function ValueOrb3D({
   max = 100,
   curve = 'sqrt',
   showLevel = true,
+  color,
+  colors,
+  accent,
 }: ValueOrb3DProps) {
   const entity = useEntity(entityId);
   const dark = useDarkMode();
@@ -126,15 +149,24 @@ export function ValueOrb3D({
       min,
       max,
       curve,
+      color,
+      colors,
       intensity: intensity.toFixed(2),
       lavaScale: innerScale.toFixed(2),
       level,
       renderer: 'css-glass-lava',
     });
-  }, [entityId, rawValue, min, max, curve, intensity, innerScale, level]);
+  }, [entityId, rawValue, min, max, curve, color, colors, intensity, innerScale, level]);
 
+  const lavaCore = colors?.core ?? color;
   const style = {
-    '--vorb-accent': theme.primary,
+    ...(lavaCore ? { '--vorb-lava-core': lavaCore } : {}),
+    ...(colors?.mid ? { '--vorb-lava-mid': colors.mid } : {}),
+    ...(colors?.deep ? { '--vorb-lava-deep': colors.deep } : {}),
+    ...(colors?.hot ? { '--vorb-lava-hot': colors.hot } : {}),
+    ...(colors?.bloom ? { '--vorb-lava-bloom': colors.bloom } : {}),
+    ...(colors?.glow ? { '--vorb-lava-glow': colors.glow } : {}),
+    '--vorb-accent': accent ?? color ?? theme.primary,
     '--vorb-intensity': String(intensity),
     '--vorb-lava-scale': String(innerScale),
   } as CSSProperties;

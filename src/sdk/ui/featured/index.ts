@@ -6,6 +6,7 @@ export {
   suggestOrbRange,
   intensityLevelLabel,
   type ValueOrb3DProps,
+  type ValueOrb3DColors,
   type OrbCurve,
 } from './ValueOrb3D';
 export { WeatherForecastRow, type WeatherForecastRowProps } from './WeatherForecastRow';
