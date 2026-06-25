@@ -1,20 +1,20 @@
 /**
  * Panel CSS bundle for the shadow root (mount.tsx).
  *
- * Adding styles:
- *   - New featured widget → `sdk/ui/featured/MyWidget.css` (auto-included)
- *   - New domain card   → `sdk/ui/cards/.../MyCard.css` (auto-included)
- *   - Layout / charts   → `sdk/ui/layout.css`, `sdk/ui/charts.css` (auto-included)
- *   - Tokens / showcase → edit files in `styles/` (fixed order below)
+ * SDK (for all dashboards):
+ *   - tokens, primitives, widgets, co-located sdk/ui CSS (auto via Vite glob)
  *
- * No manual registry — all .css under sdk/ui/ is auto-discovered (Vite glob).
+ * Default-dashboard example only (not required for custom projects):
+ *   - default-dashboard/home.css, default-dashboard/demo-pages.css
+ *
+ * Studio editor chrome lives in studio.css (imported separately in mount.tsx).
  */
 
 import tokens from './styles/tokens.css?inline';
 import primitives from './styles/primitives.css?inline';
-import showcase from './styles/showcase.css?inline';
 import widgets from './styles/widgets.css?inline';
-import studioShell from './styles/studio-shell.css?inline';
+import defaultHome from '../default-dashboard/home.css?inline';
+import defaultDemoPages from '../default-dashboard/demo-pages.css?inline';
 
 const sdkUiCssModules = import.meta.glob('./sdk/ui/**/*.css', {
   eager: true,
@@ -27,7 +27,12 @@ const sdkUiCss = Object.keys(sdkUiCssModules)
   .map((key) => sdkUiCssModules[key])
   .join('\n');
 
-/** Layered CSS: tokens → shared → legacy widgets → co-located sdk/ui → studio chrome */
-export const panelCss = [tokens, primitives, showcase, widgets, sdkUiCss, studioShell].join(
-  '\n',
-);
+/** SDK layers first, then shipped example-dashboard styles */
+export const panelCss = [
+  tokens,
+  primitives,
+  widgets,
+  sdkUiCss,
+  defaultHome,
+  defaultDemoPages,
+].join('\n');
