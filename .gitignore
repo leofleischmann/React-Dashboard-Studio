@@ -6,6 +6,11 @@ dist
 .claude
 TODO.txt
 
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
 # Local working copy created by scripts/sync.mjs (your dashboard, not this repo)
 dashboard/
 
