@@ -25,6 +25,7 @@ import {
   writeLocalFiles,
 } from './dashboard-local.mjs';
 import { generateEntityTypes } from './gen-entity-types.mjs';
+import { generateSdkReference } from './gen-sdk-reference.mjs';
 import {
   filesHash,
   readSyncState,
@@ -220,7 +221,12 @@ async function pull(conn) {
     console.log(`   🗑  ${removed.length} veraltete lokale Datei(en) entfernt: ${removed.join(', ')}`);
   }
 
-  console.log('🏷  Entity-Typen generieren …');
+  console.log('🏷  SDK-Referenz + Entity-Typen generieren …');
+  try {
+    generateSdkReference({ root: ROOT, writeDashboard: true });
+  } catch (err) {
+    console.warn(`⚠️  gen:sdk-reference fehlgeschlagen: ${err.message}`);
+  }
   try {
     await generateEntityTypes({ root: ROOT, hassUrl: HASS_URL, token: TOKEN });
   } catch (err) {

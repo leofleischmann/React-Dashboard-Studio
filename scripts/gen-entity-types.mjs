@@ -81,7 +81,8 @@ function writeEntityTypeFiles(root, states) {
     `# Home Assistant Entities (${ids.length})`,
     '',
     `> Automatisch generiert von \`npm run gen:types\` · ${ids.length} Entities`,
-    `> In VS Code durchsuchbar — oder im HA-Studio über **⚡ Sensor / Aktion**.`,
+    `> SDK-API: \`npm run gen:sdk-reference\` → docs/sdk-reference.json`,
+    `> In VS Code durchsuchbar — oder im HA-Studio über **⚡ Entities**.`,
     '',
   ];
   for (const domain of [...byDomain.keys()].sort()) {

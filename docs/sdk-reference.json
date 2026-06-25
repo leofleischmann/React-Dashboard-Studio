@@ -1,0 +1,903 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-25T18:09:22.753Z",
+  "availableModules": [
+    "@ha",
+    "@ha/ui",
+    "@ha/layout",
+    "@ha/format"
+  ],
+  "modules": [
+    {
+      "id": "@ha",
+      "source": "src\\sdk\\hass\\hooks\\index.ts",
+      "exports": {
+        "values": [
+          "DashboardProvider",
+          "FORECAST_TYPE_PARAM",
+          "aggregateHistory",
+          "aggregateHistoryByDay",
+          "aggregateHistoryDelta",
+          "applyThemeVars",
+          "callService",
+          "callServiceWithTarget",
+          "clearPersistentState",
+          "computeEnergyKwh",
+          "energyDailySeries",
+          "energyPeriodHours",
+          "energyPeriodLabel",
+          "energyPeriodStartMs",
+          "fetchCalendarEvents",
+          "fetchEntityHistory",
+          "fetchEntityStatistics",
+          "fetchLogbook",
+          "fetchWeatherForecast",
+          "getAppHass",
+          "logbookCacheMarker",
+          "states",
+          "useAreaEntities",
+          "useAreaName",
+          "useAreas",
+          "useCalendarEvents",
+          "useDarkMode",
+          "useDashboardScope",
+          "useDashboardState",
+          "useEnergy",
+          "useEntities",
+          "useEntitiesByDomain",
+          "useEntitiesByLabel",
+          "useEntity",
+          "useEntityAge",
+          "useEntityAttribute",
+          "useEntityHistory",
+          "useEntityHistoryPending",
+          "useEntityRegistry",
+          "useEntityState",
+          "useEntityStatistics",
+          "useHassReady",
+          "useIsMobile",
+          "useLabels",
+          "useLogbook",
+          "usePersistentState",
+          "useSun",
+          "useTemplate",
+          "useTheme",
+          "useTime",
+          "useWeatherForecast"
+        ],
+        "types": [
+          "AreaEntry",
+          "CalendarEvent",
+          "EnergyPeriod",
+          "EntityFilter",
+          "EntityRegistryEntry",
+          "EntityStatistics",
+          "HassEntity",
+          "HassServiceTarget",
+          "HistoryPoint",
+          "LabelEntry",
+          "LogbookEntry",
+          "TemplateListeners",
+          "UseEnergyOptions",
+          "UseEnergyResult",
+          "UseEntityAgeOptions",
+          "UseEntityAgeResult",
+          "UseLogbookOptions",
+          "UseLogbookResult",
+          "UseTemplateOptions",
+          "UseTemplateResult",
+          "UseWeatherForecastOptions",
+          "UseWeatherForecastResult",
+          "WeatherForecastEntry",
+          "WeatherForecastType"
+        ]
+      }
+    },
+    {
+      "id": "@ha/ui",
+      "source": "src\\sdk\\ui\\index.ts",
+      "exports": {
+        "values": [
+          "ActionButton",
+          "AlarmPanel",
+          "BatteryRow",
+          "BinaryBadge",
+          "COMPOSITE_WIDGET_CATALOG",
+          "CalendarCard",
+          "CameraTile",
+          "Card",
+          "ClimateCard",
+          "CounterCard",
+          "CoverCard",
+          "DOMAIN_WIDGET_CATALOG",
+          "DeviceCard",
+          "DeviceTrackerChip",
+          "EnergyDeviceCard",
+          "EntityRow",
+          "FEATURED_WIDGET_CATALOG",
+          "FanCard",
+          "Gauge",
+          "Grid",
+          "HistoryChart",
+          "HumidifierCard",
+          "InputBooleanTile",
+          "LightTile",
+          "LiveClock",
+          "LockCard",
+          "MediaPlayerCard",
+          "Minitimeline",
+          "NumberSlider",
+          "PersonChip",
+          "RoomCard",
+          "SceneButton",
+          "ScriptButton",
+          "Section",
+          "SelectCard",
+          "SirenCard",
+          "SparkChart",
+          "Stat",
+          "SunArc",
+          "TimerCard",
+          "UpdateCard",
+          "VacuumCard",
+          "ValueOrb3D",
+          "ValveCard",
+          "WIDGET_CATALOG",
+          "WaterHeaterCard",
+          "WeatherCard",
+          "WeatherForecastRow",
+          "WidgetCatalogGrid",
+          "buildCatalogExampleMap",
+          "canShowCatalogDemo",
+          "catalogByCategory",
+          "catalogSnippet",
+          "catalogSnippetDisplay",
+          "intensityLevelLabel",
+          "mapToIntensity",
+          "pickNumericSensorEntity",
+          "resolveCatalogEntityId",
+          "suggestOrbRange",
+          "widgetCatalogNames",
+          "widgetImportStatement",
+          "widgetNameForDomain"
+        ],
+        "types": [
+          "ChartAxes",
+          "ChartSeries",
+          "GaugeThreshold",
+          "LiveClockProps",
+          "MinitimelineProps",
+          "OrbCurve",
+          "SparkChartProps",
+          "SunArcProps",
+          "ValueOrb3DProps",
+          "WeatherForecastRowProps",
+          "WidgetCatalogEntry",
+          "WidgetCategory"
+        ]
+      }
+    },
+    {
+      "id": "@ha/layout",
+      "source": "src\\sdk\\ui\\layout.tsx",
+      "exports": {
+        "values": [
+          "PageShell",
+          "ResponsiveGrid",
+          "RoutedPageShell",
+          "Row",
+          "Stack",
+          "Tabs",
+          "useHashRoute"
+        ],
+        "types": [
+          "TabItem"
+        ]
+      }
+    },
+    {
+      "id": "@ha/format",
+      "source": "src\\sdk\\format\\index.ts",
+      "exports": {
+        "values": [
+          "batteryColor",
+          "brightness",
+          "colorTemp",
+          "deviceClassIcon",
+          "duration",
+          "energy",
+          "entityAgeLabel",
+          "entityAgeMs",
+          "entityDisplayName",
+          "entityDisplayNameForId",
+          "euro",
+          "forecastDayLabel",
+          "greeting",
+          "isAvailable",
+          "num",
+          "pct",
+          "power",
+          "relativeTime",
+          "stateColor",
+          "stateLabel",
+          "stateNumber",
+          "temp",
+          "weatherIcon"
+        ],
+        "types": [
+          "EntityAgeStyle"
+        ]
+      }
+    }
+  ],
+  "widgets": [
+    {
+      "name": "SceneButton",
+      "label": "Szene",
+      "category": "domain",
+      "domains": [
+        "scene"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<SceneButton entityId=\"scene.beispiel\" />"
+      }
+    },
+    {
+      "name": "ScriptButton",
+      "label": "Skript",
+      "category": "domain",
+      "domains": [
+        "script"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<ScriptButton entityId=\"script.beispiel\" />"
+      }
+    },
+    {
+      "name": "CalendarCard",
+      "label": "Kalender",
+      "category": "domain",
+      "domains": [
+        "calendar"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<CalendarCard entityId=\"calendar.beispiel\" />"
+      }
+    },
+    {
+      "name": "CameraTile",
+      "label": "Kamera",
+      "category": "domain",
+      "domains": [
+        "camera"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<CameraTile entityId=\"camera.beispiel\" refreshSec={10} fit=\"cover\" />"
+      }
+    },
+    {
+      "name": "ClimateCard",
+      "label": "Klima",
+      "category": "domain",
+      "domains": [
+        "climate"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<ClimateCard entityId=\"climate.beispiel\" />"
+      }
+    },
+    {
+      "name": "HumidifierCard",
+      "label": "Luftbefeuchter",
+      "category": "domain",
+      "domains": [
+        "humidifier"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<HumidifierCard entityId=\"humidifier.beispiel\" />"
+      }
+    },
+    {
+      "name": "WaterHeaterCard",
+      "label": "Warmwasser",
+      "category": "domain",
+      "domains": [
+        "water_heater"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<WaterHeaterCard entityId=\"water_heater.beispiel\" />"
+      }
+    },
+    {
+      "name": "CoverCard",
+      "label": "Rollo",
+      "category": "domain",
+      "domains": [
+        "cover"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<CoverCard entityId=\"cover.beispiel\" />"
+      }
+    },
+    {
+      "name": "FanCard",
+      "label": "Ventilator",
+      "category": "domain",
+      "domains": [
+        "fan"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<FanCard entityId=\"fan.beispiel\" />"
+      }
+    },
+    {
+      "name": "Stat",
+      "label": "Stat",
+      "category": "domain",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<Stat label=\"${id.split('.')[1] ?? 'Sensor'}\" value={num(useEntity('sensor.beispiel')?.state)} />"
+      }
+    },
+    {
+      "name": "Gauge",
+      "label": "Gauge",
+      "category": "domain",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<Gauge entityId=\"sensor.beispiel\" min={0} max={100} />"
+      }
+    },
+    {
+      "name": "SparkChart",
+      "label": "SparkChart",
+      "category": "domain",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "static",
+        "example": "<SparkChart series={[…]} height={120} axes={{ xLabel: "
+      }
+    },
+    {
+      "name": "EntityRow",
+      "label": "Entity-Zeile",
+      "category": "domain",
+      "domains": [
+        "switch"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<EntityRow entityId=\"switch.beispiel\" />"
+      }
+    },
+    {
+      "name": "BinaryBadge",
+      "label": "Binary",
+      "category": "domain",
+      "domains": [
+        "binary_sensor"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<BinaryBadge entityId=\"binary_sensor.beispiel\" />"
+      }
+    },
+    {
+      "name": "ActionButton",
+      "label": "Aktion",
+      "category": "domain",
+      "domains": [
+        "button",
+        "automation"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<ActionButton entityId=\"button.beispiel\" />"
+      }
+    },
+    {
+      "name": "NumberSlider",
+      "label": "Zahl",
+      "category": "domain",
+      "domains": [
+        "input_number"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<NumberSlider entityId=\"input_number.beispiel\" min={0} max={100} step={1} />"
+      }
+    },
+    {
+      "name": "InputBooleanTile",
+      "label": "Schalter",
+      "category": "domain",
+      "domains": [
+        "input_boolean"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<InputBooleanTile entityId=\"input_boolean.beispiel\" />"
+      }
+    },
+    {
+      "name": "SelectCard",
+      "label": "Auswahl",
+      "category": "domain",
+      "domains": [
+        "input_select",
+        "select"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<SelectCard entityId=\"input_select.beispiel\" />"
+      }
+    },
+    {
+      "name": "LightTile",
+      "label": "Licht",
+      "category": "domain",
+      "domains": [
+        "light"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<LightTile entityId=\"light.beispiel\" showBrightness />"
+      }
+    },
+    {
+      "name": "MediaPlayerCard",
+      "label": "Media",
+      "category": "domain",
+      "domains": [
+        "media_player"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<MediaPlayerCard entityId=\"media_player.beispiel\" />"
+      }
+    },
+    {
+      "name": "PersonChip",
+      "label": "Person",
+      "category": "domain",
+      "domains": [
+        "person"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<PersonChip entityId=\"person.beispiel\" />"
+      }
+    },
+    {
+      "name": "DeviceTrackerChip",
+      "label": "Tracker",
+      "category": "domain",
+      "domains": [
+        "device_tracker"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<DeviceTrackerChip entityId=\"device_tracker.beispiel\" />"
+      }
+    },
+    {
+      "name": "LockCard",
+      "label": "Schloss",
+      "category": "domain",
+      "domains": [
+        "lock"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<LockCard entityId=\"lock.beispiel\" />"
+      }
+    },
+    {
+      "name": "AlarmPanel",
+      "label": "Alarm",
+      "category": "domain",
+      "domains": [
+        "alarm_control_panel"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<AlarmPanel entityId=\"alarm_control_panel.beispiel\" />"
+      }
+    },
+    {
+      "name": "SirenCard",
+      "label": "Sirene",
+      "category": "domain",
+      "domains": [
+        "siren"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<SirenCard entityId=\"siren.beispiel\" />"
+      }
+    },
+    {
+      "name": "TimerCard",
+      "label": "Timer",
+      "category": "domain",
+      "domains": [
+        "timer"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<TimerCard entityId=\"timer.beispiel\" />"
+      }
+    },
+    {
+      "name": "CounterCard",
+      "label": "Zähler",
+      "category": "domain",
+      "domains": [
+        "counter"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<CounterCard entityId=\"counter.beispiel\" />"
+      }
+    },
+    {
+      "name": "UpdateCard",
+      "label": "Update",
+      "category": "domain",
+      "domains": [
+        "update"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<UpdateCard entityId=\"update.beispiel\" />"
+      }
+    },
+    {
+      "name": "VacuumCard",
+      "label": "Staubsauger",
+      "category": "domain",
+      "domains": [
+        "vacuum"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<VacuumCard entityId=\"vacuum.beispiel\" />"
+      }
+    },
+    {
+      "name": "ValveCard",
+      "label": "Ventil",
+      "category": "domain",
+      "domains": [
+        "valve"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<ValveCard entityId=\"valve.beispiel\" />"
+      }
+    },
+    {
+      "name": "WeatherCard",
+      "label": "Wetter",
+      "category": "domain",
+      "domains": [
+        "weather"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<WeatherCard entityId=\"weather.beispiel\" showWind />"
+      }
+    },
+    {
+      "name": "SunArc",
+      "label": "Sonnenbogen",
+      "category": "featured",
+      "domains": [
+        "sun"
+      ],
+      "inserterDefault": true,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<SunArc entityId=\"sun.beispiel\" showStars showMoon />"
+      }
+    },
+    {
+      "name": "ValueOrb3D",
+      "label": "Wert-Orb",
+      "category": "featured",
+      "domains": [
+        "sensor",
+        "number",
+        "input_number"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<ValueOrb3D entityId=\"sensor.beispiel\" min={0} max={100} />"
+      }
+    },
+    {
+      "name": "LiveClock",
+      "label": "Uhr",
+      "category": "featured",
+      "domains": [],
+      "inserterDefault": false,
+      "optionalEntity": true,
+      "snippet": {
+        "kind": "static",
+        "example": "<LiveClock showSeconds locale="
+      }
+    },
+    {
+      "name": "WeatherForecastRow",
+      "label": "5-Tage-Vorhersage",
+      "category": "featured",
+      "domains": [
+        "weather"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<WeatherForecastRow entityId=\"weather.beispiel\" days={5} />"
+      }
+    },
+    {
+      "name": "Minitimeline",
+      "label": "Aktivitäts-Timeline",
+      "category": "featured",
+      "domains": [
+        "binary_sensor",
+        "light",
+        "switch",
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "template",
+        "example": "<Minitimeline entityId=\"binary_sensor.beispiel\" limit={8} hours={24} />"
+      }
+    },
+    {
+      "name": "RoomCard",
+      "label": "Raum",
+      "category": "composite",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": true,
+      "snippet": {
+        "kind": "static",
+        "example": "<RoomCard name="
+      }
+    },
+    {
+      "name": "EnergyDeviceCard",
+      "label": "Energie-Gerät",
+      "category": "composite",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": true,
+      "snippet": {
+        "kind": "static",
+        "example": "<EnergyDeviceCard name="
+      }
+    },
+    {
+      "name": "DeviceCard",
+      "label": "Gerät (Energie)",
+      "category": "composite",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": true,
+      "snippet": {
+        "kind": "static",
+        "example": "<DeviceCard name="
+      }
+    },
+    {
+      "name": "BatteryRow",
+      "label": "Batterie",
+      "category": "composite",
+      "domains": [
+        "sensor"
+      ],
+      "inserterDefault": false,
+      "optionalEntity": false,
+      "snippet": {
+        "kind": "static",
+        "example": "<BatteryRow name="
+      }
+    },
+    {
+      "name": "Grid",
+      "label": "Grid",
+      "category": "composite",
+      "domains": [],
+      "inserterDefault": false,
+      "optionalEntity": true,
+      "snippet": {
+        "kind": "static",
+        "example": "<Grid min={180}>…</Grid>"
+      }
+    }
+  ],
+  "domainDefaultWidgets": {
+    "scene": "SceneButton",
+    "script": "ScriptButton",
+    "calendar": "CalendarCard",
+    "camera": "CameraTile",
+    "climate": "ClimateCard",
+    "humidifier": "HumidifierCard",
+    "water_heater": "WaterHeaterCard",
+    "cover": "CoverCard",
+    "fan": "FanCard",
+    "sensor": "Gauge",
+    "switch": "EntityRow",
+    "binary_sensor": "BinaryBadge",
+    "button": "ActionButton",
+    "automation": "ActionButton",
+    "input_number": "NumberSlider",
+    "input_boolean": "InputBooleanTile",
+    "input_select": "SelectCard",
+    "select": "SelectCard",
+    "light": "LightTile",
+    "media_player": "MediaPlayerCard",
+    "person": "PersonChip",
+    "device_tracker": "DeviceTrackerChip",
+    "lock": "LockCard",
+    "alarm_control_panel": "AlarmPanel",
+    "siren": "SirenCard",
+    "timer": "TimerCard",
+    "counter": "CounterCard",
+    "update": "UpdateCard",
+    "vacuum": "VacuumCard",
+    "valve": "ValveCard",
+    "weather": "WeatherCard",
+    "sun": "SunArc",
+    "number": "ValueOrb3D"
+  },
+  "entityActions": {
+    "light": "toggle",
+    "switch": "toggle",
+    "fan": "toggle",
+    "cover": "toggle",
+    "lock": "unlock",
+    "input_boolean": "toggle",
+    "input_button": "press",
+    "button": "press",
+    "media_player": "media_play_pause",
+    "script": "turn_on",
+    "scene": "turn_on",
+    "automation": "trigger",
+    "vacuum": "start",
+    "valve": "toggle",
+    "siren": "toggle",
+    "humidifier": "toggle",
+    "water_heater": "toggle"
+  },
+  "charts": [
+    "HistoryChart",
+    "SparkChart"
+  ],
+  "entityInserter": {
+    "modes": [
+      {
+        "id": "value",
+        "label": "Wert",
+        "example": "useEntity('sensor.temperatur')?.state"
+      },
+      {
+        "id": "template",
+        "label": "Template",
+        "example": "useTemplate(\"{{ states('sensor.temperatur') }}\").value"
+      },
+      {
+        "id": "action",
+        "label": "Aktion",
+        "example": "callService('light', 'toggle', { entity_id: 'light.wohnzimmer' })"
+      },
+      {
+        "id": "id",
+        "label": "nur ID",
+        "example": "'sensor.temperatur'"
+      },
+      {
+        "id": "widget",
+        "label": "Widget",
+        "example": "<Gauge entityId=\"sensor.temperatur\" />"
+      }
+    ]
+  },
+  "importHints": {
+    "widgets": "import { ActionButton, AlarmPanel, BatteryRow, BinaryBadge, CalendarCard, CameraTile, ClimateCard, CounterCard, CoverCard, DeviceCard, DeviceTrackerChip, EnergyDeviceCard, EntityRow, FanCard, Gauge, Grid, HumidifierCard, InputBooleanTile, LightTile, LiveClock, LockCard, MediaPlayerCard, Minitimeline, NumberSlider, PersonChip, RoomCard, SceneButton, ScriptButton, SelectCard, SirenCard, SparkChart, Stat, SunArc, TimerCard, UpdateCard, VacuumCard, ValueOrb3D, ValveCard, WaterHeaterCard, WeatherCard, WeatherForecastRow } from '@ha/ui';",
+    "layout": "import { PageShell, ResponsiveGrid, RoutedPageShell, Row, Stack, Tabs, useHashRoute } from '@ha/layout';"
+  }
+}

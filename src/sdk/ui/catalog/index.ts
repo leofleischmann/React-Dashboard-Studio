@@ -10,6 +10,7 @@ export { DOMAIN_WIDGET_CATALOG } from './domain';
 export { FEATURED_WIDGET_CATALOG } from './featured';
 export { COMPOSITE_WIDGET_CATALOG } from './composite';
 export { pickNumericSensorEntity } from './demos';
+export { widgetCatalogNames, widgetImportStatement } from './imports';
 
 /** All registerable widgets — studio gallery & widget reference. */
 export const WIDGET_CATALOG: WidgetCatalogEntry[] = [

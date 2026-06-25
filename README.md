@@ -72,6 +72,17 @@ npm run dev                        # preview + entity snippets
 
 `npm run sync:watch` pushes on save. Windows: `studio.bat`. `./dashboard/` is gitignored (your project, not the HACS starter).
 
+### SDK reference & AI tools
+
+```bash
+npm run gen:sdk-reference   # docs/sdk-reference.json + .md (no HA needed)
+npm run gen:all               # SDK reference + entity types (needs .env.local)
+```
+
+After `sync:pull`, entity types (`ha-entities.d.ts`, `ENTITIES.md`) and `SDK-REFERENCE.json` land in `./dashboard/` next to your project.
+
+**Cursor MCP** (optional): see [`mcp-server/README.md`](mcp-server/README.md) for live SDK + entity tools in the editor.
+
 ---
 
 ## Contributing to the panel itself
