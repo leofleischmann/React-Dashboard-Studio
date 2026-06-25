@@ -90,22 +90,51 @@
   overflow: hidden;
   border-radius: 8px;
   background: color-mix(in srgb, var(--rd-text) 4%, var(--rd-card-bg));
+  position: relative;
+}
+
+.rd-chart--interactive .rd-chart__plot,
+.rd-chart--interactive .rd-chart__spark {
+  cursor: crosshair;
+}
+
+.rd-chart__spark {
+  position: relative;
 }
 
 .rd-chart__x-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 14px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.rd-chart__x-ticks {
+  position: relative;
+  height: 14px;
+  width: 100%;
 }
 
 .rd-chart__tick-x {
+  position: absolute;
+  top: 0;
   font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
   color: var(--rd-text-2);
   line-height: 1;
   white-space: nowrap;
+}
+
+.rd-chart__tick-x--start {
+  transform: translateX(0);
+}
+
+.rd-chart__tick-x--middle {
+  transform: translateX(-50%);
+}
+
+.rd-chart__tick-x--end {
+  transform: translateX(-100%);
 }
 
 .rd-chart__xlabel {
@@ -115,7 +144,84 @@
   letter-spacing: 0.04em;
   color: var(--rd-text-2);
   text-align: center;
-  flex: 1;
+  line-height: 1;
+}
+
+.rd-chart__cursor-line {
+  stroke: color-mix(in srgb, var(--rd-text) 45%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.rd-chart__grid-line--v {
+  stroke-dasharray: 2 4;
+  opacity: 0.65;
+}
+
+.rd-chart__tooltip {
+  position: absolute;
+  top: 4px;
+  z-index: 3;
+  transform: translateX(-50%);
+  min-width: 120px;
+  max-width: min(220px, 90%);
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--rd-border);
+  background: color-mix(in srgb, var(--rd-card-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.rd-chart__tooltip--flip {
+  transform: translateX(-100%);
+  margin-left: -8px;
+}
+
+.rd-chart__tooltip-time {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--rd-text-2);
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rd-chart__tooltip-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rd-chart__tooltip-rows li {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+}
+
+.rd-chart__tooltip-rows i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.rd-chart__tooltip-label {
+  color: var(--rd-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-chart__tooltip-rows strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
 }
 
 .rd-chart__svg {
