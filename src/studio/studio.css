@@ -401,12 +401,17 @@
   margin: 0 8px 8px;
   padding: 6px 8px;
   background: #15151a;
+  border: 1px solid #2e2e36;
   border-radius: 8px;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
   color: #7fd1a6;
-  white-space: nowrap;
-  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex-shrink: 0;
 }
 .rd-inserter__hint {
   margin: 0 8px 6px;

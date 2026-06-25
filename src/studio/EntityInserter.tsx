@@ -145,7 +145,12 @@ export function EntityInserter({
         ))}
       </div>
 
-      <div className="rd-inserter__preview">{snippetFor(mode, 'sensor.beispiel')}</div>
+      <div
+        className="rd-inserter__preview"
+        title={snippetFor(mode, 'sensor.beispiel')}
+      >
+        {snippetFor(mode, 'sensor.beispiel')}
+      </div>
 
       {!hasQuery && (
         <p className="rd-inserter__hint">
