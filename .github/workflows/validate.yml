@@ -24,6 +24,27 @@ jobs:
 
       - run: npm ci
 
+      - name: Verify committed bundle filenames match manifest version
+        shell: bash
+        run: |
+          v=$(jq -r .version custom_components/homeassistant_dashboard_studio/manifest.json)
+          dir=custom_components/homeassistant_dashboard_studio
+          shopt -s nullglob
+          mismatched=()
+          for f in "$dir"/dashboard.v*.js "$dir"/studio-editor.v*.js; do
+            base=$(basename "$f")
+            case "$base" in
+              "dashboard.v${v}.js"|"studio-editor.v${v}.js") ;;
+              *) mismatched+=("$base") ;;
+            esac
+          done
+          if [ "${#mismatched[@]}" -gt 0 ]; then
+            echo "::error::Bundle filename(s) do not match manifest version ${v}: ${mismatched[*]}"
+            exit 1
+          fi
+          test -f "$dir/dashboard.v${v}.js"
+          test -f "$dir/studio-editor.v${v}.js"
+
       - name: Check default dashboard compiles
         run: npm run check:default
 
