@@ -1,7 +1,12 @@
 .rd-value-orb {
+  --vorb-lava-core: #e63a12;
+  --vorb-lava-mid: color-mix(in srgb, var(--vorb-lava-core) 42%, white);
+  --vorb-lava-deep: color-mix(in srgb, var(--vorb-lava-core) 72%, black);
+  --vorb-lava-hot: color-mix(in srgb, var(--vorb-lava-core) 8%, white);
+  --vorb-lava-bloom: color-mix(in srgb, var(--vorb-lava-core) 48%, transparent);
   --vorb-lava-glow: color-mix(
     in srgb,
-    #ff6a28 calc(35% + var(--vorb-intensity, 0.2) * 50%),
+    var(--vorb-lava-core) calc(35% + var(--vorb-intensity, 0.2) * 50%),
     transparent
   );
   display: flex;
@@ -97,13 +102,18 @@
 
 .rd-value-orb__lava-hot {
   background:
-    radial-gradient(circle at 38% 32%, #fff6b8 0%, transparent 36%),
-    radial-gradient(circle at 62% 68%, #ff8c2a 0%, #e63a12 52%, #6b1208 100%);
+    radial-gradient(circle at 38% 32%, var(--vorb-lava-hot) 0%, transparent 36%),
+    radial-gradient(
+      circle at 62% 68%,
+      var(--vorb-lava-mid) 0%,
+      var(--vorb-lava-core) 52%,
+      var(--vorb-lava-deep) 100%
+    );
   animation: rd-vorb-lava-pulse 4.2s ease-in-out infinite;
 }
 
 .rd-value-orb__lava-bloom {
-  background: radial-gradient(circle at 50% 55%, rgba(255, 120, 40, 0.55) 0%, transparent 62%);
+  background: radial-gradient(circle at 50% 55%, var(--vorb-lava-bloom) 0%, transparent 62%);
   filter: blur(6px);
   opacity: calc(0.45 + var(--vorb-intensity, 0.2) * 0.45);
   animation: rd-vorb-lava-drift 7s ease-in-out infinite;

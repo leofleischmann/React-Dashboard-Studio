@@ -77,7 +77,16 @@ export function LiveClockDemo(_props: { entityId: string }) {
 export function ValueOrb3DDemo({ entityId }: { entityId: string }) {
   const entity = useEntity(entityId);
   const { min, max } = useMemo(() => suggestOrbRange(entity), [entity]);
-  return <ValueOrb3D entityId={entityId} min={min} max={max} />;
+  const isTemperature = entity?.attributes.device_class === 'temperature';
+
+  return (
+    <ValueOrb3D
+      entityId={entityId}
+      min={min}
+      max={max}
+      color={isTemperature ? '#e63a12' : '#3b82f6'}
+    />
+  );
 }
 
 export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {

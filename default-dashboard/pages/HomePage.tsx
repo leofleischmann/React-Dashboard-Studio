@@ -311,7 +311,7 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
           <Panel title="Energie" icon="⚡" span action={<button type="button" className="rd-panel__action" onClick={() => onNavigate('charts')}>Charts →</button>}>
             <div className="rd-energy__layout">
               <div className="rd-energy__orb">
-                <ValueOrb3D entityId={primaryPower.entity_id} min={0} max={4500} />
+                <ValueOrb3D entityId={primaryPower.entity_id} min={0} max={4500} color="#3b82f6" />
               </div>
               <div className="rd-energy__main">
                 <SparkChart

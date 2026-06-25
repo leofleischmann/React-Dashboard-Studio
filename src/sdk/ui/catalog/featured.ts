@@ -25,7 +25,8 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     category: 'featured',
     domains: ['sensor', 'number', 'input_number'],
     pickExample: pickNumericSensorEntity,
-    snippet: (id) => `<ValueOrb3D entityId="${id}" min={0} max={100} />`,
+    snippet: (id) =>
+      `<ValueOrb3D entityId="${id}" min={0} max={100} color="#e63a12" />`,
     Demo: ValueOrb3DDemo,
   },
   {
