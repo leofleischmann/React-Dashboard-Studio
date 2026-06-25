@@ -9,3 +9,4 @@ export {
   type OrbCurve,
 } from './ValueOrb3D';
 export { WeatherForecastRow, type WeatherForecastRowProps } from './WeatherForecastRow';
+export { Minitimeline, type MinitimelineProps } from './Minitimeline';

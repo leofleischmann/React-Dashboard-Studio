@@ -491,6 +491,79 @@
   color: var(--rd-text-2);
 }
 
+/* ── Minitimeline ─────────────────────────────────────────── */
+.rd-minitimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-minitimeline__title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rd-text-2);
+}
+.rd-minitimeline__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.rd-minitimeline__item {
+  display: grid;
+  grid-template-columns: 52px 12px 1fr;
+  gap: 0 10px;
+  align-items: start;
+  position: relative;
+  padding-bottom: 14px;
+}
+.rd-minitimeline__item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 58px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  background: var(--rd-border);
+}
+.rd-minitimeline__time {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--rd-text-2);
+  font-variant-numeric: tabular-nums;
+  padding-top: 1px;
+}
+.rd-minitimeline__dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--rd-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rd-accent) 22%, transparent);
+  justify-self: center;
+  z-index: 1;
+}
+.rd-minitimeline__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-minitimeline__body strong {
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.rd-minitimeline__body span {
+  font-size: 0.82rem;
+  color: var(--rd-text-1);
+}
+.rd-minitimeline__body small {
+  font-size: 0.72rem;
+  color: var(--rd-text-2);
+}
+
 /* ── Person chip ─────────────────────────────────────────── */
 .rd-person-chip {
   display: flex;

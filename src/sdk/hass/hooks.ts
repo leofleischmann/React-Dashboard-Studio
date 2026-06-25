@@ -27,6 +27,16 @@ import {
 import { normalizeIds } from './restCache';
 import { fetchCalendarEvents, type CalendarEvent } from './calendar';
 import {
+  getLogbookSnapshot,
+  isLogbookPending,
+  subscribeLogbook,
+} from './cachedLogbook';
+import {
+  fetchLogbook,
+  logbookCacheMarker,
+  type LogbookEntry,
+} from './logbook';
+import {
   getWeatherForecastSnapshot,
   isWeatherForecastPending,
   subscribeWeatherForecast,
@@ -69,6 +79,8 @@ export type { HassEntity } from './types';
 export type { EntityFilter } from './entityFilter';
 export type { EntityStatistics } from './statistics';
 export type { CalendarEvent } from './calendar';
+export type { LogbookEntry } from './logbook';
+export { fetchLogbook, logbookCacheMarker };
 export type { WeatherForecastEntry, WeatherForecastType } from './weather';
 export { fetchWeatherForecast, FORECAST_TYPE_PARAM };
 export type { EntityRegistryEntry, AreaEntry, LabelEntry } from './registryStore';
@@ -534,6 +546,78 @@ export function useCalendarEvents(
   }, [ready, entityId, daysAhead, refreshMs]);
 
   return events;
+}
+
+const EMPTY_LOGBOOK: LogbookEntry[] = [];
+
+export interface UseLogbookOptions {
+  /** Single entity filter. */
+  entityId?: string;
+  /** Domain filter, e.g. `binary_sensor`. */
+  domain?: string;
+  /** Lookback window in hours (default 24). */
+  hours?: number;
+  /** Max entries returned (default 20). */
+  limit?: number;
+  refreshMs?: number;
+}
+
+export interface UseLogbookResult {
+  entries: LogbookEntry[];
+  loading: boolean;
+}
+
+/**
+ * Recent logbook entries from HA recorder (`/api/logbook/...`).
+ *
+ *   const { entries } = useLogbook({ entityId: 'binary_sensor.tuer', limit: 10 });
+ *   const motion = useLogbook({ domain: 'binary_sensor', hours: 12 });
+ */
+export function useLogbook(options: UseLogbookOptions = {}): UseLogbookResult {
+  const {
+    entityId,
+    domain,
+    hours = 24,
+    limit = 20,
+    refreshMs = 120_000,
+  } = options;
+  const ready = useHassReady();
+
+  const marker = logbookCacheMarker({ entityId, domain, hours, limit });
+  const queryKey = `${marker}\0${hours}\0${limit}`;
+
+  const getSnapshot = useCallback(() => {
+    if (!ready) return EMPTY_LOGBOOK;
+    return getLogbookSnapshot(marker, hours, limit);
+  }, [ready, marker, hours, limit]);
+
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (!ready) return () => {};
+      return subscribeLogbook(marker, hours, limit, refreshMs, listener);
+    },
+    [ready, marker, hours, limit, refreshMs],
+  );
+
+  const getPendingSnapshot = useCallback(() => {
+    if (!ready) return false;
+    return isLogbookPending(marker, hours, limit);
+  }, [ready, marker, hours, limit]);
+
+  const loading = useSyncExternalStore(subscribe, getPendingSnapshot, () => false);
+  const entries = useSyncExternalStore(subscribe, getSnapshot, () => EMPTY_LOGBOOK);
+
+  useEffect(() => {
+    if (loading) return;
+    console.log(
+      '[Debug useLogbook]:',
+      queryKey,
+      entries.length,
+      'entries',
+    );
+  }, [queryKey, entries.length, loading]);
+
+  return { entries, loading };
 }
 
 const EMPTY_WEATHER_FORECAST: WeatherForecastEntry[] = [];

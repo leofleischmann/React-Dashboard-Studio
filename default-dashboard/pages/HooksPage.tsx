@@ -23,6 +23,7 @@ import {
   useHassReady,
   useIsMobile,
   useLabels,
+  useLogbook,
   useSun,
   useTemplate,
   useTheme,
@@ -30,7 +31,7 @@ import {
   useWeatherForecast,
 } from '@ha';
 import { entityDisplayName, energy, forecastDayLabel, num, stateLabel, weatherIcon } from '@ha/format';
-import { Section } from '@ha/ui';
+import { Section, Minitimeline } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
 import { WeatherForecastRow } from '@ha/ui';
 import { PageHead } from '../components/PageHead';
@@ -97,6 +98,21 @@ export function HooksPage() {
   const weatherEntity = useEntitiesByDomain('weather')[0];
   const weatherId = weatherEntity?.entity_id ?? '';
   const weatherForecast = useWeatherForecast(weatherId, { days: 5 });
+
+  const binarySensors = useEntitiesByDomain('binary_sensor');
+  const logLights = useEntitiesByDomain('light');
+  const logEntityId =
+    binarySensors[0]?.entity_id ?? logLights[0]?.entity_id ?? '';
+  const entityLogbook = useLogbook({
+    entityId: logEntityId || undefined,
+    hours: 24,
+    limit: 6,
+  });
+  const domainLogbook = useLogbook({
+    domain: 'binary_sensor',
+    hours: 12,
+    limit: 6,
+  });
 
   const firstLight = lights[0]?.entity_id;
   const allLightIds = lights.map((l) => l.entity_id);
@@ -424,6 +440,64 @@ export function HooksPage() {
             <WeatherForecastRow entityId={weatherId} days={5} />
           </div>
         )}
+      </Section>
+
+      <Section title="Logbook & Timeline">
+        <ResponsiveGrid min={270}>
+          <HookDemoCard
+            module="@ha"
+            name="useLogbook({ entityId, limit })"
+            hint={logEntityId || 'binary_sensor.*'}
+          >
+            {!logEntityId ? (
+              <span className="rd-empty">Keine passende Entity</span>
+            ) : entityLogbook.loading ? (
+              <span className="rd-empty">Logbook lädt…</span>
+            ) : entityLogbook.entries.length === 0 ? (
+              <span className="rd-empty">Keine Einträge (24h)</span>
+            ) : (
+              <ul className="rd-dd-hook-list">
+                {entityLogbook.entries.map((entry) => (
+                  <li key={`${entry.when.toISOString()}${entry.message}`}>
+                    {entry.when.toLocaleTimeString('de-DE', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}{' '}
+                    — {entry.message || entry.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </HookDemoCard>
+
+          <HookDemoCard
+            module="@ha"
+            name="useLogbook({ domain, hours })"
+            hint="binary_sensor · 12h"
+          >
+            {domainLogbook.loading ? (
+              <span className="rd-empty">Logbook lädt…</span>
+            ) : domainLogbook.entries.length === 0 ? (
+              <span className="rd-empty">Keine Domain-Einträge</span>
+            ) : (
+              <>
+                <strong>{domainLogbook.entries.length} Einträge</strong>
+                <small>{domainLogbook.entries[0]?.message ?? domainLogbook.entries[0]?.name}</small>
+              </>
+            )}
+          </HookDemoCard>
+        </ResponsiveGrid>
+        <div style={{ marginTop: 14, display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          {logEntityId && (
+            <Minitimeline entityId={logEntityId} limit={6} hours={24} title="Entity-Timeline" />
+          )}
+          <Minitimeline
+            domain="binary_sensor"
+            limit={6}
+            hours={12}
+            title="binary_sensor (Domain)"
+          />
+        </div>
       </Section>
 
       <DashboardStateSection />

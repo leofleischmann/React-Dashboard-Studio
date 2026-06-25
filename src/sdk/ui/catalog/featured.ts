@@ -1,6 +1,7 @@
 import type { WidgetCatalogEntry } from './types';
 import {
   LiveClockDemo,
+  MinitimelineDemo,
   pickNumericSensorEntity,
   ValueOrb3DDemo,
   WeatherForecastRowDemo,
@@ -43,5 +44,16 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     domains: ['weather'],
     snippet: (id) => `<WeatherForecastRow entityId="${id}" days={5} />`,
     Demo: WeatherForecastRowDemo,
+  },
+  {
+    name: 'Minitimeline',
+    label: 'Aktivitäts-Timeline',
+    category: 'featured',
+    domains: ['binary_sensor', 'light', 'switch', 'sensor'],
+    pickExample: (entities) =>
+      entities.find((e) => e.entity_id.startsWith('binary_sensor.'))?.entity_id ??
+      entities.find((e) => e.entity_id.startsWith('light.'))?.entity_id,
+    snippet: (id) => `<Minitimeline entityId="${id}" limit={8} hours={24} />`,
+    Demo: MinitimelineDemo,
   },
 ];

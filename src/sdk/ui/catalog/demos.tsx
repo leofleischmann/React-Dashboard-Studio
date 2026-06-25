@@ -6,6 +6,7 @@ import { CameraTile } from '../cards/domain';
 import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
 import { WeatherForecastRow } from '../featured/WeatherForecastRow';
+import { Minitimeline } from '../featured/Minitimeline';
 import { SparkChart } from '../charts';
 import { Stat } from '../primitives';
 
@@ -69,4 +70,8 @@ export function ValueOrb3DDemo({ entityId }: { entityId: string }) {
 
 export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {
   return <WeatherForecastRow entityId={entityId} days={5} />;
+}
+
+export function MinitimelineDemo({ entityId }: { entityId: string }) {
+  return <Minitimeline entityId={entityId} limit={5} hours={24} />;
 }
