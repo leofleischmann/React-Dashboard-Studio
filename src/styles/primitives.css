@@ -404,3 +404,53 @@
   color: var(--rd-text-2);
 }
 
+/* ── CircularProgress ────────────────────────────────────── */
+.rd-circular {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rd-circular svg {
+  display: block;
+}
+.rd-circular__arc {
+  transition: stroke-dasharray 0.45s ease;
+}
+.rd-circular__caption {
+  position: absolute;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rd-circular__label {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--rd-text-2);
+  text-align: center;
+  max-width: 120px;
+}
+
+/* ── ErrorBoundary ───────────────────────────────────────── */
+.rd-error-boundary {
+  background: color-mix(in srgb, var(--rd-danger, #f87171) 12%, var(--rd-card-bg));
+  border: 1px solid color-mix(in srgb, var(--rd-danger, #f87171) 45%, transparent);
+  border-radius: var(--rd-radius);
+  padding: 14px 16px;
+}
+.rd-error-boundary__title {
+  display: block;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rd-danger, #f87171);
+  margin-bottom: 6px;
+}
+.rd-error-boundary__message {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--rd-text-2);
+  word-break: break-word;
+}
+

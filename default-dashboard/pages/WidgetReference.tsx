@@ -1,5 +1,9 @@
-import { Section, WidgetCatalogGrid } from '@ha/ui';
+import { Section, WidgetCatalogGrid, ErrorBoundary } from '@ha/ui';
 import { PageHead } from '../components/PageHead';
+
+function BrokenWidgetDemo(): never {
+  throw new Error('Demo: absichtlicher Render-Fehler');
+}
 
 export function WidgetReference() {
   return (
@@ -28,6 +32,16 @@ export function WidgetReference() {
           Mehrere Entities oder Layout-Bausteine — RoomCard, DeviceCard, Grid.
         </p>
         <WidgetCatalogGrid categories={['composite']} />
+      </Section>
+
+      <Section title="ErrorBoundary">
+        <p className="rd-dd-lead">
+          Ein kaputtes Widget sprengt nicht das ganze Dashboard — Fehler bleiben in der
+          Kachel eingegrenzt.
+        </p>
+        <ErrorBoundary>
+          <BrokenWidgetDemo />
+        </ErrorBoundary>
       </Section>
     </>
   );

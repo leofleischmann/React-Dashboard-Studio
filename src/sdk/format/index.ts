@@ -8,6 +8,10 @@ export {
   energy,
   brightness,
   colorTemp,
+  pressure,
+  distance,
+  speed,
+  bytes,
 } from './units';
 export {
   isAvailable,
@@ -23,6 +27,8 @@ export {
   duration,
   greeting,
   forecastDayLabel,
+  timestamp,
+  weekday,
   type EntityAgeStyle,
 } from './time';
 export { deviceClassIcon, weatherIcon, batteryColor } from './icons';

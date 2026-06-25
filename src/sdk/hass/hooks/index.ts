@@ -30,6 +30,7 @@ export {
   getAppHass,
   type HassServiceTarget,
 } from './app';
+export type { EntityHookOptions } from './entity';
 export {
   useEntity,
   useEntityState,

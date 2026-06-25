@@ -13,17 +13,61 @@ import { useHassReady } from './ready';
 import { stableArraySnapshot } from './shared';
 import { useTime } from './app';
 
+const MISSING_STATES = new Set(['unavailable', 'unknown']);
+
+export type EntityHookOptions = {
+  /** Used when the entity is missing or state is unavailable/unknown. */
+  fallback?: string;
+};
+
+function entityWithFallback(
+  entity: HassEntity | undefined,
+  entityId: KnownEntityId,
+  fallback?: string,
+): HassEntity | undefined {
+  if (!fallback) return entity;
+  if (entity && !MISSING_STATES.has(entity.state)) return entity;
+  const now = new Date().toISOString();
+  return {
+    entity_id: entityId,
+    state:
+      entity && !MISSING_STATES.has(entity.state)
+        ? entity.state
+        : fallback,
+    attributes: entity?.attributes ?? {},
+    last_changed: entity?.last_changed ?? now,
+    last_updated: entity?.last_updated ?? now,
+    context: entity?.context ?? { id: '', parent_id: null, user_id: null },
+  };
+}
+
+function stateWithFallback(
+  state: string | undefined,
+  fallback?: string,
+): string | undefined {
+  if (state === undefined || MISSING_STATES.has(state)) return fallback ?? state;
+  return state;
+}
+
 /**
  * Reactive access to one entity. Re-renders the component ONLY when this
  * specific entity changes.
  *
  *   const temp = useEntity('sensor.wohnzimmer_temperatur');
  *   <div>{temp?.state} °C</div>
+ *
+ * With `fallback`, missing/unavailable entities return a stub with that state:
+ *
+ *   const temp = useEntity('sensor.wohnzimmer_temperatur', { fallback: '–' });
+ *   <div>{temp.state}</div>
  */
-export function useEntity(entityId: KnownEntityId): HassEntity | undefined {
+export function useEntity(
+  entityId: KnownEntityId,
+  options?: EntityHookOptions,
+): HassEntity | undefined {
   const getSnapshot = useCallback(
-    () => hassStore.getEntity(entityId),
-    [entityId],
+    () => entityWithFallback(hassStore.getEntity(entityId), entityId, options?.fallback),
+    [entityId, options?.fallback],
   );
   const subscribe = useCallback(
     (listener: () => void) => hassStore.subscribeEntity(entityId, listener),
@@ -33,10 +77,14 @@ export function useEntity(entityId: KnownEntityId): HassEntity | undefined {
 }
 
 /** Reactive shortcut for just the state string, e.g. "on" / "23.4". */
-export function useEntityState(entityId: KnownEntityId): string | undefined {
+export function useEntityState(
+  entityId: KnownEntityId,
+  options?: EntityHookOptions,
+): string | undefined {
   const getSnapshot = useCallback(
-    () => hassStore.getEntity(entityId)?.state,
-    [entityId],
+    () =>
+      stateWithFallback(hassStore.getEntity(entityId)?.state, options?.fallback),
+    [entityId, options?.fallback],
   );
   const subscribe = useCallback(
     (listener: () => void) => hassStore.subscribeEntity(entityId, listener),

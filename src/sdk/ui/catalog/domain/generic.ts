@@ -5,7 +5,7 @@ import {
   Gauge,
 } from '../../cards/domain';
 import type { WidgetCatalogEntry } from '../types';
-import { pickNumericSensorEntity, SparkDemo, StatDemo } from '../demos';
+import { pickNumericSensorEntity, SparkDemo, StatDemo, CircularProgressDemo, pickBatteryEntity } from '../demos';
 
 export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
   {
@@ -32,8 +32,19 @@ export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
     category: 'domain',
     domains: ['sensor'],
     pickExample: pickNumericSensorEntity,
-    snippet: '<SparkChart series={[…]} height={120} axes={{ xLabel: "Zeit", yLabel: "W" }} />',
+    snippet:
+      '<SparkChart series={[…]} height={80} axes={{ xLabel: "Zeit", yLabel: "Wert" }} showLegend />',
     Demo: SparkDemo,
+  },
+  {
+    name: 'CircularProgress',
+    label: 'Fortschritts-Ring',
+    category: 'domain',
+    domains: ['sensor'],
+    pickExample: (entities) => pickBatteryEntity(entities) ?? pickNumericSensorEntity(entities),
+    snippet: (id) =>
+      `<CircularProgress value={Number(useEntity('${id}', { fallback: '0' }).state) || 0} max={100} label="…" />`,
+    Demo: CircularProgressDemo,
   },
   {
     name: 'EntityRow',
