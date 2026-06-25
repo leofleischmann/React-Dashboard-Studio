@@ -25,8 +25,14 @@ jobs:
       - name: Verify panel bundle
         shell: bash
         run: |
-          test -f custom_components/homeassistant_dashboard_studio/dashboard.js
-          if grep -q 'from "./' custom_components/homeassistant_dashboard_studio/dashboard.js; then
-            echo "dashboard.js must not import other chunks."
+          v=$(jq -r .version custom_components/homeassistant_dashboard_studio/manifest.json)
+          dashboard="custom_components/homeassistant_dashboard_studio/dashboard.v${v}.js"
+          editor="custom_components/homeassistant_dashboard_studio/studio-editor.v${v}.js"
+          test -f "$dashboard"
+          test -f "$editor"
+          unexpected=$(grep -oE 'from "\./[^"]+\.js"' "$dashboard" | grep -v "./studio-editor.v${v}.js" || true)
+          if [ -n "$unexpected" ]; then
+            echo "dashboard bundle must only import ./studio-editor.v${v}.js as an optional chunk."
+            echo "$unexpected"
             exit 1
           fi

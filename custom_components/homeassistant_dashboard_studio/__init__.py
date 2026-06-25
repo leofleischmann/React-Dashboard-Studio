@@ -39,12 +39,10 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
         [StaticPathConfig(static_url, str(panel_dir), cache_headers=False)]
     )
 
-    # Append the integration version as a cache-busting query. The frontend (and
-    # its service worker) caches the panel module by URL; without this, a HACS
-    # update would keep serving the previous dashboard.js until the browser cache
-    # is cleared by hand. Bumping the version changes the URL, forcing a refetch.
+    # Versioned bundle filename busts browser/service-worker cache on HACS updates
+    # without a ?v= query (that would make studio-editor.js load a second React copy).
     integration = await async_get_integration(hass, DOMAIN)
-    module_url = f"{static_url}/dashboard.js?v={integration.version}"
+    module_url = f"{static_url}/dashboard.v{integration.version}.js"
 
     await panel_custom.async_register_panel(
         hass,

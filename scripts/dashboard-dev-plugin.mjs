@@ -24,6 +24,9 @@ function isDashboardFile(file) {
   return file.startsWith(DASHBOARD_DIR);
 }
 
+/**
+ * @returns {import('vite').Plugin}
+ */
 export function dashboardDevPlugin() {
   return {
     name: 'homeassistant-dashboard-studio-local',
