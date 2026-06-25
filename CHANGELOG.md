@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Home Assistant Dashboard Studio. HACS-Updates zeigen die jeweilige Sektion als GitHub-Release-Notes.
 
+## 0.4.4
+
+### Performance
+
+- **Bundle-Split:** Panel lädt nur `dashboard.js` (~472 kB) im Ansichtsmodus — CodeMirror, Datei-Panel und Entity-Inserter kommen in `studio-editor.js` (~538 kB) und werden erst bei **✎ Bearbeiten** (oder **⚡ Entities** in der Dev-Vorschau) nachgeladen
+
 ## 0.4.2
 
 ### Performance
