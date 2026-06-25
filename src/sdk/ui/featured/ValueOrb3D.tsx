@@ -5,8 +5,6 @@ import type { HassEntity } from '../../hass/types';
 import { entityDisplayName, num, power, stateNumber } from '../../format';
 import './ValueOrb3D.css';
 
-const MERIDIAN_ANGLES = [0, 36, 72, 108, 144] as const;
-
 export type OrbCurve = 'linear' | 'sqrt';
 
 /** Map a numeric reading to orb intensity 0…1 (with a small floor for visibility). */
@@ -92,25 +90,15 @@ function formatReading(entity: HassEntity | undefined): string {
   return unit ? `${num(v, 1)} ${unit}` : num(v, 1);
 }
 
-function OrbShell({ variant }: { variant: 'outer' | 'inner' }) {
-  return (
-    <div className={`rd-value-orb__shell rd-value-orb__shell--${variant}`} aria-hidden>
-      {MERIDIAN_ANGLES.map((deg) => (
-        <span
-          key={`m-${variant}-${deg}`}
-          className="rd-value-orb__ring"
-          style={{ transform: `rotateY(${deg}deg) rotateX(90deg)` }}
-        />
-      ))}
-      <span className="rd-value-orb__ring rd-value-orb__ring--equator" />
-      <span className="rd-value-orb__ring" style={{ transform: 'rotateX(90deg)' }} />
-      <span className="rd-value-orb__ring" style={{ transform: 'rotateZ(90deg) rotateX(90deg)' }} />
-    </div>
-  );
-}
+const WIRE_RINGS = [
+  { key: 'eq', transform: 'rotateX(90deg)' },
+  { key: 'm0', transform: 'rotateY(0deg) rotateX(90deg)' },
+  { key: 'm1', transform: 'rotateY(60deg) rotateX(90deg)' },
+  { key: 'm2', transform: 'rotateY(120deg) rotateX(90deg)' },
+] as const;
 
 /**
- * Calm wireframe-style orb — any numeric entity state mapped to 0…1 via min/max.
+ * Minimal luminous orb — numeric entity state mapped to 0…1 via min/max.
  * Pure CSS 3D (no WebGL).
  */
 export function ValueOrb3D({
@@ -131,7 +119,7 @@ export function ValueOrb3D({
   const label = entityDisplayName(entity, entityId);
   const level = intensityLevelLabel(intensity);
   const rawValue = stateNumber(entity);
-  const baseScale = 0.94 + intensity * 0.14;
+  const baseScale = 0.88 + intensity * 0.2;
 
   useEffect(() => {
     console.log('[Debug ValueOrb3D]:', {
@@ -148,7 +136,6 @@ export function ValueOrb3D({
 
   const style = {
     '--vorb-accent': theme.primary,
-    '--vorb-pulse': String(0.2 + intensity * 0.5),
     '--vorb-intensity': String(intensity),
     '--vorb-base-scale': String(baseScale),
   } as CSSProperties;
@@ -159,10 +146,22 @@ export function ValueOrb3D({
   return (
     <div className={`rd-value-orb${dark ? ' rd-value-orb--dark' : ''}`} style={style}>
       <div className="rd-value-orb__canvas" title={title}>
+        <div className="rd-value-orb__vignette" aria-hidden />
         <div className="rd-value-orb__stage">
-          <div className="rd-value-orb__orb">
-            <OrbShell variant="outer" />
-            <OrbShell variant="inner" />
+          <div className="rd-value-orb__orb" aria-hidden>
+            <div className="rd-value-orb__halo" />
+            <div className="rd-value-orb__core">
+              <span className="rd-value-orb__specular" />
+            </div>
+            <div className="rd-value-orb__wire">
+              {WIRE_RINGS.map((ring) => (
+                <span
+                  key={ring.key}
+                  className="rd-value-orb__ring"
+                  style={{ transform: ring.transform }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
