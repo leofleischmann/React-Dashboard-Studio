@@ -321,7 +321,7 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
                 <span>{entityDisplayName(primaryPower, primaryPower.entity_id)} · jetzt</span>
               </div>
               <SparkChart
-                height={110}
+                height={72}
                 showLegend={false}
                 loading={historyLoading}
                 series={[{ label: 'Verbrauch', color: theme.primary, points: history[primaryPower.entity_id] ?? [] }]}
