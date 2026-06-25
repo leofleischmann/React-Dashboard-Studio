@@ -1,2 +1,3 @@
 export * from './widgets';
-export * from './WidgetCatalogGrid';
+export * from './catalog';
+export { WidgetCatalogGrid } from './WidgetCatalogGrid';
