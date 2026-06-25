@@ -1,0 +1,33 @@
+/* Design tokens + .rd-root shell */
+.rd-root {
+  --rd-bg: var(--primary-background-color, #f3f4f8);
+  --rd-card-bg: var(--card-background-color, #ffffff);
+  --rd-text: var(--primary-text-color, #1b1c22);
+  --rd-text-2: var(--secondary-text-color, #6b6e7b);
+  --rd-accent: var(--primary-color, #2f7bf6);
+  --rd-border: var(--divider-color, rgba(20, 22, 40, 0.08));
+  --rd-radius: var(--ha-card-border-radius, 18px);
+  --rd-ok: #2faa57;
+  --rd-warn: #e0a100;
+  --rd-danger: #e0483d;
+  --rd-shadow: 0 1px 2px rgba(16, 18, 40, 0.04), 0 6px 20px rgba(16, 18, 40, 0.05);
+
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 28px clamp(16px, 4vw, 48px);
+  background: var(--rd-bg);
+  color: var(--rd-text);
+  font-family: var(
+    --paper-font-body1_-_font-family,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif
+  );
+}
+.rd-root *,
+.rd-root *::before,
+.rd-root *::after {
+  box-sizing: border-box;
+}

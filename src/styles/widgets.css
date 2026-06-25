@@ -1,0 +1,872 @@
+/* Domain widget cards (@ha/ui) — split into co-located .css over time */
+/* ── LightTile widget (rendered by @ha/ui LightTile) ─────── */
+.rd-light {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--rd-radius);
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+  box-shadow: var(--rd-shadow);
+  color: var(--rd-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease,
+    background 0.2s ease;
+}
+.rd-light:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -14px rgba(20, 22, 40, 0.45);
+}
+.rd-light__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--rd-border);
+  color: var(--rd-text-2);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.rd-light__name {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.rd-light__state {
+  font-size: 0.8rem;
+  color: var(--rd-text-2);
+}
+.rd-light.is-on {
+  border-color: color-mix(in srgb, #f6c344 50%, var(--rd-border));
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, #f6c344 14%, var(--rd-card-bg)),
+    var(--rd-card-bg)
+  );
+}
+.rd-light.is-on .rd-light__icon {
+  background: linear-gradient(160deg, #ffd76a, #f4a300);
+  color: #5a3b00;
+  box-shadow: 0 0 0 5px color-mix(in srgb, #f6c344 18%, transparent),
+    0 8px 18px -6px rgba(244, 163, 0, 0.6);
+}
+.rd-light.is-on .rd-light__state {
+  color: #c98a00;
+  font-weight: 600;
+}
+
+/* ── Showcase: empty hint ────────────────────────────────── */
+.rd-empty {
+  padding: 22px;
+  border-radius: var(--rd-radius);
+  border: 1px dashed var(--rd-border);
+  color: var(--rd-text-2);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ── Loading ─────────────────────────────────────────────── */
+.rd-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 100vh;
+  color: var(--secondary-text-color, #6b6e7b);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.rd-spinner {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid rgba(120, 130, 160, 0.2);
+  border-top-color: var(--primary-color, #2f7bf6);
+  animation: rd-spin 0.8s linear infinite;
+}
+@keyframes rd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Generic entity row ──────────────────────────────────── */
+.rd-entity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-entity-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rd-entity-row__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-entity-row__id {
+  font-size: 0.72rem;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--rd-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-entity-row__side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.rd-entity-row__state {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Gauge ───────────────────────────────────────────────── */
+.rd-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-gauge__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.rd-gauge__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-gauge__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rd-gauge__value small {
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Action button ───────────────────────────────────────── */
+.rd-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.rd-action-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--rd-accent) 40%, var(--rd-border));
+  background: color-mix(in srgb, var(--rd-accent) 6%, var(--rd-card-bg));
+}
+.rd-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rd-action-btn__name {
+  font-weight: 600;
+}
+.rd-action-btn__hint {
+  font-size: 0.72rem;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--rd-text-2);
+}
+
+/* ── Climate card ────────────────────────────────────────── */
+.rd-climate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-climate__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-climate__name {
+  font-weight: 600;
+}
+.rd-climate__mode {
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  color: var(--rd-text-2);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+}
+.rd-climate__temps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.rd-climate__temps small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--rd-text-2);
+}
+.rd-climate__target {
+  color: var(--rd-accent);
+}
+
+/* ── Binary badge ────────────────────────────────────────── */
+.rd-binary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-binary__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rd-border);
+  flex-shrink: 0;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.rd-binary.is-on .rd-binary__dot {
+  background: var(--rd-ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-ok) 18%, transparent);
+}
+.rd-binary__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-binary__name {
+  font-weight: 600;
+}
+.rd-binary__state {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+  text-transform: capitalize;
+}
+.rd-binary.is-on .rd-binary__state {
+  color: var(--rd-ok);
+}
+
+/* ── Media player card ───────────────────────────────────── */
+.rd-media {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-media__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-media__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-media__play {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.rd-media__play.is-playing {
+  background: var(--rd-accent);
+  border-color: var(--rd-accent);
+  color: #fff;
+}
+.rd-media__play:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.rd-media__track {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-media__title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-media__artist {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-media__vol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rd-media__vol-label {
+  font-size: 0.78rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Cover card ──────────────────────────────────────────── */
+.rd-cover {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-cover__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-cover__name {
+  font-weight: 600;
+}
+.rd-cover__state {
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--rd-border);
+  color: var(--rd-text-2);
+}
+.rd-cover__state.is-open {
+  color: var(--rd-accent);
+  border-color: color-mix(in srgb, var(--rd-accent) 35%, transparent);
+}
+.rd-cover__actions {
+  display: flex;
+  gap: 6px;
+}
+.rd-cover__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 8px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-cover__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+  color: var(--rd-accent);
+}
+.rd-cover__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Weather card ────────────────────────────────────────── */
+.rd-weather-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-weather-card__name {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+}
+.rd-weather-card__main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rd-weather-card__icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.rd-weather-card__temp {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rd-weather-card__temp small {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--rd-text-2);
+}
+.rd-weather-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+  text-transform: capitalize;
+}
+
+/* ── Person chip ─────────────────────────────────────────── */
+.rd-person-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-person-chip__avatar {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.rd-person-chip__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-person-chip__name {
+  font-weight: 600;
+}
+.rd-person-chip__state {
+  font-size: 0.82rem;
+  color: var(--rd-text-2);
+}
+.rd-person-chip.is-home .rd-person-chip__state {
+  color: var(--rd-ok);
+}
+
+/* ── Number / brightness slider ──────────────────────────── */
+.rd-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-slider__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.rd-slider__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-slider__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.rd-slider__input {
+  width: 100%;
+  accent-color: var(--rd-accent);
+  cursor: pointer;
+}
+.rd-slider__input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Select card ─────────────────────────────────────────── */
+.rd-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-select__name {
+  font-weight: 600;
+}
+.rd-select__input {
+  width: 100%;
+  font: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: var(--rd-card-bg);
+  color: var(--rd-text);
+}
+.rd-select__input:disabled {
+  opacity: 0.5;
+}
+
+/* ── Lock card ───────────────────────────────────────────── */
+.rd-lock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-lock__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-lock__name {
+  font-weight: 600;
+}
+.rd-lock__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-lock__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-lock__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-lock__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-lock__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Vacuum card ─────────────────────────────────────────── */
+.rd-vacuum {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-vacuum__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-vacuum__name {
+  font-weight: 600;
+}
+.rd-vacuum__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-vacuum__battery {
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-vacuum__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-vacuum__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-vacuum__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-vacuum__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Fan card ────────────────────────────────────────────── */
+.rd-fan {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-fan__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-fan__name {
+  font-weight: 600;
+}
+.rd-fan__speed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+
+/* ── Alarm panel ─────────────────────────────────────────── */
+.rd-alarm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rd-alarm.is-armed {
+  border-color: color-mix(in srgb, var(--rd-warn) 45%, var(--rd-border));
+}
+.rd-alarm__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-alarm__name {
+  font-weight: 600;
+}
+.rd-alarm__state {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.rd-alarm__actions {
+  display: flex;
+  gap: 6px;
+}
+.rd-alarm__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-alarm__btn--off {
+  color: var(--rd-danger);
+}
+.rd-alarm__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-alarm__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Camera tile ─────────────────────────────────────────── */
+.rd-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+.rd-camera__name {
+  padding: 12px 14px 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.rd-camera__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--rd-border);
+}
+
+/* ── Timer card ──────────────────────────────────────────── */
+.rd-timer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-timer.is-active {
+  border-color: color-mix(in srgb, var(--rd-ok) 40%, var(--rd-border));
+}
+.rd-timer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-timer__name {
+  font-weight: 600;
+}
+.rd-timer__state {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.rd-timer__remaining {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.rd-timer__actions {
+  display: flex;
+  gap: 8px;
+}
+.rd-timer__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-timer__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Counter card ────────────────────────────────────────── */
+.rd-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.rd-counter__name {
+  font-weight: 600;
+  align-self: stretch;
+  text-align: left;
+}
+.rd-counter__value {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.rd-counter__actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.rd-counter__btn {
+  flex: 1;
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-counter__btn:hover:not(:disabled) {
+  border-color: var(--rd-accent);
+}
+.rd-counter__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Scene / Script buttons ──────────────────────────────── */
+.rd-scene-btn,
+.rd-script-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.rd-scene-btn:hover:not(:disabled),
+.rd-script-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--rd-accent) 40%, var(--rd-border));
+}
+.rd-scene-btn:disabled,
+.rd-script-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rd-scene-btn__icon,
+.rd-script-btn__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.rd-scene-btn__name,
+.rd-script-btn__name {
+  font-weight: 600;
+}
+
+/* ── Humidifier / water heater / valve / siren / update ─── */
+.rd-humidifier, .rd-water-heater, .rd-valve, .rd-siren, .rd-update {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-humidifier__head, .rd-valve__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.rd-humidifier__metrics, .rd-water-heater__temps {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--rd-text-2);
+}
+.rd-water-heater__mode { font-size: 0.82rem; color: var(--rd-text-2); }
+.rd-valve__actions, .rd-siren { gap: 8px; }
+.rd-valve__btn {
+  flex: 1;
+  font: inherit;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--rd-border);
+  background: transparent;
+  cursor: pointer;
+}
+.rd-siren.is-on { border-color: color-mix(in srgb, var(--rd-warn) 45%, var(--rd-border)); }
+.rd-update.has-update { border-color: color-mix(in srgb, var(--rd-accent) 45%, var(--rd-border)); }
+.rd-update__versions { font-size: 0.82rem; color: var(--rd-text-2); }
+
+/* ── Tracker / boolean tile / calendar ───────────────────── */
+.rd-tracker-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.rd-tracker-chip.is-home .rd-tracker-chip__state { color: var(--rd-ok); }
+.rd-bool-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.rd-bool-tile.is-on { border-color: color-mix(in srgb, var(--rd-ok) 40%, var(--rd-border)); }
+.rd-calendar { display: flex; flex-direction: column; gap: 10px; }
+.rd-calendar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rd-calendar__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+}
+.rd-calendar__list span { color: var(--rd-text-2); font-size: 0.75rem; }
+.rd-calendar__empty { margin: 0; color: var(--rd-text-2); font-size: 0.85rem; }
+
