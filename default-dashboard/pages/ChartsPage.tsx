@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useEntities, useEntityHistory, useEntityStatistics } from '@ha';
 import { entityDisplayName, num } from '@ha/format';
 import { Card, HistoryChart, Section, SparkChart, Stat } from '@ha/ui';
@@ -20,8 +21,8 @@ function pickChartSensors(entities: ReturnType<typeof useEntities>, limit = 4) {
 
 export function ChartsPage() {
   const entities = useEntities();
-  const sensors = pickChartSensors(entities);
-  const ids = sensors.map((s) => s.entity_id);
+  const sensors = useMemo(() => pickChartSensors(entities), [entities]);
+  const ids = useMemo(() => sensors.map((s) => s.entity_id), [sensors]);
   const history = useEntityHistory(ids, { hours: 48 });
   const primaryId = ids[0];
   const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });

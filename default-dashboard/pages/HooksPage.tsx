@@ -33,10 +33,8 @@ export function HooksPage() {
   const attr = useEntityAttribute<string>(sampleId, 'friendly_name');
   const calendar = useEntitiesByDomain('calendar')[0];
   const events = useCalendarEvents(calendar?.entity_id ?? '', 7);
-  const stats = useEntityStatistics(
-    filtered[0] ? [filtered[0].entity_id] : [],
-    { days: 7 },
-  );
+  const statsEntityId = filtered[0]?.entity_id;
+  const stats = useEntityStatistics(statsEntityId ? [statsEntityId] : [], { days: 7 });
 
   return (
     <div className="rd-sdk-hooks">
@@ -142,13 +140,13 @@ export function HooksPage() {
           <HookDemoCard
             module="@ha"
             name="useEntityStatistics(ids, { days: 7 })"
-            hint={filtered[0]?.entity_id}
+            hint={statsEntityId}
           >
-            {filtered[0] && stats[filtered[0].entity_id] ? (
+            {statsEntityId && stats[statsEntityId] ? (
               <>
-                min {num(stats[filtered[0].entity_id].min)} · max{' '}
-                {num(stats[filtered[0].entity_id].max)} · mean{' '}
-                {num(stats[filtered[0].entity_id].mean)}
+                min {num(stats[statsEntityId].min)} · max{' '}
+                {num(stats[statsEntityId].max)} · mean{' '}
+                {num(stats[statsEntityId].mean)}
               </>
             ) : (
               <span className="rd-empty">Statistik nicht verfügbar</span>
