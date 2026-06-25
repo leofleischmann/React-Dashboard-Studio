@@ -258,12 +258,6 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
         />
       </div>
 
-      {primaryPower && (
-        <Panel title="Wert-Orb" icon="⚡" span>
-          <ValueOrb3D entityId={primaryPower.entity_id} min={0} max={4500} />
-        </Panel>
-      )}
-
       {/* ── MAIN GRID ────────────────────────────────────────── */}
       <div className="rd-home__grid">
         {/* Scenes & quick controls */}
@@ -314,26 +308,27 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
 
         {/* Energy */}
         {primaryPower && (
-          <Panel title="Energie" icon="⚡" action={<button type="button" className="rd-panel__action" onClick={() => onNavigate('charts')}>Charts →</button>}>
-            <div className="rd-energy">
-              <div className="rd-energy__now">
-                <strong>{num(primaryPower.state, 0)}<small> W</small></strong>
-                <span>{entityDisplayName(primaryPower, primaryPower.entity_id)} · jetzt</span>
+          <Panel title="Energie" icon="⚡" span action={<button type="button" className="rd-panel__action" onClick={() => onNavigate('charts')}>Charts →</button>}>
+            <div className="rd-energy__layout">
+              <div className="rd-energy__orb">
+                <ValueOrb3D entityId={primaryPower.entity_id} min={0} max={4500} />
               </div>
-              <SparkChart
-                height={72}
-                showLegend={false}
-                loading={historyLoading}
-                series={[{ label: 'Verbrauch', color: theme.primary, points: history[primaryPower.entity_id] ?? [] }]}
-                axes={{ xLabel: 'Zeit', yLabel: 'W' }}
-              />
-              {powerStats && (
-                <div className="rd-energy__stats">
-                  <span><small>Ø 7 T</small>{num(powerStats.mean, 0)} W</span>
-                  <span><small>Min</small>{num(powerStats.min, 0)} W</span>
-                  <span><small>Max</small>{num(powerStats.max, 0)} W</span>
-                </div>
-              )}
+              <div className="rd-energy__main">
+                <SparkChart
+                  height={72}
+                  showLegend={false}
+                  loading={historyLoading}
+                  series={[{ label: 'Verbrauch', color: theme.primary, points: history[primaryPower.entity_id] ?? [] }]}
+                  axes={{ xLabel: 'Zeit', yLabel: 'W' }}
+                />
+                {powerStats && (
+                  <div className="rd-energy__stats">
+                    <span><small>Ø 7 T</small>{num(powerStats.mean, 0)} W</span>
+                    <span><small>Min</small>{num(powerStats.min, 0)} W</span>
+                    <span><small>Max</small>{num(powerStats.max, 0)} W</span>
+                  </div>
+                )}
+              </div>
             </div>
             {ctx.power.length > 1 && (
               <div className="rd-energy__more">
