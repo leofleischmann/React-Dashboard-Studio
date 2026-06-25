@@ -66,7 +66,7 @@ function MoonDisc({ phase, r }: { phase: number; r: number }) {
 
 /**
  * Sun path arc for `sun.sun` — sky gradient, stars at night, moon phase,
- * azimuth for horizontal position, elevation for height.
+ * azimuth for position along the semicircle track; elevation drives sky tone and labels.
  */
 export function SunArc({ entityId = 'sun.sun' }: { entityId?: string }) {
   const sun = useSun(entityId);
@@ -82,18 +82,15 @@ export function SunArc({ entityId = 'sun.sun' }: { entityId?: string }) {
 
   const az = sun.azimuth ?? 180;
   const t = Math.min(1, Math.max(0, (az - 90) / 180));
-  const sx = cx + r * Math.cos(Math.PI * t) * -1;
+  // Semicircle track: t=0 east (sunrise), t=0.5 south (noon), t=1 west (sunset)
+  const sx = cx - r * Math.cos(Math.PI * t);
+  const sy = cy - r * Math.sin(Math.PI * t);
 
   const isDay = sun.isDay ?? true;
   const elevation = sun.elevation ?? 0;
   const tone = skyTone(elevation, isDay);
   const golden = isGoldenHour(elevation, isDay);
   const phase = moonPhase(now);
-
-  const elevNorm = isDay
-    ? Math.min(1, Math.max(0, elevation / 65))
-    : 0.28 + phase * 0.12;
-  const sy = cy - elevNorm * r;
 
   const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
 
