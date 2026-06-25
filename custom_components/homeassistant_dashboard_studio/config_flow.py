@@ -24,7 +24,7 @@ class ReactDashboardStudioConfigFlow(ConfigFlow, domain=DOMAIN):
         """Options under Geräte & Dienste → Integration → Optionen."""
         from .options_flow import ReactDashboardStudioOptionsFlowHandler
 
-        return ReactDashboardStudioOptionsFlowHandler()
+        return ReactDashboardStudioOptionsFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict | None = None

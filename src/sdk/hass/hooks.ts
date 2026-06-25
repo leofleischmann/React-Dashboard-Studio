@@ -10,6 +10,13 @@ import {
   aggregateHistoryDelta,
 } from './history';
 import { fetchEntityStatistics, type EntityStatistics } from './statistics';
+import {
+  getEntityHistorySnapshot,
+  getEntityStatisticsSnapshot,
+  subscribeEntityHistory,
+  subscribeEntityStatistics,
+} from './cachedRest';
+import { normalizeIds } from './restCache';
 import { fetchCalendarEvents, type CalendarEvent } from './calendar';
 import { filterEntities, type EntityFilter } from './entityFilter';
 import {
@@ -334,32 +341,22 @@ export function useEntityHistory(
 ): Record<string, HistoryPoint[]> {
   const { hours = 24, refreshMs = 180_000 } = options;
   const ready = useHassReady();
-  const idsKey = entityIds.join('\0');
-  const [data, setData] = useState<Record<string, HistoryPoint[]>>({});
+  const idsKey = normalizeIds(entityIds);
 
-  useEffect(() => {
-    if (!ready || entityIds.length === 0) return;
+  const getSnapshot = useCallback(() => {
+    if (!ready || entityIds.length === 0) return {};
+    return getEntityHistorySnapshot(entityIds, hours);
+  }, [ready, idsKey, hours, entityIds]);
 
-    let cancelled = false;
-    const load = () => {
-      fetchEntityHistory(entityIds, hours)
-        .then((next) => {
-          if (!cancelled) setData(next);
-        })
-        .catch(() => {
-          /* recorder unavailable */
-        });
-    };
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (!ready || entityIds.length === 0) return () => {};
+      return subscribeEntityHistory(entityIds, hours, refreshMs, listener);
+    },
+    [ready, idsKey, hours, refreshMs, entityIds],
+  );
 
-    load();
-    const timer = setInterval(load, refreshMs);
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
-  }, [ready, idsKey, hours, refreshMs]);
-
-  return data;
+  return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
 }
 
 /** Reactive statistics (min/max/mean) over 7 or 30 days. */
@@ -369,32 +366,22 @@ export function useEntityStatistics(
 ): Record<string, EntityStatistics> {
   const { days = 7, refreshMs = 300_000 } = options;
   const ready = useHassReady();
-  const idsKey = entityIds.join('\0');
-  const [data, setData] = useState<Record<string, EntityStatistics>>({});
+  const idsKey = normalizeIds(entityIds);
 
-  useEffect(() => {
-    if (!ready || entityIds.length === 0) return;
+  const getSnapshot = useCallback(() => {
+    if (!ready || entityIds.length === 0) return {};
+    return getEntityStatisticsSnapshot(entityIds, days);
+  }, [ready, idsKey, days, entityIds]);
 
-    let cancelled = false;
-    const load = () => {
-      fetchEntityStatistics(entityIds, days)
-        .then((next) => {
-          if (!cancelled) setData(next);
-        })
-        .catch(() => {
-          /* statistics unavailable */
-        });
-    };
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (!ready || entityIds.length === 0) return () => {};
+      return subscribeEntityStatistics(entityIds, days, refreshMs, listener);
+    },
+    [ready, idsKey, days, refreshMs, entityIds],
+  );
 
-    load();
-    const timer = setInterval(load, refreshMs);
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
-  }, [ready, idsKey, days, refreshMs]);
-
-  return data;
+  return useSyncExternalStore(subscribe, getSnapshot, () => ({}));
 }
 
 /** Upcoming events for a calendar entity. */
