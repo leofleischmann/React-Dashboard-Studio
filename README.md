@@ -44,7 +44,8 @@ export default function Dashboard() {
 | --- | --- |
 | **Multiple dashboards** | One sidebar entry per project; rename updates the sidebar title on save |
 | **Files** | Multi-file projects in the file panel; `./components/Card.tsx` imports work. ⌂ = entry file |
-| **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or widget snippets + gallery |
+| **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or **widgets (eject)** + gallery |
+| **Widgets = eject** | Adding a widget copies its source into your dashboard (folded `#region`, nested widgets cascade), no `@ha/ui` import — fully editable, and nothing the SDK later changes can break it |
 | **Modules** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` only |
 | **Mobile** | View-only, no editor |
 
@@ -53,7 +54,7 @@ export default function Dashboard() {
 | Module | What you get |
 | --- | --- |
 | `@ha` | Entity hooks, history, logbook, weather, energy, templates, persistent state, `callService`, … |
-| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) |
+| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) — inserted via eject, not import |
 | `@ha/layout` | `PageShell`, `Tabs`, grids, routing helpers |
 | `@ha/format` | Numbers, labels, time, icons |
 
