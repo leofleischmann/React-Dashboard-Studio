@@ -14,6 +14,7 @@ import {
   useEntitiesByDomain,
   useEntitiesByLabel,
   useEntity,
+  useEntityActions,
   useEntityAge,
   useEntityAttribute,
   useEnergy,
@@ -67,6 +68,12 @@ export function HooksPage() {
   const sunIsDay = useTemplate("{{ is_state('sun.sun', 'above_horizon') }}", {
     parse: 'boolean',
   });
+
+  const switches = useEntitiesByDomain('switch');
+  const inputBooleans = useEntitiesByDomain('input_boolean');
+  const controllable = lights[0] ?? switches[0] ?? inputBooleans[0];
+  const controllableId = controllable?.entity_id ?? '';
+  const actions = useEntityActions(controllableId);
 
   const entity = useEntity(sampleId);
   const sampleState = useEntityState(sampleId);
@@ -224,6 +231,56 @@ export function HooksPage() {
             >
               clear ({debugLog.length})
             </button>
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
+
+      <Section title="@ha — Aktionen">
+        <p className="rd-dd-lead">
+          <code>useEntityActions(id)</code> bündelt Live-Status und fertige Aktionen
+          (<code>toggle</code>, <code>turnOn/Off</code>, <code>press</code>) für ein Entity —
+          domain-bewusst, ohne <code>callService</code>-Boilerplate pro Tile.
+        </p>
+        <ResponsiveGrid min={270}>
+          <HookDemoCard
+            module="@ha"
+            name="useEntityActions(id)"
+            hint={controllableId || 'kein schaltbares Entity gefunden'}
+          >
+            {controllableId ? (
+              <>
+                <strong>{actions.isOn ? '✓ An' : '○ Aus'}</strong>
+                <small>{entityDisplayName(controllable, controllableId)}</small>
+                <div className="rd-dd-btn-row">
+                  <button
+                    type="button"
+                    className="rd-demo-btn"
+                    disabled={!actions.isAvailable}
+                    onClick={() => actions.toggle()}
+                  >
+                    toggle
+                  </button>
+                  <button
+                    type="button"
+                    className="rd-demo-btn"
+                    disabled={!actions.isAvailable}
+                    onClick={() => actions.turnOn()}
+                  >
+                    turnOn
+                  </button>
+                  <button
+                    type="button"
+                    className="rd-demo-btn"
+                    disabled={!actions.isAvailable}
+                    onClick={() => actions.turnOff()}
+                  >
+                    turnOff
+                  </button>
+                </div>
+              </>
+            ) : (
+              <small>Lege ein Light/Switch/Input-Boolean an, um die Aktionen zu testen.</small>
+            )}
           </HookDemoCard>
         </ResponsiveGrid>
       </Section>
