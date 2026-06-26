@@ -71,7 +71,17 @@ function buildMarkdown(manifest) {
     lines.push(`| ${mode.label} | \`${mode.example}\` |`);
   }
 
-  lines.push('', '## Widgets', '');
+  lines.push(
+    '',
+    '## Widgets',
+    '',
+    '> Widgets werden im Editor über den **⚡ Inserter → Widget** *ejected*: der',
+    '> Komponenten-Quellcode wird in dein Dashboard kopiert (eingeklappter',
+    '> `#region`-Block, frei bearbeitbar, mit-ejecteten Sub-Widgets) und das',
+    '> `<Tag … />` an den Cursor gesetzt — **kein `@ha/ui`-Import nötig**. Die',
+    '> Snippet-Spalte zeigt das einzufügende Tag.',
+    '',
+  );
   const byCategory = new Map();
   for (const w of manifest.widgets) {
     const cat = w.category ?? 'domain';
@@ -122,7 +132,11 @@ function buildMarkdown(manifest) {
   lines.push('```');
   lines.push(manifest.charts.join(', '));
   lines.push('```');
-  lines.push('', `\`${manifest.importHints.widgets}\``);
+  lines.push(
+    '',
+    '> Charts/Widgets fügst du im Editor per **Inserter → eject** ein — der',
+    '> Quelltext wird in dein Dashboard kopiert, ein `@ha/ui`-Import ist nicht nötig.',
+  );
 
   return lines.join('\n');
 }
@@ -160,6 +174,11 @@ export function generateSdkReference(options = {}) {
     availableModules: readAvailableModules(),
     modules,
     widgets,
+    /** How widgets get into a dashboard. The editor ejects their source. */
+    widgetInsertion: {
+      mode: 'eject',
+      note: 'Widgets are inserted by ejecting their source into the dashboard (folded #region block, nested widgets cascade-ejected), not by importing from @ha/ui. The widget `snippet` is the usage tag placed at the cursor.',
+    },
     domainDefaultWidgets: domainDefaultWidgets(widgets),
     entityActions: readEntityActions(),
     charts,
@@ -171,7 +190,7 @@ export function generateSdkReference(options = {}) {
         { id: 'id', label: 'nur ID', example: `'${exampleId}'` },
         {
           id: 'widget',
-          label: 'Widget',
+          label: 'Widget (eject)',
           example: `<Gauge entityId="${exampleId}" />`,
         },
       ],
