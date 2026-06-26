@@ -1,7 +1,7 @@
 {
   "name": "homeassistant_dashboard_studio",
   "private": true,
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "description": "Home Assistant Dashboard Studio - pro-code Home Assistant dashboard as a custom panel, installable via HACS.",
   "scripts": {
@@ -16,6 +16,9 @@
     "gen:sdk-reference": "node scripts/gen-sdk-reference.mjs",
     "gen:eject-sources": "node scripts/gen-eject-sources.mjs",
     "eject:imports": "node scripts/eject-imports.mjs",
+    "eject:dashboard": "node scripts/eject-dashboard.mjs",
+    "eject:dashboard:list": "node scripts/eject-dashboard.mjs --list",
+    "eject:dashboard:dry": "node scripts/eject-dashboard.mjs --dry",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

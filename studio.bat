@@ -36,6 +36,8 @@ echo   3  sync:push         ./dashboard/ -^> HA
 echo   4  sync:watch        Auto-Push bei Speichern
 echo   5  gen:types         Entity-Typen + ENTITIES.md
 echo   6  check:dashboard   ./dashboard/ pruefen
+echo   7  eject             @ha/ui-Widgets einfrieren
+echo   8  gen:all           Entity-Typen + SDK-Referenz
 echo.
 echo   Entwickler ^(Integration selbst erweitern^)
 echo   -----------------------------------------
@@ -46,7 +48,7 @@ echo.
 echo   0  Beenden
 echo.
 set "choice="
-set /p choice="Auswahl (1-6, A-C, 0): "
+set /p choice="Auswahl (1-8, A-C, 0): "
 
 if "%choice%"=="1"  goto run_dev
 if "%choice%"=="2"  goto run_sync_pull
@@ -54,6 +56,8 @@ if "%choice%"=="3"  goto run_sync_push
 if "%choice%"=="4"  goto run_sync_watch
 if "%choice%"=="5"  goto run_gen_types
 if "%choice%"=="6"  goto run_check_dashboard
+if "%choice%"=="7"  goto eject_menu
+if "%choice%"=="8"  goto run_gen_all
 if /i "%choice%"=="A"  goto run_build
 if /i "%choice%"=="B"  goto run_check_default
 if /i "%choice%"=="C"  goto run_dev_default
@@ -84,9 +88,76 @@ goto after
 call npm run gen:types
 goto after
 
+:run_gen_all
+call npm run gen:all
+goto after
+
 :run_check_dashboard
 call npm run check:dashboard
 goto after
+
+:eject_menu
+cls
+echo.
+echo  Eject — @ha/ui-Widgets in editierbare #region-Bloecke umwandeln
+echo  ==============================================================
+echo.
+echo   1  Liste          Ejectbare Widgets pro Datei ^(./dashboard/^)
+echo   2  Datei          Eine Datei ejecten
+echo   3  Alle           Alle Dateien in ./dashboard/ ejecten
+echo   4  Dry-Run        Vorschau ohne Schreiben ^(alle^)
+echo   0  Zurueck
+echo.
+set "eject_choice="
+set /p eject_choice="Auswahl (1-4, 0): "
+
+if "%eject_choice%"=="1" goto run_eject_list
+if "%eject_choice%"=="2" goto run_eject_file
+if "%eject_choice%"=="3" goto run_eject_all
+if "%eject_choice%"=="4" goto run_eject_dry
+if "%eject_choice%"=="0" goto menu
+
+echo.
+echo  Ungueltige Auswahl.
+timeout /t 2 >nul
+goto eject_menu
+
+:run_eject_list
+call npm run eject:dashboard:list
+goto after_eject
+
+:run_eject_all
+echo.
+echo  Alle @ha/ui-Widgets in ./dashboard/ werden eingefroren.
+echo  Nicht automatisch rueckgaengig — ggf. vorher sync:push oder Git.
+echo.
+set /p eject_confirm="Fortfahren? [j/N] "
+if /i "%eject_confirm%"=="j" goto run_eject_all_do
+if /i "%eject_confirm%"=="y" goto run_eject_all_do
+if /i "%eject_confirm%"=="ja" goto run_eject_all_do
+if /i "%eject_confirm%"=="yes" goto run_eject_all_do
+goto eject_menu
+
+:run_eject_all_do
+call npm run eject:dashboard
+goto after_eject
+
+:run_eject_dry
+call npm run eject:dashboard:dry
+goto after_eject
+
+:run_eject_file
+echo.
+set "eject_file="
+set /p eject_file="Datei (z.B. dashboard/pages/ChartsPage.tsx): "
+if "%eject_file%"=="" goto eject_menu
+call npm run eject:imports -- "%eject_file%"
+goto after_eject
+
+:after_eject
+echo.
+pause
+goto eject_menu
 
 :run_build
 call npm run build
