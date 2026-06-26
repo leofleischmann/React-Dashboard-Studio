@@ -29,4 +29,8 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'error',
     },
   },
+  {
+    files: ['src/sdk/debug/db.ts'],
+    rules: { 'no-console': 'off' },
+  },
 );

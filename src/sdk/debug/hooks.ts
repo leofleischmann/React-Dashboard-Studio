@@ -6,7 +6,7 @@ export function useAuthorDebugEnabled(): [boolean, (enabled: boolean) => void] {
   const enabled = useSyncExternalStore(
     (listener) => debugStore.subscribe(listener),
     () => debugStore.getAuthorEnabled(),
-    () => true,
+    () => import.meta.env.DEV,
   );
   const setEnabled = useCallback((next: boolean) => {
     debugStore.setAuthorEnabled(next);

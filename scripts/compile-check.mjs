@@ -9,6 +9,7 @@ const REGISTRY = new Set([
   '@ha/ui',
   '@ha/layout',
   '@ha/format',
+  '@ha/debug',
 ]);
 
 const RESOLVE_EXTS = ['', '.tsx', '.ts', '.jsx', '.js', '/index.tsx', '/index.ts'];

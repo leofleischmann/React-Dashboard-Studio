@@ -38,6 +38,9 @@ class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
         if user_input is not None:
             options = dict(self.config_entry.options or {})
             options[CONF_DEBUG_LOGS] = user_input[CONF_DEBUG_LOGS]
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, options=options
+            )
             await self._notify_workspace_clients()
             return self.async_create_entry(title="", data=options)
 
@@ -65,9 +68,12 @@ class ReactDashboardStudioOptionsFlowHandler(OptionsFlow):
                     errors={"base": "not_confirmed"},
                 )
 
-            await async_reset_dashboard_workspace(self.hass)
             options = dict(self.config_entry.options or {})
             options[CONF_RESET_COUNT] = factory_reset_count(self.hass) + 1
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, options=options
+            )
+            await async_reset_dashboard_workspace(self.hass)
             return self.async_create_entry(title="", data=options)
 
         return self.async_show_form(step_id="reset", data_schema=self._reset_schema())

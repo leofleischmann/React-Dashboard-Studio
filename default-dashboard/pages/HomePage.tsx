@@ -1,4 +1,4 @@
-import { useMemo, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import {
   callServiceWithTarget,
   getAppHass,
@@ -24,6 +24,7 @@ import {
   stateLabel,
   weatherIcon,
 } from '@ha/format';
+import { db } from '@ha/debug';
 import {
   LightTile,
   MediaPlayerCard,
@@ -272,6 +273,31 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
 
   const hasControl = ctx.scenes.length > 0 || ctx.lights.length > 0;
   const hasGuard = ctx.persons.length > 0 || ctx.locks.length > 0 || ctx.motion.length > 0 || lowBatteries.length > 0;
+
+  useEffect(() => {
+    if (!ready) {
+      db.debug('HomePage', 'waiting for hass');
+      return;
+    }
+    db.log('HomePage', 'snapshot', {
+      entities: entities.length,
+      areas: areas.length,
+      lightsOn: ctx.lightsOn,
+      lights: ctx.lights.length,
+      personsHome: ctx.personsHome,
+      power: primaryPower?.entity_id ?? null,
+      weather: ctx.weather?.state ?? null,
+    });
+  }, [
+    ready,
+    entities.length,
+    areas.length,
+    ctx.lightsOn,
+    ctx.lights.length,
+    ctx.personsHome,
+    primaryPower?.entity_id,
+    ctx.weather?.state,
+  ]);
 
   return (
     <div className={`rd-home ${dark ? 'is-dark' : 'is-light'}`}>
@@ -601,6 +627,7 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
             ['@ha/ui', '30+ Live-Widgets', 'widgets'],
             ['@ha/layout', 'Seiten, Tabs, Grids', 'layout'],
             ['@ha/format', 'Werte & Zustände', 'format'],
+            ['@ha/debug', 'db.log Debug-Engine', 'hooks'],
           ] as const).map(([mod, desc, page]) => (
             <button key={mod} type="button" className="rd-reveal__mod" onClick={() => onNavigate(page)}>
               <code>{mod}</code>

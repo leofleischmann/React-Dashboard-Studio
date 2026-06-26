@@ -6,7 +6,7 @@ export function HookDemoCard({
   hint,
   children,
 }: {
-  module: '@ha' | '@ha/ui' | '@ha/layout' | '@ha/format';
+  module: '@ha' | '@ha/ui' | '@ha/layout' | '@ha/format' | '@ha/debug';
   name: string;
   hint?: string;
   children: ReactNode;

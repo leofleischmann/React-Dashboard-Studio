@@ -31,6 +31,7 @@ import {
   useWeatherForecast,
 } from '@ha';
 import { entityDisplayName, energy, forecastDayLabel, num, stateLabel, weatherIcon } from '@ha/format';
+import { db, useDebugActive } from '@ha/debug';
 import { Section, Minitimeline } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
 import { WeatherForecastRow } from '@ha/ui';
@@ -137,6 +138,11 @@ export function HooksPage() {
 
   const hass = getAppHass();
   const haVersion = (hass?.config as { version?: string } | undefined)?.version;
+  const debugActive = useDebugActive();
+
+  useEffect(() => {
+    db.log('HooksPage', 'mounted', { ready, entities: entities.length, debugActive });
+  }, [ready, entities.length, debugActive]);
 
   return (
     <>
@@ -144,6 +150,56 @@ export function HooksPage() {
         Reaktive Hooks für jede Facette von Home Assistant. Komponenten rendern nur neu,
         wenn sich relevante Entities ändern — jede Karte zeigt Live-Daten.
       </PageHead>
+
+      <Section title="@ha/debug — Dashboard-Logging">
+        <p className="rd-dd-lead">
+          <code>db.log(scope, …)</code> schreibt nur in die Browser-Konsole, wenn die
+          Integration-Option <strong>Debug-Logs</strong> aktiv ist und im Editor der
+          🐞-Toggle eingeschaltet ist (in <code>npm run dev</code> reicht der Toggle).
+        </p>
+        <ResponsiveGrid min={270}>
+          <HookDemoCard module="@ha/debug" name="useDebugActive()" hint="Live-Status der Debug-Engine">
+            <strong>{debugActive ? '✓ Ausgabe aktiv' : '○ Stumm'}</strong>
+            <small>db.isEnabled() → {db.isEnabled() ? 'true' : 'false'}</small>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha/debug" name="db.log(scope, …)" hint="[db:scope] in der Konsole">
+            <button
+              type="button"
+              className="rd-demo-btn"
+              onClick={() =>
+                db.log('HooksPage', 'demo click', {
+                  entities: entities.length,
+                  ready,
+                  time: now.toISOString(),
+                })
+              }
+            >
+              Test-Log schreiben
+            </button>
+            <small>Öffne die DevTools-Konsole</small>
+          </HookDemoCard>
+
+          <HookDemoCard module="@ha/debug" name="db.warn / db.error" hint="console.warn & console.error">
+            <div className="rd-dd-btn-row">
+              <button
+                type="button"
+                className="rd-demo-btn"
+                onClick={() => db.warn('HooksPage', 'Beispiel-Warnung')}
+              >
+                warn
+              </button>
+              <button
+                type="button"
+                className="rd-demo-btn"
+                onClick={() => db.error('HooksPage', new Error('Beispiel-Fehler'))}
+              >
+                error
+              </button>
+            </div>
+          </HookDemoCard>
+        </ResponsiveGrid>
+      </Section>
 
       <Section title="Entities">
         <ResponsiveGrid min={270}>
@@ -571,6 +627,7 @@ export function HooksPage() {
           Ebenfalls exportiert: <code>fetchEntityHistory</code>, <code>fetchEntityStatistics</code>,{' '}
           <code>fetchCalendarEvents</code> (imperative Promise-APIs) sowie{' '}
           <code>aggregateHistory</code> &amp; Co. — live im Tab <strong>Charts</strong>.
+          Debug-Ausgabe über <code>@ha/debug</code> — siehe Abschnitt oben.
         </p>
       </Section>
     </>

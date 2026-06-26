@@ -10,6 +10,7 @@ import {
   type HistoryPoint,
 } from '@ha';
 import { entityDisplayName, num } from '@ha/format';
+import { db } from '@ha/debug';
 import { Card, Section, SparkChart, Stat } from '@ha/ui';
 import { ResponsiveGrid } from '@ha/layout';
 import { PageHead } from '../components/PageHead';
@@ -28,8 +29,8 @@ function EnergyAggregation({ entityId, label }: { entityId: string; label: strin
       .then((res) => {
         if (alive) setPoints(res[entityId] ?? []);
       })
-      .catch(() => {
-        /* recorder unavailable */
+      .catch((err) => {
+        db.warn('ChartsPage', 'fetchEntityHistory failed', entityId, err);
       });
     return () => {
       alive = false;
@@ -84,6 +85,15 @@ export function ChartsPage() {
   const statsMap = useEntityStatistics(primaryId ? [primaryId] : [], { days: 7 });
   const stats = primaryId ? statsMap[primaryId] : undefined;
   const energy = useMemo(() => energySensor(entities), [entities]);
+
+  useEffect(() => {
+    db.log('ChartsPage', 'loaded', {
+      sensors: sensors.length,
+      historyLoading,
+      primaryId: primaryId ?? null,
+      energy: energy?.entity_id ?? null,
+    });
+  }, [sensors.length, historyLoading, primaryId, energy?.entity_id]);
 
   const series = sensors.map((s, i) => ({
     label: entityDisplayName(s, s.entity_id),

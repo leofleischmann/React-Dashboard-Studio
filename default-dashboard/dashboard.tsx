@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { PageShell, Tabs, useHashRoute, type TabItem } from '@ha/layout';
+import { db } from '@ha/debug';
 import type { ExampleTab } from './types';
 import { HomePage } from './pages/HomePage';
 import { WidgetReference } from './pages/WidgetReference';
@@ -28,6 +30,10 @@ const VALID_PAGES = [
 /** Beispiel-Dashboard — bei Erstinstallation mitgeliefert, vollständig über ✎ Bearbeiten anpassbar. */
 export default function Dashboard() {
   const [page, setPage] = useHashRoute<ExampleTab>('home', VALID_PAGES);
+
+  useEffect(() => {
+    db.log('Dashboard', 'route', page);
+  }, [page]);
 
   return (
     <div className="rd-root rd-dd">

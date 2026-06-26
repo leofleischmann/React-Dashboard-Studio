@@ -3,9 +3,10 @@ type Listener = () => void;
 const AUTHOR_DEBUG_KEY = 'homeassistant_dashboard_studio:author_debug';
 
 function readAuthorEnabled(): boolean {
-  if (typeof sessionStorage === 'undefined') return true;
+  const fallback = import.meta.env.DEV;
+  if (typeof sessionStorage === 'undefined') return fallback;
   const raw = sessionStorage.getItem(AUTHOR_DEBUG_KEY);
-  if (raw === null) return true;
+  if (raw === null) return fallback;
   return raw === '1';
 }
 

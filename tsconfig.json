@@ -20,7 +20,8 @@
       "@ha": ["src/sdk/hass/hooks.ts"],
       "@ha/ui": ["src/sdk/ui/index.ts"],
       "@ha/layout": ["src/sdk/ui/layout.tsx"],
-      "@ha/format": ["src/sdk/format.ts"]
+      "@ha/format": ["src/sdk/format.ts"],
+      "@ha/debug": ["src/sdk/debug/index.ts"]
     }
   },
   "include": ["src"]
