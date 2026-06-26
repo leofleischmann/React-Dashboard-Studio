@@ -34,7 +34,7 @@ const REGION_END = '// #endregion';
 const HA_UI_IMPORT_RE = /import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+'@ha\/ui';?/g;
 const ANY_IMPORT_RE = /import\s+(type\s+)?\{([^}]*)\}\s+from\s+'([^']+)';?/g;
 
-function loadEjectSources() {
+export function loadEjectSources() {
   const path = join(ROOT, 'src/sdk/ui/catalog/eject.generated.ts');
   const text = readFileSync(path, 'utf8');
   const start = text.indexOf('{', text.indexOf('EJECT_SOURCES'));
@@ -182,7 +182,7 @@ function addImports(text, valueByMod, typeByMod) {
 }
 
 /** Convert one file. Returns { text, ejected[], kept[] } or null if nothing to do. */
-function convertFile(text, EJECT, shouldEject) {
+export function convertFile(text, EJECT, shouldEject) {
   const imported = ejectableWidgets(text, EJECT);
   const seeds = [...imported].filter(shouldEject);
   if (seeds.length === 0) return null;
@@ -306,4 +306,6 @@ function main() {
   if (failed) process.exit(1);
 }
 
-main();
+const isMain =
+  process.argv[1] && join(process.argv[1]) === join(fileURLToPath(import.meta.url));
+if (isMain) main();

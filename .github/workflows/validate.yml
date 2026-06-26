@@ -32,6 +32,12 @@ jobs:
             exit 1
           fi
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
       - name: Verify committed bundle filenames match manifest version
         shell: bash
         run: |
