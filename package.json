@@ -15,6 +15,7 @@
     "gen:types": "node scripts/gen-entity-types.mjs",
     "gen:sdk-reference": "node scripts/gen-sdk-reference.mjs",
     "gen:eject-sources": "node scripts/gen-eject-sources.mjs",
+    "eject:imports": "node scripts/eject-imports.mjs",
     "gen:all": "node scripts/gen-all.mjs",
     "sync": "node scripts/sync.mjs",
     "sync:pull": "node scripts/sync.mjs pull",
