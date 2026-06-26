@@ -433,35 +433,6 @@
   padding: 0;
 }
 
-/* ── Weather ─────────────────────────────────────────────── */
-.rd-wx-layout {
-  display: grid;
-  grid-template-columns: minmax(190px, 260px) 1fr;
-  gap: 20px;
-  align-items: center;
-}
-.rd-wx { display: flex; flex-direction: column; gap: 14px; }
-.rd-wx__hero { display: flex; align-items: center; gap: 14px; }
-.rd-wx__glyph { font-size: 3.4rem; line-height: 1; filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25)); }
-.rd-wx__temp { font-size: 2.8rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-.rd-wx__temp small { font-size: 1.2rem; color: var(--rd-text-2); }
-.rd-wx__cond { font-size: 0.9rem; color: var(--rd-text-2); font-weight: 600; }
-.rd-wx__metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); gap: 8px; }
-.rd-wx__metric {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: 9px 11px;
-  border-radius: 12px;
-  background: var(--tile-bg);
-  border: 1px solid var(--tile-brd);
-}
-.rd-wx__metric-ico { font-size: 0.9rem; }
-.rd-wx__metric-val { font-weight: 700; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
-.rd-wx__metric-label { font-size: 0.66rem; color: var(--rd-text-2); }
-.rd-wx-forecast { min-width: 0; }
-@media (max-width: 720px) { .rd-wx-layout { grid-template-columns: 1fr; } }
-
 /* ── Rooms ───────────────────────────────────────────────── */
 .rd-rooms {
   display: grid;

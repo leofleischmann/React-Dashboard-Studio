@@ -8,7 +8,6 @@ const DEFAULT_DASHBOARD_STYLE_MARKERS = [
   'rd-atmo',
   'rd-vital',
   'rd-room2',
-  'rd-wx',
   'rd-sec',
   'rd-activity',
   'rd-hero',
