@@ -101,7 +101,15 @@ After `sync:pull`, entity types (`ha-entities.d.ts`, `ENTITIES.md`) and `SDK-REF
 ## Contributing to the panel itself
 
 ```bash
-npm run build   # → custom_components/homeassistant_dashboard_studio/dashboard.v*.js
+npm run build   # → custom_components/.../dashboard.v*.js (also regenerates the embedded
+                #   default project + eject sources)
+npm run lint    # ESLint — no-console, no-debugger, react-hooks rules
+npm test        # Vitest — eject generator, freeze logic, CLI⇄studio consistency
 ```
 
-Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). Starter dashboard: [`default-dashboard/`](default-dashboard/).
+Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). New widgets get an
+eject source automatically via `npm run gen:eject-sources` (run by `build`) — no per-widget
+maintenance. Starter dashboard: [`default-dashboard/`](default-dashboard/).
+
+CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
+lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.
