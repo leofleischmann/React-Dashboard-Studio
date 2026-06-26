@@ -40,12 +40,16 @@ export default function Dashboard() {
 }
 ```
 
+> `@ha/ui` widgets are importable (as above). But the **⚡ inserter doesn't import — it
+> *ejects*:** it copies the widget's source into your dashboard, so nothing the SDK later
+> changes or removes can break it. Both work; eject is the update-safe default.
+
 | Topic | Notes |
 | --- | --- |
 | **Multiple dashboards** | One sidebar entry per project; rename updates the sidebar title on save |
 | **Files** | Multi-file projects in the file panel; `./components/Card.tsx` imports work. ⌂ = entry file |
 | **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or **widgets (eject)** + gallery |
-| **Widgets = eject** | Adding a widget copies its source into your dashboard (folded `#region`, nested widgets cascade), no `@ha/ui` import — fully editable, and nothing the SDK later changes can break it |
+| **Widgets = eject** | The inserter copies a widget's source into your dashboard (folded `#region`, nested widgets cascade) and drops the `<Tag/>` — fully editable, and SDK changes can't break it. Importing from `@ha/ui` directly (as above) still works too. |
 | **Modules** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` only |
 | **Mobile** | View-only, no editor |
 
@@ -54,7 +58,7 @@ export default function Dashboard() {
 | Module | What you get |
 | --- | --- |
 | `@ha` | Entity hooks, history, logbook, weather, energy, templates, persistent state, `callService`, … |
-| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) — inserted via eject, not import |
+| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) — importable, but the inserter ejects them (update-safe) |
 | `@ha/layout` | `PageShell`, `Tabs`, grids, routing helpers |
 | `@ha/format` | Numbers, labels, time, icons |
 
