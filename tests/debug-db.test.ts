@@ -6,6 +6,7 @@ describe('db debug engine', () => {
   afterEach(() => {
     debugStore.setIntegrationEnabled(false);
     debugStore.setAuthorEnabled(true);
+    debugStore.clearEntries();
     vi.restoreAllMocks();
   });
 
@@ -50,5 +51,46 @@ describe('db debug engine', () => {
     db.error('Scope', new Error('boom'));
     expect(warnSpy).toHaveBeenCalledWith('[db:Scope]', 'careful');
     expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('db.scope() binds the scope and nests with ":"', () => {
+    debugStore.setAuthorEnabled(true);
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const log = db.scope('HomePage');
+    log.log('ready');
+    log.scope('Chart').log('drawn');
+    expect(spy).toHaveBeenNthCalledWith(1, '[db:HomePage]', 'ready');
+    expect(spy).toHaveBeenNthCalledWith(2, '[db:HomePage:Chart]', 'drawn');
+  });
+
+  it('assert logs an error only when the condition is falsy', () => {
+    debugStore.setAuthorEnabled(true);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    db.assert('Scope', true, 'should not log');
+    expect(errorSpy).not.toHaveBeenCalled();
+    db.assert('Scope', false, 'value missing');
+    expect(errorSpy).toHaveBeenCalledWith('[db:Scope]', 'Assertion failed:', 'value missing');
+  });
+
+  it('captures entries into the ring buffer while active, but not when silent', () => {
+    debugStore.setAuthorEnabled(true);
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    db.log('HomePage', 'hello', 1);
+    const entries = debugStore.getEntries();
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({ level: 'log', scope: 'HomePage', args: ['hello', 1] });
+
+    debugStore.setAuthorEnabled(false);
+    db.log('HomePage', 'ignored');
+    expect(debugStore.getEntries()).toHaveLength(1);
+  });
+
+  it('clearEntries empties the buffer', () => {
+    debugStore.setAuthorEnabled(true);
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    db.log('Scope', 'x');
+    expect(debugStore.getEntries().length).toBeGreaterThan(0);
+    debugStore.clearEntries();
+    expect(debugStore.getEntries()).toHaveLength(0);
   });
 });

@@ -2,6 +2,21 @@ type Listener = () => void;
 
 const AUTHOR_DEBUG_KEY = 'homeassistant_dashboard_studio:author_debug';
 
+/** Console levels the debug engine mirrors into its in-app buffer. */
+export type DebugLevel = 'log' | 'info' | 'warn' | 'error' | 'debug';
+
+/** A single captured log line — used by the in-app log viewer (`useDebugLog`). */
+export interface DebugEntry {
+  readonly id: number;
+  readonly level: DebugLevel;
+  readonly scope: string;
+  readonly args: readonly unknown[];
+  readonly time: number;
+}
+
+/** How many recent entries the ring buffer keeps. */
+const MAX_ENTRIES = 200;
+
 function readAuthorEnabled(): boolean {
   const fallback = import.meta.env.DEV;
   if (typeof sessionStorage === 'undefined') return fallback;
@@ -16,19 +31,31 @@ function writeAuthorEnabled(enabled: boolean): void {
 }
 
 /**
- * Debug output is allowed when:
+ * Single source of truth for the debug engine.
+ *
+ * Output is *active* when:
  * - `npm run dev` and the author toggle is on, or
  * - integration option `debug_logs` is on and the author toggle is on.
+ *
+ * State changes (`subscribe`) and captured log entries (`subscribeEntries`) are
+ * tracked separately so a log viewer can re-render on new lines without waking
+ * up the toolbar toggle, and vice versa.
  */
 class DebugStore {
   private integrationEnabled = false;
   private authorEnabled = readAuthorEnabled();
-  private listeners = new Set<Listener>();
+  private stateListeners = new Set<Listener>();
+
+  private entries: readonly DebugEntry[] = [];
+  private entryListeners = new Set<Listener>();
+  private nextId = 1;
+
+  // --- gates -------------------------------------------------------------
 
   setIntegrationEnabled(enabled: boolean): void {
     if (this.integrationEnabled === enabled) return;
     this.integrationEnabled = enabled;
-    this.notify();
+    this.notifyState();
   }
 
   getIntegrationEnabled(): boolean {
@@ -39,7 +66,7 @@ class DebugStore {
     if (this.authorEnabled === enabled) return;
     this.authorEnabled = enabled;
     writeAuthorEnabled(enabled);
-    this.notify();
+    this.notifyState();
   }
 
   getAuthorEnabled(): boolean {
@@ -53,12 +80,44 @@ class DebugStore {
   }
 
   subscribe(listener: Listener): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    this.stateListeners.add(listener);
+    return () => this.stateListeners.delete(listener);
   }
 
-  private notify(): void {
-    for (const listener of this.listeners) listener();
+  // --- log buffer --------------------------------------------------------
+
+  /** Append a captured line to the ring buffer. Caller guards on `isActive()`. */
+  record(level: DebugLevel, scope: string, args: readonly unknown[]): void {
+    const entry: DebugEntry = { id: this.nextId++, level, scope, args, time: Date.now() };
+    const next = [...this.entries, entry];
+    if (next.length > MAX_ENTRIES) next.splice(0, next.length - MAX_ENTRIES);
+    this.entries = next;
+    this.notifyEntries();
+  }
+
+  getEntries(): readonly DebugEntry[] {
+    return this.entries;
+  }
+
+  clearEntries(): void {
+    if (this.entries.length === 0) return;
+    this.entries = [];
+    this.notifyEntries();
+  }
+
+  subscribeEntries(listener: Listener): () => void {
+    this.entryListeners.add(listener);
+    return () => this.entryListeners.delete(listener);
+  }
+
+  // --- internals ---------------------------------------------------------
+
+  private notifyState(): void {
+    for (const listener of this.stateListeners) listener();
+  }
+
+  private notifyEntries(): void {
+    for (const listener of this.entryListeners) listener();
   }
 }
 
