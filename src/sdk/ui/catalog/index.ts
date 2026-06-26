@@ -33,6 +33,23 @@ export function catalogSnippetDisplay(entry: WidgetCatalogEntry): string {
   return typeof entry.snippet === 'string' ? entry.snippet : `<${entry.name} … />`;
 }
 
+/**
+ * Hand-written `source` override for the "eject" action, if a widget ships one.
+ * The automatic, generator-derived sources live in `eject.generated.ts` and are
+ * resolved by the studio gallery (editor-only) so they never weigh down the
+ * dashboard runtime bundle. See `ejectSourceFor`.
+ */
+export function catalogSourceOverride(
+  entry: WidgetCatalogEntry,
+  entityId: string | null,
+): string | null {
+  if (entry.source === undefined) return null;
+  if (typeof entry.source === 'function') {
+    return entry.source(entityId ?? `${entry.domains[0] ?? 'entity'}.beispiel`);
+  }
+  return entry.source;
+}
+
 /** Entity-Inserter: domain → default widget name (from catalog `inserterDefault`). */
 export function widgetNameForDomain(domain: string): string {
   const featured = FEATURED_WIDGET_CATALOG.find(

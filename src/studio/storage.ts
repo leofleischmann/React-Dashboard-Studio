@@ -29,10 +29,6 @@ export async function loadWorkspace(): Promise<Workspace | null> {
   const local = await loadLocalWorkspace();
   if (local) {
     localDashboardMode = true;
-    console.log('[Debug storage]: loaded local workspace', {
-      activeId: local.activeId,
-      projects: Object.keys(local.projects),
-    });
     return local;
   }
   localDashboardMode = false;
@@ -44,13 +40,8 @@ export async function loadWorkspace(): Promise<Workspace | null> {
       type: WS_GET,
     });
     const workspace = normalizeWorkspace(res?.workspace);
-    console.log('[Debug storage]: loaded global workspace', {
-      activeId: workspace?.activeId,
-      projects: workspace ? Object.keys(workspace.projects) : [],
-    });
     return workspace;
   } catch (err) {
-    console.warn('[Debug storage]: get_workspace failed', err);
     return null;
   }
 }
@@ -70,7 +61,6 @@ export async function loadStudioState(boundProjectId?: string): Promise<LoadedSt
         ? panelId
         : workspace.activeId;
     const p = workspace.projects[activeId];
-    console.log('[Debug storage]: loadStudioState', { boundProjectId: panelId, activeId });
     return {
       workspace,
       activeId,
@@ -106,7 +96,6 @@ export function subscribeWorkspaceReset(onReset: () => void): () => void {
           return;
         }
         if (!normalizeWorkspace(msg?.workspace)) {
-          console.log('[Debug storage]: workspace cleared — reset to default');
           onReset();
         }
       },
@@ -134,7 +123,6 @@ export async function saveWorkspace(workspace: Workspace): Promise<void> {
       const err = await res.text().catch(() => '');
       throw new Error(err || 'Lokales Speichern fehlgeschlagen.');
     }
-    console.log('[Debug storage]: saved local workspace');
     return;
   }
 
@@ -143,10 +131,6 @@ export async function saveWorkspace(workspace: Workspace): Promise<void> {
   await connection.sendMessagePromise({
     type: WS_SAVE,
     workspace,
-  });
-  console.log('[Debug storage]: saved global workspace', {
-    activeId: workspace.activeId,
-    projects: Object.keys(workspace.projects),
   });
 }
 

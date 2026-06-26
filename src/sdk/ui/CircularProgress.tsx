@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { pct } from '../format';
 
 export type CircularProgressProps = {
@@ -48,16 +47,6 @@ export function CircularProgress({
   const ratio = Math.min(1, Math.max(0, value / span));
   const ringColor = resolveRingColor(value, color, warningBelow, criticalBelow);
 
-  useEffect(() => {
-    console.log('[Debug CircularProgress]:', {
-      value,
-      max,
-      ratio: ratio.toFixed(2),
-      ringColor,
-      warningBelow,
-      criticalBelow,
-    });
-  }, [value, max, ratio, ringColor, warningBelow, criticalBelow]);
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
   const dash = ratio * circumference;

@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateEntityTypes } from './gen-entity-types.mjs';
 import { generateSdkReference } from './gen-sdk-reference.mjs';
+import { generateEjectSources } from './gen-eject-sources.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -25,6 +26,9 @@ function loadEnv() {
 const env = loadEnv();
 const hassUrl = env.VITE_HASS_URL;
 const token = env.VITE_HASS_TOKEN;
+
+console.log('[Debug gen-all]: Eject-Quellen generieren …');
+generateEjectSources({ root: ROOT });
 
 console.log('[Debug gen-all]: SDK-Referenz generieren …');
 generateSdkReference({ root: ROOT, writeDashboard: existsSync(join(ROOT, 'dashboard')) });

@@ -15,7 +15,6 @@ import { TIMER_DOMAIN_CATALOG } from './timer';
 import { UPDATE_DOMAIN_CATALOG } from './update';
 import { VALVE_DOMAIN_CATALOG } from './valve';
 import { VACUUM_DOMAIN_CATALOG } from './vacuum';
-import { WEATHER_DOMAIN_CATALOG } from './weather';
 
 /** Entity-bound cards — one widget per HA domain (implementations in `cards/domain/`). */
 export const DOMAIN_WIDGET_CATALOG: WidgetCatalogEntry[] = [
@@ -26,7 +25,6 @@ export const DOMAIN_WIDGET_CATALOG: WidgetCatalogEntry[] = [
   ...MEDIA_DOMAIN_CATALOG,
   ...CAMERA_DOMAIN_CATALOG,
   ...COVER_DOMAIN_CATALOG,
-  ...WEATHER_DOMAIN_CATALOG,
   ...PRESENCE_DOMAIN_CATALOG,
   ...SECURITY_DOMAIN_CATALOG,
   ...FAN_DOMAIN_CATALOG,

@@ -12,7 +12,6 @@ class PanelStore {
     const next = id?.trim() || null;
     if (this.projectId === next) return;
     this.projectId = next;
-    console.log('[Debug panelStore]: projectId =', next);
     for (const listener of this.listeners) listener();
   }
 

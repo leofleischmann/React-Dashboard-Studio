@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useLogbook } from '../../hass/hooks';
 import { entityDisplayNameForId, relativeTime, stateLabel } from '../../format';
 
@@ -62,18 +61,6 @@ export function Minitimeline({
     hours,
     limit,
   });
-
-  useEffect(() => {
-    console.log('[Debug Minitimeline]:', {
-      entityId,
-      domain,
-      hours,
-      limit,
-      timeFormat,
-      showRelativeHint,
-      count: entries.length,
-    });
-  }, [entityId, domain, hours, limit, timeFormat, showRelativeHint, entries.length]);
 
   return (
     <div className="rd-card rd-minitimeline">

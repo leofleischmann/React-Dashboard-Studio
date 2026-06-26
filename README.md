@@ -40,11 +40,22 @@ export default function Dashboard() {
 }
 ```
 
+> `@ha/ui` widgets are importable (as above). But the **⚡ inserter doesn't import — it
+> *ejects*:** it copies the widget's source into your dashboard, so nothing the SDK later
+> changes or removes can break it. Both work; eject is the update-safe default.
+>
+> Developing with imports and want to *freeze* a file later (e.g. a widget got deprecated)?
+> `npm run eject:imports -- <file…>` rewrites `@ha/ui` widget imports in the given files into
+> editable `#region` blocks (imports merged in place, results validated). Pick exactly what
+> to freeze: `--only A,B` / `--except A,B` choose widgets, `--list` shows what's ejectable per
+> file, `--dry` previews. Unselected (nested) widgets stay imports. One-way by design.
+
 | Topic | Notes |
 | --- | --- |
 | **Multiple dashboards** | One sidebar entry per project; rename updates the sidebar title on save |
 | **Files** | Multi-file projects in the file panel; `./components/Card.tsx` imports work. ⌂ = entry file |
-| **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or widget snippets + gallery |
+| **Insert entities** | **⚡ Sensor / Action** — value, service, template, ID, or **widgets (eject)** + gallery |
+| **Widgets = eject** | The inserter copies a widget's source into your dashboard (folded `#region`, nested widgets cascade) and drops the `<Tag/>` — fully editable, and SDK changes can't break it. Importing from `@ha/ui` directly (as above) still works too. |
 | **Modules** | `@ha`, `@ha/ui`, `@ha/layout`, `@ha/format`, `react` only |
 | **Mobile** | View-only, no editor |
 
@@ -53,7 +64,7 @@ export default function Dashboard() {
 | Module | What you get |
 | --- | --- |
 | `@ha` | Entity hooks, history, logbook, weather, energy, templates, persistent state, `callService`, … |
-| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) |
+| `@ha/ui` | Stats, charts, domain cards, featured widgets (`SunArc`, `Minitimeline`, …) — importable, but the inserter ejects them (update-safe) |
 | `@ha/layout` | `PageShell`, `Tabs`, grids, routing helpers |
 | `@ha/format` | Numbers, labels, time, icons |
 
@@ -90,7 +101,15 @@ After `sync:pull`, entity types (`ha-entities.d.ts`, `ENTITIES.md`) and `SDK-REF
 ## Contributing to the panel itself
 
 ```bash
-npm run build   # → custom_components/homeassistant_dashboard_studio/dashboard.v*.js
+npm run build   # → custom_components/.../dashboard.v*.js (also regenerates the embedded
+                #   default project + eject sources)
+npm run lint    # ESLint — no-console, no-debugger, react-hooks rules
+npm test        # Vitest — eject generator, freeze logic, CLI⇄studio consistency
 ```
 
-Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). Starter dashboard: [`default-dashboard/`](default-dashboard/).
+Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). New widgets get an
+eject source automatically via `npm run gen:eject-sources` (run by `build`) — no per-widget
+maintenance. Starter dashboard: [`default-dashboard/`](default-dashboard/).
+
+CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
+lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.

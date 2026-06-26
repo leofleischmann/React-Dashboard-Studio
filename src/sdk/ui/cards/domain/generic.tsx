@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { callService, useEntity } from '../../../hass/hooks';
 import {
   defaultEntityService,
@@ -94,10 +93,6 @@ export function Gauge({
       if (value >= th.value) fillColor = th.color;
     }
   }
-
-  useEffect(() => {
-    console.log('[Debug Gauge]:', { entityId, value, min, max, curve, color, pct: pct.toFixed(1) });
-  }, [entityId, value, min, max, curve, color, pct]);
 
   return (
     <div className="rd-card rd-gauge">

@@ -31,7 +31,7 @@ import {
   SparkChart,
   SunArc,
   ValueOrb3D,
-  WeatherForecastRow,
+  WeatherNow,
 } from '@ha/ui';
 import type { ExampleTab } from '../types';
 import { homeContext, energySensor } from '../lib/pickers';
@@ -147,39 +147,6 @@ function Vital({
         <span className="rd-vital__label">{label}</span>
       </span>
     </button>
-  );
-}
-
-function WeatherNow({ weather }: { weather: HassEntity }) {
-  const a = weather.attributes as Record<string, unknown>;
-  const t = a.temperature as number | undefined;
-  const metrics: Array<[string, string, string]> = [];
-  if (a.apparent_temperature != null) metrics.push(['🌡️', 'Gefühlt', `${num(a.apparent_temperature as number)}°`]);
-  if (a.humidity != null) metrics.push(['💧', 'Feuchte', `${num(a.humidity as number, 0)}%`]);
-  if (a.wind_speed != null) metrics.push(['💨', 'Wind', `${num(a.wind_speed as number, 0)} ${String(a.wind_speed_unit ?? 'km/h')}`]);
-  if (a.pressure != null) metrics.push(['📊', 'Druck', `${num(a.pressure as number, 0)} hPa`]);
-
-  return (
-    <div className="rd-wx">
-      <div className="rd-wx__hero">
-        <span className="rd-wx__glyph" aria-hidden>{weatherIcon(weather.state)}</span>
-        <div className="rd-wx__read">
-          <div className="rd-wx__temp">{num(t)}<small>°</small></div>
-          <div className="rd-wx__cond">{stateLabel(weather.state)}</div>
-        </div>
-      </div>
-      {metrics.length > 0 && (
-        <div className="rd-wx__metrics">
-          {metrics.map(([ico, label, val]) => (
-            <div key={label} className="rd-wx__metric">
-              <span className="rd-wx__metric-ico" aria-hidden>{ico}</span>
-              <span className="rd-wx__metric-val">{val}</span>
-              <span className="rd-wx__metric-label">{label}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -372,12 +339,7 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
           <div className="rd-home__grid">
             {ctx.weather && weatherId && (
               <Panel title="Wetter" icon="🌦️" tone="sky" span>
-                <div className="rd-wx-layout">
-                  <WeatherNow weather={ctx.weather} />
-                  <div className="rd-wx-forecast">
-                    <WeatherForecastRow entityId={weatherId} days={5} />
-                  </div>
-                </div>
+                <WeatherNow entityId={weatherId} forecastDays={5} />
               </Panel>
             )}
             {sun.entity && (
