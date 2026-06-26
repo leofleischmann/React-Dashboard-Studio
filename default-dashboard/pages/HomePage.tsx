@@ -43,6 +43,8 @@ import { RoomCard } from '../components/RoomCard';
 
 const ROOM_TONES = ['#a78bfa', '#38bdf8', '#22c55e', '#f59e0b', '#fb7185', '#2dd4bf', '#f472b6', '#60a5fa'];
 
+const log = db.scope('HomePage');
+
 function weatherToMode(condition: string | undefined): AtmoMode {
   const c = (condition ?? '').toLowerCase();
   if (/(rain|pour|drizzle|lightning)/.test(c)) return 'rain';
@@ -276,10 +278,10 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
 
   useEffect(() => {
     if (!ready) {
-      db.debug('HomePage', 'waiting for hass');
+      log.debug('waiting for hass');
       return;
     }
-    db.log('HomePage', 'snapshot', {
+    log.log('snapshot', {
       entities: entities.length,
       areas: areas.length,
       lightsOn: ctx.lightsOn,
@@ -627,7 +629,7 @@ export function HomePage({ onNavigate }: { onNavigate: (p: ExampleTab) => void }
             ['@ha/ui', '30+ Live-Widgets', 'widgets'],
             ['@ha/layout', 'Seiten, Tabs, Grids', 'layout'],
             ['@ha/format', 'Werte & Zustände', 'format'],
-            ['@ha/debug', 'db.log Debug-Engine', 'hooks'],
+            ['@ha/debug', 'db.scope Debug-Engine', 'hooks'],
           ] as const).map(([mod, desc, page]) => (
             <button key={mod} type="button" className="rd-reveal__mod" onClick={() => onNavigate(page)}>
               <code>{mod}</code>

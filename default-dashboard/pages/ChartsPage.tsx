@@ -18,6 +18,8 @@ import { energySensor, numericSensors } from '../lib/pickers';
 
 const CHART_COLORS = ['#6ea8fe', '#34d399', '#fbbf24', '#f87171'];
 
+const log = db.scope('ChartsPage');
+
 /** Demonstrates aggregateHistoryByDay / aggregateHistoryDelta on an energy sensor. */
 function EnergyAggregation({ entityId, label }: { entityId: string; label: string }) {
   const [points, setPoints] = useState<HistoryPoint[]>([]);
@@ -30,7 +32,7 @@ function EnergyAggregation({ entityId, label }: { entityId: string; label: strin
         if (alive) setPoints(res[entityId] ?? []);
       })
       .catch((err) => {
-        db.warn('ChartsPage', 'fetchEntityHistory failed', entityId, err);
+        log.warn('fetchEntityHistory failed', entityId, err);
       });
     return () => {
       alive = false;
@@ -87,7 +89,7 @@ export function ChartsPage() {
   const energy = useMemo(() => energySensor(entities), [entities]);
 
   useEffect(() => {
-    db.log('ChartsPage', 'loaded', {
+    log.log('loaded', {
       sensors: sensors.length,
       historyLoading,
       primaryId: primaryId ?? null,

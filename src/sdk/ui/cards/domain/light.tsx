@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { callService, useEntity } from '../../../hass/hooks';
+import { useEntityActions } from '../../../hass/hooks';
 
 const BULB_ICON = (
   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -23,8 +23,9 @@ export function LightTile({
   /** Mini brightness bar when on (default false). */
   showBrightness?: boolean;
 }) {
-  const light = useEntity(entityId);
-  const on = light?.state === 'on';
+  const actions = useEntityActions(entityId);
+  const light = actions.entity;
+  const on = actions.isOn;
   const label = name ?? light?.attributes.friendly_name ?? entityId;
   const brightnessRaw = light?.attributes.brightness;
   const brightness =
@@ -35,7 +36,7 @@ export function LightTile({
   return (
     <button
       className={`rd-light ${on ? 'is-on' : ''}`}
-      onClick={() => callService('light', 'toggle', { entity_id: entityId })}
+      onClick={() => actions.toggle()}
       aria-pressed={on}
     >
       <span className="rd-light__icon">{icon ?? BULB_ICON}</span>

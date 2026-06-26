@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import {
-  callService,
   useEnergy,
   useEntity,
+  useEntityActions,
 } from '../../../hass/hooks';
-import { energy, isAvailable, pct, power, stateNumber } from '../../../format';
+import { energy, pct, power, stateNumber } from '../../../format';
 import { SparkChart } from '../../charts';
 
 /** Extended device card: live power, today/week kWh, optional week chart. */
@@ -29,14 +29,14 @@ export function EnergyDeviceCard({
 }) {
   const energyEntity = useEntity(energyId);
   const powerEntity = useEntity(powerId ?? '');
-  const sw = useEntity(switchId ?? '');
+  const sw = useEntityActions(switchId ?? '');
   const battery = useEntity(batteryId ?? '');
 
   const today = useEnergy(energyId, { period: 'today' });
   const week = useEnergy(energyId, { period: 'week' });
 
   const watts = powerId ? (stateNumber(powerEntity) ?? 0) : 0;
-  const on = switchId ? sw?.state === 'on' : false;
+  const on = sw.isOn;
   const barPct = powerId ? Math.min(100, (watts / maxPowerW) * 100) : 0;
   const batteryPct = batteryId ? stateNumber(battery) : undefined;
 
@@ -60,8 +60,8 @@ export function EnergyDeviceCard({
         {switchId && (
           <button
             className={`rd-switch ${on ? 'is-on' : ''}`}
-            disabled={!isAvailable(sw)}
-            onClick={() => callService('switch', 'toggle', { entity_id: switchId })}
+            disabled={!sw.isAvailable}
+            onClick={() => sw.toggle()}
             aria-label={`${name} schalten`}
           >
             <span className="rd-switch__knob" />
