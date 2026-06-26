@@ -43,7 +43,7 @@ export function DashboardActions({
         type="button"
         className="rd-studio__btn rd-dashboard-actions__btn"
         disabled={disabled}
-        title="Neues Dashboard (erscheint in der Sidebar nach Speichern)"
+        title="Neues Dashboard erstellen"
         onClick={handleCreate}
       >
         + Neu

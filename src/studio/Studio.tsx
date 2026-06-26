@@ -30,6 +30,7 @@ import {
   type Workspace,
 } from './workspace';
 import { DashboardActions } from './DashboardActions';
+import { navigateToProjectPanel } from './panelNav';
 import { panelStore } from './panelStore';
 import { Preview } from './Preview';
 
@@ -202,28 +203,49 @@ export default function Studio() {
   const canDelete = workspace ? Object.keys(workspace.projects).length > 1 : false;
 
   const createProject = useCallback(
-    (name: string) => {
+    async (name: string) => {
       if (!workspace) return;
       const base = dirty
         ? savedWorkspace!
         : withActiveProject(workspace, boundProjectId, project);
-      const { workspace: withNew } = createWorkspaceProject(base, name, blankProject());
-      const nextWs: Workspace = { ...withNew, activeId: boundProjectId };
-      setWorkspace(nextWs);
-      window.alert(
-        `Dashboard „${name}“ erstellt. Nach dem Speichern erscheint es in der Sidebar — wechsle dann zum neuen Eintrag.`,
+      const { workspace: withNew, id: newId } = createWorkspaceProject(
+        base,
+        name,
+        blankProject(),
       );
+      const nextWs: Workspace = { ...withNew, activeId: boundProjectId };
+      try {
+        await saveWorkspace(nextWs);
+        setWorkspace(nextWs);
+        setSavedWorkspace(nextWs);
+        setError(null);
+        if (!localMode) {
+          navigateToProjectPanel(newId);
+        }
+      } catch (err) {
+        setError(`Erstellen fehlgeschlagen: ${(err as Error).message}`);
+      }
     },
-    [workspace, boundProjectId, project, dirty, savedWorkspace],
+    [workspace, boundProjectId, project, dirty, savedWorkspace, localMode],
   );
 
   const renameProject = useCallback(
-    (name: string) => {
+    async (name: string) => {
       if (!workspace) return;
-      const nextWs = renameWorkspaceProject(workspace, boundProjectId, name);
-      setWorkspace(nextWs);
+      const base = dirty
+        ? savedWorkspace!
+        : withActiveProject(workspace, boundProjectId, project);
+      const nextWs = renameWorkspaceProject(base, boundProjectId, name);
+      try {
+        await saveWorkspace(nextWs);
+        setWorkspace(nextWs);
+        setSavedWorkspace(nextWs);
+        setError(null);
+      } catch (err) {
+        setError(`Umbenennen fehlgeschlagen: ${(err as Error).message}`);
+      }
     },
-    [workspace, boundProjectId],
+    [workspace, boundProjectId, project, dirty, savedWorkspace],
   );
 
   const removeProject = useCallback(async () => {
@@ -417,8 +439,8 @@ export default function Studio() {
             projectName={projectName}
             canDelete={canDelete}
             disabled={editing && dirty}
-            onCreate={createProject}
-            onRename={renameProject}
+            onCreate={(name) => void createProject(name)}
+            onRename={(name) => void renameProject(name)}
             onDelete={() => void removeProject()}
           />
         )}
