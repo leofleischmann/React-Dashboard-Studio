@@ -285,6 +285,12 @@ export function ejectableWidgetsInText(text: string): string[] {
   return [...set];
 }
 
+/** All widgets freezing this file would eject — imported `@ha/ui` widgets + cascade. */
+export function freezableWidgets(text: string): string[] {
+  const imported = ejectableWidgetsInText(text);
+  return imported.length ? [...ejectClosure(imported)] : [];
+}
+
 function stripHaUiNames(text: string, remove: Set<string>): string {
   return text.replace(
     /[ \t]*import\s+(type\s+)?\{([^}]*)\}\s+from\s+'@ha\/ui';?\n?/g,

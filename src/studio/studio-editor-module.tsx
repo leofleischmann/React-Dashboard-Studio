@@ -7,7 +7,7 @@ import { FilePanel } from './FilePanel';
 import { Preview } from './Preview';
 import {
   computeEjectChanges,
-  ejectableWidgetsInText,
+  freezableWidgets,
   freezeImports,
   type EjectInsert,
 } from './ejectInsert';
@@ -84,7 +84,7 @@ export default function StudioEditorLayout({
 
   // Freeze this file: turn every @ha/ui widget import into an editable eject.
   const freezable = useMemo(
-    () => ejectableWidgetsInText(project.files[activePath] ?? ''),
+    () => freezableWidgets(project.files[activePath] ?? ''),
     [project.files, activePath],
   );
 
@@ -134,9 +134,9 @@ export default function StudioEditorLayout({
               type="button"
               className="rd-studio__freeze"
               onClick={freezeFile}
-              title={`@ha/ui-Widget-Importe in editierbare Ejects umwandeln: ${freezable.join(', ')}`}
+              title={`In editierbare Ejects umwandeln (inkl. verschachtelter): ${freezable.join(', ')}`}
             >
-              ❄️ {freezable.length} Import{freezable.length > 1 ? 'e' : ''} einfrieren
+              ❄️ {freezable.length} Widget{freezable.length > 1 ? 's' : ''} einfrieren
             </button>
           )}
         </div>
