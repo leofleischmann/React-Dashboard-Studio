@@ -79,3 +79,10 @@ export {
   type UseEntityAgeOptions,
   type UseEntityAgeResult,
 } from './entityAge';
+// Entity-action helpers — public so ejected widget sources resolve against `@ha`.
+export {
+  entityDomain,
+  defaultEntityService,
+  TOGGLE_DOMAINS,
+  PRESS_DOMAINS,
+} from '../../entityActions';

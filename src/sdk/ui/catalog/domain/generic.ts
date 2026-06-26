@@ -6,7 +6,6 @@ import {
 } from '../../cards/domain';
 import type { WidgetCatalogEntry } from '../types';
 import { pickNumericSensorEntity, SparkDemo, StatDemo, CircularProgressDemo, pickBatteryEntity } from '../demos';
-import { actionButtonSource, binaryBadgeSource, entityRowSource } from './sources';
 
 export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
   {
@@ -54,7 +53,6 @@ export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
     domains: ['switch'],
     inserterDefault: true,
     snippet: (id) => `<EntityRow entityId="${id}" />`,
-    source: entityRowSource,
     Demo: EntityRow,
   },
   {
@@ -64,7 +62,6 @@ export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
     domains: ['binary_sensor'],
     inserterDefault: true,
     snippet: (id) => `<BinaryBadge entityId="${id}" />`,
-    source: binaryBadgeSource,
     Demo: BinaryBadge,
   },
   {
@@ -73,7 +70,6 @@ export const GENERIC_DOMAIN_CATALOG: WidgetCatalogEntry[] = [
     category: 'domain',
     domains: ['button', 'automation'],
     snippet: (id) => `<ActionButton entityId="${id}" />`,
-    source: actionButtonSource,
     Demo: ActionButton,
   },
 ];
