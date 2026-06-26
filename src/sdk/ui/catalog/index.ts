@@ -33,6 +33,18 @@ export function catalogSnippetDisplay(entry: WidgetCatalogEntry): string {
   return typeof entry.snippet === 'string' ? entry.snippet : `<${entry.name} … />`;
 }
 
+/** Editable component source for the "eject" action, or null if none is offered. */
+export function catalogSource(
+  entry: WidgetCatalogEntry,
+  entityId: string | null,
+): string | null {
+  if (entry.source === undefined) return null;
+  if (typeof entry.source === 'function') {
+    return entry.source(entityId ?? `${entry.domains[0] ?? 'entity'}.beispiel`);
+  }
+  return entry.source;
+}
+
 /** Entity-Inserter: domain → default widget name (from catalog `inserterDefault`). */
 export function widgetNameForDomain(domain: string): string {
   const featured = FEATURED_WIDGET_CATALOG.find(

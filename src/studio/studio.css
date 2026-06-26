@@ -568,11 +568,9 @@
   background: #1a1d28;
   color: inherit;
   text-align: left;
-  cursor: pointer;
 }
 .rd-widget-gallery__card:hover {
   border-color: #4a5570;
-  background: #222636;
 }
 .rd-widget-gallery__card.is-copied {
   border-color: var(--rd-ok, #2faa57);
@@ -629,10 +627,40 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.rd-widget-gallery__copied {
+.rd-widget-gallery__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.rd-widget-gallery__act {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid #3a4358;
+  border-radius: 7px;
+  background: #232838;
+  color: #d7dcec;
   font-size: 0.72rem;
-  color: var(--rd-ok, #2faa57);
   font-weight: 600;
+  cursor: pointer;
+}
+.rd-widget-gallery__act:hover {
+  border-color: #5a688f;
+  background: #2b3146;
+}
+.rd-widget-gallery__act--ghost {
+  flex: 0 0 auto;
+  background: transparent;
+  color: #9fd0ff;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.rd-widget-gallery__act--ghost:hover {
+  background: color-mix(in srgb, #9fd0ff 12%, transparent);
+}
+.rd-widget-gallery__copied {
+  font-size: 0.78rem;
+  color: var(--rd-ok, #2faa57);
+  font-weight: 700;
 }
 .rd-studio__editor {
   display: flex;
