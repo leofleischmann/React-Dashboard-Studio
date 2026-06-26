@@ -43,6 +43,10 @@ export default function Dashboard() {
 > `@ha/ui` widgets are importable (as above). But the **⚡ inserter doesn't import — it
 > *ejects*:** it copies the widget's source into your dashboard, so nothing the SDK later
 > changes or removes can break it. Both work; eject is the update-safe default.
+>
+> Developing with imports and want to *freeze* a file later (e.g. a widget got deprecated)?
+> `npm run eject:imports -- path/to/Page.tsx` rewrites every `@ha/ui` widget import in the
+> given files into editable `#region` blocks (nested widgets cascade). One-way by design.
 
 | Topic | Notes |
 | --- | --- |
