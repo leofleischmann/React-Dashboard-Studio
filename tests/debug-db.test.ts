@@ -14,7 +14,7 @@ describe('db debug engine', () => {
     debugStore.setIntegrationEnabled(false);
     debugStore.setAuthorEnabled(true);
     const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    db.log('Test', 'hello');
+    db.scope('Test').log('hello');
     expect(spy).toHaveBeenCalledWith('[db:Test]', 'hello');
   });
 
@@ -22,7 +22,7 @@ describe('db debug engine', () => {
     debugStore.setIntegrationEnabled(true);
     debugStore.setAuthorEnabled(true);
     const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    db.log('ChartsPage', 'loaded', 3);
+    db.scope('ChartsPage').log('loaded', 3);
     expect(spy).toHaveBeenCalledWith('[db:ChartsPage]', 'loaded', 3);
   });
 
@@ -30,7 +30,7 @@ describe('db debug engine', () => {
     debugStore.setIntegrationEnabled(true);
     debugStore.setAuthorEnabled(false);
     const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    db.log('Test', 'nope');
+    db.scope('Test').log('nope');
     expect(spy).not.toHaveBeenCalled();
     expect(debugStore.isActive()).toBe(false);
   });
@@ -47,13 +47,14 @@ describe('db debug engine', () => {
     debugStore.setAuthorEnabled(true);
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    db.warn('Scope', 'careful');
-    db.error('Scope', new Error('boom'));
+    const log = db.scope('Scope');
+    log.warn('careful');
+    log.error(new Error('boom'));
     expect(warnSpy).toHaveBeenCalledWith('[db:Scope]', 'careful');
     expect(errorSpy).toHaveBeenCalled();
   });
 
-  it('db.scope() binds the scope and nests with ":"', () => {
+  it('nests scopes with ":"', () => {
     debugStore.setAuthorEnabled(true);
     const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const log = db.scope('HomePage');
@@ -66,29 +67,30 @@ describe('db debug engine', () => {
   it('assert logs an error only when the condition is falsy', () => {
     debugStore.setAuthorEnabled(true);
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    db.assert('Scope', true, 'should not log');
+    const log = db.scope('Scope');
+    log.assert(true, 'should not log');
     expect(errorSpy).not.toHaveBeenCalled();
-    db.assert('Scope', false, 'value missing');
+    log.assert(false, 'value missing');
     expect(errorSpy).toHaveBeenCalledWith('[db:Scope]', 'Assertion failed:', 'value missing');
   });
 
   it('captures entries into the ring buffer while active, but not when silent', () => {
     debugStore.setAuthorEnabled(true);
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    db.log('HomePage', 'hello', 1);
+    db.scope('HomePage').log('hello', 1);
     const entries = debugStore.getEntries();
     expect(entries).toHaveLength(1);
     expect(entries[0]).toMatchObject({ level: 'log', scope: 'HomePage', args: ['hello', 1] });
 
     debugStore.setAuthorEnabled(false);
-    db.log('HomePage', 'ignored');
+    db.scope('HomePage').log('ignored');
     expect(debugStore.getEntries()).toHaveLength(1);
   });
 
   it('clearEntries empties the buffer', () => {
     debugStore.setAuthorEnabled(true);
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    db.log('Scope', 'x');
+    db.scope('Scope').log('x');
     expect(debugStore.getEntries().length).toBeGreaterThan(0);
     debugStore.clearEntries();
     expect(debugStore.getEntries()).toHaveLength(0);

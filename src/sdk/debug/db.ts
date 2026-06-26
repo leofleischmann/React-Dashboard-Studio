@@ -1,18 +1,18 @@
 import { debugStore, type DebugLevel } from './store';
 
 /**
- * Dashboard debug API — logs only when the engine is active (integration option
- * `debug_logs` + author 🐞 toggle, or `npm run dev` + toggle). Every call is a
- * no-op otherwise, so it is safe to leave `db.*` calls in shipped dashboards.
- *
- * Two equivalent styles:
+ * Dashboard debug API. Output happens only when the engine is active
+ * (integration option `debug_logs` + author 🐞 toggle, or `npm run dev` +
+ * toggle); otherwise every call is a no-op, so `db` calls are safe to leave in
+ * shipped dashboards.
  *
  *   import { db } from '@ha/debug';
- *   db.log('HomePage', 'sensors', sensors.length);   // ad-hoc, pass scope each call
  *
- *   const log = db.scope('HomePage');                 // bound scope, less repetition
- *   log.log('sensors', sensors.length);
- *   log.scope('Chart').warn('no data');               // → [db:HomePage:Chart]
+ *   const log = db.scope('HomePage');     // one logger per component/module
+ *   log.info('sensors', sensors.length);  // → [db:HomePage] sensors 4
+ *   log.scope('Chart').warn('no data');   // → [db:HomePage:Chart] no data
+ *
+ *   if (db.isEnabled()) expensiveDiagnostics();
  */
 
 const label = (scope: string): string => `[db:${scope}]`;
@@ -83,40 +83,14 @@ function createLogger(scope: string): ScopedLogger {
   };
 }
 
-/** Ad-hoc debug API where the scope is the first argument of every call. */
 export interface DebugApi {
   /** True when `db.*` would write to the console / buffer right now. */
   isEnabled(): boolean;
-  /** Returns a logger bound to `name` (no scope arg on its methods). */
+  /** Returns a logger bound to `name`. Nest further via the logger's `.scope()`. */
   scope(name: string): ScopedLogger;
-  log(scope: string, ...args: unknown[]): void;
-  info(scope: string, ...args: unknown[]): void;
-  warn(scope: string, ...args: unknown[]): void;
-  error(scope: string, ...args: unknown[]): void;
-  debug(scope: string, ...args: unknown[]): void;
-  assert(scope: string, condition: unknown, ...args: unknown[]): void;
-  table(scope: string, data: unknown, columns?: readonly string[]): void;
-  group(scope: string, groupLabel?: string): void;
-  groupEnd(): void;
-  time(scope: string, timerLabel: string): void;
-  timeEnd(scope: string, timerLabel: string): void;
 }
 
 export const db: DebugApi = {
   isEnabled: () => debugStore.isActive(),
   scope: (name) => createLogger(name),
-  log: (scope, ...args) => emit('log', scope, args),
-  info: (scope, ...args) => emit('info', scope, args),
-  warn: (scope, ...args) => emit('warn', scope, args),
-  error: (scope, ...args) => emit('error', scope, args),
-  debug: (scope, ...args) => emit('debug', scope, args),
-  assert: (scope, condition, ...args) => createLogger(scope).assert(condition, ...args),
-  table: (scope, data, columns) => createLogger(scope).table(data, columns),
-  group: (scope, groupLabel) => createLogger(scope).group(groupLabel),
-  groupEnd: () => {
-    if (!debugStore.isActive()) return;
-    console.groupEnd();
-  },
-  time: (scope, timerLabel) => createLogger(scope).time(timerLabel),
-  timeEnd: (scope, timerLabel) => createLogger(scope).timeEnd(timerLabel),
 };

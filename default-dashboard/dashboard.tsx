@@ -27,12 +27,14 @@ const VALID_PAGES = [
   'format',
 ] as const satisfies readonly ExampleTab[];
 
+const log = db.scope('Dashboard');
+
 /** Beispiel-Dashboard — bei Erstinstallation mitgeliefert, vollständig über ✎ Bearbeiten anpassbar. */
 export default function Dashboard() {
   const [page, setPage] = useHashRoute<ExampleTab>('home', VALID_PAGES);
 
   useEffect(() => {
-    db.log('Dashboard', 'route', page);
+    log.log('route', page);
   }, [page]);
 
   return (
