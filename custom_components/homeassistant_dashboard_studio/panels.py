@@ -32,8 +32,11 @@ async def async_ensure_static_assets(hass: HomeAssistant) -> str:
 
     panel_dir = Path(__file__).parent
     static_url = f"/{DOMAIN}"
+    # Bundle filenames are version-stamped (dashboard.v{version}.js), so a version
+    # bump always busts the cache — safe to let the browser cache the ~640 KB
+    # module instead of re-downloading it on every panel load.
     await hass.http.async_register_static_paths(
-        [StaticPathConfig(static_url, str(panel_dir), cache_headers=False)]
+        [StaticPathConfig(static_url, str(panel_dir), cache_headers=True)]
     )
 
     integration = await async_get_integration(hass, DOMAIN)
