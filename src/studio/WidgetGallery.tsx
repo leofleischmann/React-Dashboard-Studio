@@ -6,31 +6,25 @@ import {
   buildCatalogExampleMap,
   canShowCatalogDemo,
   catalogSnippet,
-  catalogSourceOverride,
   resolveCatalogEntityId,
   type WidgetCatalogEntry,
 } from '../sdk/ui/catalog';
-// Generator-derived sources — imported only here (editor) so they stay out of
-// the dashboard runtime bundle.
-import { EJECT_SOURCES } from '../sdk/ui/catalog/eject.generated';
-import { WIDGET_IMPORTS } from '../lib/entityWidgets';
+import { ejectForWidgetName, type EjectInsert } from './ejectInsert';
 
 function GalleryCard({
   entry,
   entityId,
-  onPick,
+  onEject,
   copied,
   pickLabel,
 }: {
   entry: WidgetCatalogEntry;
   entityId: string | undefined;
-  onPick: (snippet: string, key: string) => void;
+  onEject: (eject: EjectInsert | null, key: string) => void;
   copied: boolean;
   pickLabel: string;
 }) {
-  const snippet = catalogSnippet(entry, entityId ?? null);
-  const source =
-    catalogSourceOverride(entry, entityId ?? null) ?? EJECT_SOURCES[entry.name] ?? null;
+  const usage = catalogSnippet(entry, entityId ?? null);
   const Preview = entry.Demo;
   const canPreview = canShowCatalogDemo(entry, entityId);
 
@@ -46,26 +40,16 @@ function GalleryCard({
           </span>
         )}
       </div>
-      <code className="rd-widget-gallery__snippet">{snippet}</code>
+      <code className="rd-widget-gallery__snippet">{usage}</code>
       <div className="rd-widget-gallery__actions">
         <button
           type="button"
           className="rd-widget-gallery__act"
-          onClick={() => onPick(snippet, entry.name)}
-          title={`${pickLabel}: ${snippet}`}
+          onClick={() => onEject(ejectForWidgetName(entry.name, entityId ?? null), entry.name)}
+          title="Quelltext ins Dashboard kopieren (eingeklappt, frei bearbeitbar)"
         >
           {pickLabel}
         </button>
-        {source && (
-          <button
-            type="button"
-            className="rd-widget-gallery__act rd-widget-gallery__act--ghost"
-            onClick={() => onPick(source, entry.name)}
-            title="Bearbeitbare Kopie des Widgets — volle Design-Freiheit"
-          >
-            ⟨⟩ Quelltext
-          </button>
-        )}
         {copied && <span className="rd-widget-gallery__copied">✓</span>}
       </div>
     </div>
@@ -73,12 +57,12 @@ function GalleryCard({
 }
 
 export function WidgetGallery({
-  onPick,
+  onEject,
   copiedKey,
   pickLabel,
   copyToClipboard,
 }: {
-  onPick: (snippet: string, key: string) => void;
+  onEject: (eject: EjectInsert | null, key: string) => void;
   copiedKey: string | null;
   pickLabel: string;
   copyToClipboard: boolean;
@@ -91,15 +75,9 @@ export function WidgetGallery({
   return (
     <div className="rd-widget-gallery">
       <p className="rd-inserter__hint">
-        Live-Vorschau mit deinen HA-Entities · Klick {copyToClipboard ? 'kopiert' : 'fügt ein'} ·
-        {' '}<strong>⟨⟩ Quelltext</strong> {copyToClipboard ? 'kopiert' : 'fügt'} eine frei
-        bearbeitbare Kopie {copyToClipboard ? '' : 'ein '}statt eines Imports
-        {!copyToClipboard && (
-          <>
-            {' '}
-            — ggf. <code>{WIDGET_IMPORTS}</code>
-          </>
-        )}
+        Live-Vorschau mit deinen HA-Entities · Klick {copyToClipboard ? 'kopiert' : 'fügt'} den
+        Widget-Code {copyToClipboard ? '' : 'eingeklappt '}in dein Dashboard — editierbar, kein
+        Import, kein Black-Box-Abhängigkeit.
       </p>
       <div className="rd-widget-gallery__grid">
         {WIDGET_CATALOG.map((entry) => (
@@ -107,7 +85,7 @@ export function WidgetGallery({
             key={entry.name}
             entry={entry}
             entityId={resolveCatalogEntityId(entry, entities, examples)}
-            onPick={onPick}
+            onEject={onEject}
             copied={copiedKey === entry.name}
             pickLabel={pickLabel}
           />

@@ -5,6 +5,8 @@ import { Editor } from './Editor';
 import { EntityInserter } from './EntityInserter';
 import { FilePanel } from './FilePanel';
 import { Preview } from './Preview';
+import { computeEjectChanges, type EjectInsert } from './ejectInsert';
+import { foldAllRegions } from './regionFold';
 import type { Project } from './project';
 
 export type StudioEditorLayoutProps = {
@@ -58,6 +60,23 @@ export default function StudioEditorLayout({
     view.focus();
   };
 
+  // Eject: copy the widget's real source into a folded #region block, drop the
+  // usage tag at the cursor and merge the imports — then collapse the region.
+  const ejectInsert = (eject: EjectInsert) => {
+    const view = cmRef.current?.view;
+    if (!view) return;
+    const { from, to } = view.state.selection.main;
+    const { changes, selection } = computeEjectChanges(
+      view.state.doc.toString(),
+      from,
+      to,
+      eject,
+    );
+    view.dispatch({ changes, selection: { anchor: selection } });
+    foldAllRegions(view);
+    view.focus();
+  };
+
   return (
     <div className="rd-studio__split" ref={splitRef}>
       <FilePanel
@@ -74,6 +93,7 @@ export default function StudioEditorLayout({
           ref={cmRef}
           value={project.files[activePath] ?? ''}
           onChange={onContentChange}
+          foldKey={activePath}
         />
         <div className="rd-studio__modules">
           <code>{activePath}</code> · import aus:{' '}
@@ -93,7 +113,11 @@ export default function StudioEditorLayout({
       </div>
 
       {inserterOpen && (
-        <EntityInserter onInsert={insertSnippet} onClose={onCloseInserter} />
+        <EntityInserter
+          onInsert={insertSnippet}
+          onEject={ejectInsert}
+          onClose={onCloseInserter}
+        />
       )}
     </div>
   );
