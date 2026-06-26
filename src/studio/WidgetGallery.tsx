@@ -6,10 +6,13 @@ import {
   buildCatalogExampleMap,
   canShowCatalogDemo,
   catalogSnippet,
-  catalogSource,
+  catalogSourceOverride,
   resolveCatalogEntityId,
   type WidgetCatalogEntry,
 } from '../sdk/ui/catalog';
+// Generator-derived sources — imported only here (editor) so they stay out of
+// the dashboard runtime bundle.
+import { EJECT_SOURCES } from '../sdk/ui/catalog/eject.generated';
 import { WIDGET_IMPORTS } from '../lib/entityWidgets';
 
 function GalleryCard({
@@ -26,7 +29,8 @@ function GalleryCard({
   pickLabel: string;
 }) {
   const snippet = catalogSnippet(entry, entityId ?? null);
-  const source = catalogSource(entry, entityId ?? null);
+  const source =
+    catalogSourceOverride(entry, entityId ?? null) ?? EJECT_SOURCES[entry.name] ?? null;
   const Preview = entry.Demo;
   const canPreview = canShowCatalogDemo(entry, entityId);
 

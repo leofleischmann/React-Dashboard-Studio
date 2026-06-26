@@ -33,8 +33,13 @@ export function catalogSnippetDisplay(entry: WidgetCatalogEntry): string {
   return typeof entry.snippet === 'string' ? entry.snippet : `<${entry.name} … />`;
 }
 
-/** Editable component source for the "eject" action, or null if none is offered. */
-export function catalogSource(
+/**
+ * Hand-written `source` override for the "eject" action, if a widget ships one.
+ * The automatic, generator-derived sources live in `eject.generated.ts` and are
+ * resolved by the studio gallery (editor-only) so they never weigh down the
+ * dashboard runtime bundle. See `ejectSourceFor`.
+ */
+export function catalogSourceOverride(
   entry: WidgetCatalogEntry,
   entityId: string | null,
 ): string | null {
