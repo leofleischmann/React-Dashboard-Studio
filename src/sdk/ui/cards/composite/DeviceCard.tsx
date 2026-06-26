@@ -1,5 +1,5 @@
-import { callService, useEntity } from '../../../hass/hooks';
-import { euro, isAvailable, num, stateNumber } from '../../../format';
+import { useEntity, useEntityActions } from '../../../hass/hooks';
+import { euro, num, stateNumber } from '../../../format';
 
 /** A power/energy card for a switchable device. */
 export function DeviceCard({
@@ -18,10 +18,9 @@ export function DeviceCard({
   const power = useEntity(powerId);
   const kwh = useEntity(kwhId);
   const cost = useEntity(costId);
-  const sw = useEntity(switchId);
+  const sw = useEntityActions(switchId);
 
   const watts = stateNumber(power) ?? 0;
-  const on = sw?.state === 'on';
   const barPct = Math.min(100, (watts / 150) * 100);
 
   return (
@@ -29,9 +28,9 @@ export function DeviceCard({
       <div className="rd-device__head">
         <span className="rd-device__name">{name}</span>
         <button
-          className={`rd-switch ${on ? 'is-on' : ''}`}
-          disabled={!isAvailable(sw)}
-          onClick={() => callService('switch', 'toggle', { entity_id: switchId })}
+          className={`rd-switch ${sw.isOn ? 'is-on' : ''}`}
+          disabled={!sw.isAvailable}
+          onClick={() => sw.toggle()}
           aria-label={`${name} schalten`}
         >
           <span className="rd-switch__knob" />

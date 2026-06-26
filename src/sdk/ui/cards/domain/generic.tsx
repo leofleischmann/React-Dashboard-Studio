@@ -1,10 +1,10 @@
-import { callService, useEntity } from '../../../hass/hooks';
+import { useEntity, useEntityActions } from '../../../hass/hooks';
 import {
   defaultEntityService,
   entityDomain,
   TOGGLE_DOMAINS,
 } from '../../../entityActions';
-import { isAvailable, num, stateNumber } from '../../../format';
+import { num, stateNumber } from '../../../format';
 
 export function EntityRow({
   entityId,
@@ -15,13 +15,13 @@ export function EntityRow({
   label?: string;
   toggle?: boolean | 'auto';
 }) {
-  const entity = useEntity(entityId);
+  const actions = useEntityActions(entityId);
+  const entity = actions.entity;
   const domain = entityDomain(entityId);
   const name = label ?? entity?.attributes.friendly_name ?? entityId;
   const unit = entity?.attributes.unit_of_measurement;
   const showToggle =
     toggle === 'auto' ? TOGGLE_DOMAINS.has(domain) : toggle;
-  const on = entity?.state === 'on' || entity?.state === 'open' || entity?.state === 'unlocked';
 
   return (
     <div className="rd-card rd-entity-row">
@@ -36,12 +36,10 @@ export function EntityRow({
         </span>
         {showToggle && (
           <button
-            className={`rd-switch ${on ? 'is-on' : ''}`}
-            disabled={!isAvailable(entity)}
+            className={`rd-switch ${actions.isOn ? 'is-on' : ''}`}
+            disabled={!actions.isAvailable}
             aria-label={`${name} schalten`}
-            onClick={() =>
-              callService(domain, defaultEntityService(entityId), { entity_id: entityId })
-            }
+            onClick={() => actions.press()}
           >
             <span className="rd-switch__knob" />
           </button>
@@ -123,7 +121,8 @@ export function ActionButton({
   entityId: string;
   label?: string;
 }) {
-  const entity = useEntity(entityId);
+  const actions = useEntityActions(entityId);
+  const entity = actions.entity;
   const domain = entityDomain(entityId);
   const name = label ?? entity?.attributes.friendly_name ?? entityId;
   const service = defaultEntityService(entityId);
@@ -131,8 +130,8 @@ export function ActionButton({
   return (
     <button
       className="rd-card rd-action-btn"
-      disabled={!isAvailable(entity)}
-      onClick={() => callService(domain, service, { entity_id: entityId })}
+      disabled={!actions.isAvailable}
+      onClick={() => actions.press()}
     >
       <span className="rd-action-btn__name">{name}</span>
       <span className="rd-action-btn__hint">{domain}.{service}</span>
