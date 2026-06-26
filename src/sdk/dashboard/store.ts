@@ -163,7 +163,6 @@ export function clearAllClientIntegrationData(): void {
     for (const key of remove) localStorage.removeItem(key);
   }
   dashboardStore.resetAll();
-  console.log('[Debug dashboard_store]: cleared all client integration data');
 }
 
 const RESET_COUNT_SESSION_KEY = 'homeassistant_dashboard_studio:last_reset_count';
@@ -179,6 +178,5 @@ export function applyFactoryResetCount(resetCount: number): boolean {
   if (resetCount <= prev) return false;
   clearAllClientIntegrationData();
   sessionStorage.setItem(RESET_COUNT_SESSION_KEY, String(resetCount));
-  console.log('[Debug dashboard_store]: applied factory reset count', resetCount);
   return true;
 }

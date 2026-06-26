@@ -126,7 +126,6 @@ export default function Studio() {
   useEffect(() => {
     if (!ready || !loaded || localMode) return;
     return subscribeWorkspaceReset(() => {
-      console.log('[Debug Studio]: integration factory reset — reloading default dashboard');
       clearAllClientIntegrationData();
       clearCompileCache();
       const defaultPath = `/${panelUrlPath('default')}`;

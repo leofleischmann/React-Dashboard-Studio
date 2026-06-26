@@ -7,7 +7,6 @@ import { panelUrlPath } from './workspace';
 export function navigateToProjectPanel(projectId: string): void {
   const path = `/${panelUrlPath(projectId)}`;
   if (window.location.pathname === path) return;
-  console.log('[Debug panelNav]: navigating to', path);
   window.history.pushState(null, '', path);
   window.dispatchEvent(new Event('popstate'));
 }
