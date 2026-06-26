@@ -15,6 +15,7 @@ from .const import (
     WS_TYPE_SAVE_WORKSPACE,
     WS_TYPE_SUBSCRIBE_WORKSPACE,
 )
+from .panels import async_sync_sidebar_panels
 
 
 def async_setup(hass: HomeAssistant) -> None:
@@ -48,6 +49,9 @@ async def ws_save_workspace(hass: HomeAssistant, connection, msg: dict) -> None:
     except ValueError as err:
         connection.send_error(msg["id"], "invalid_workspace", str(err))
         return
+    # Sidebar panels must exist before the client navigates (dispatcher alone is fire-and-forget).
+    workspace = await store.async_get_workspace()
+    await async_sync_sidebar_panels(hass, workspace)
     connection.send_result(msg["id"], {"success": True})
 
 

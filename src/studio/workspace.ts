@@ -4,6 +4,11 @@ export const WORKSPACE_VERSION = 2 as const;
 export const DEFAULT_PROJECT_ID = 'default';
 export const PROJECT_SLUG_RE = /^[a-z][a-z0-9_-]{0,31}$/;
 
+/** Must match `panel_url_path()` in custom_components/.../const.py */
+export function panelUrlPath(projectId: string): string {
+  return `homeassistant_dashboard_studio-${projectId}`;
+}
+
 export type DashboardProject = Project & {
   /** Display name (Home, Kino, …). */
   name: string;
