@@ -1,5 +1,6 @@
 import { hassStore } from '../sdk/hass/store';
 import { applyFactoryResetCount } from '../sdk/dashboard/store';
+import { applyIntegrationSettings } from '../sdk/debug/store';
 import { DEFAULT_PROJECT, blankProject, type Project } from './project';
 import { normalizeWorkspace, withActiveProject, type Workspace } from './workspace';
 
@@ -40,9 +41,11 @@ export async function loadWorkspace(): Promise<Workspace | null> {
     const res = await connection.sendMessagePromise<{
       workspace: unknown;
       reset_count?: number;
+      debug_logs?: boolean;
     }>({
       type: WS_GET,
     });
+    applyIntegrationSettings(res);
     applyFactoryResetCount(res?.reset_count ?? 0);
     const workspace = normalizeWorkspace(res?.workspace);
     return workspace;
@@ -94,8 +97,9 @@ export function subscribeWorkspaceReset(onReset: () => void): () => void {
   let unsub: (() => void) | undefined;
   let skipInitial = true;
   void connection
-    .subscribeMessage<{ workspace: unknown; reset_count?: number }>(
+    .subscribeMessage<{ workspace: unknown; reset_count?: number; debug_logs?: boolean }>(
       (msg) => {
+        applyIntegrationSettings(msg);
         applyFactoryResetCount(msg?.reset_count ?? 0);
         if (skipInitial) {
           skipInitial = false;

@@ -9,6 +9,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import { clearAllClientIntegrationData } from '../sdk/dashboard/store';
+import { useAuthorDebugEnabled, useDebugActive } from '../sdk/debug/hooks';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
 import { projectUsesDefaultDashboardStyles } from '../lib/projectUsesDefaultStyles';
 import { syncDefaultDashboardStyles } from '../mount';
@@ -77,6 +78,8 @@ export default function Studio() {
   const [version, setVersion] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [splitPct, setSplitPct] = useState(46);
+  const [authorDebug, setAuthorDebug] = useAuthorDebugEnabled();
+  const debugActive = useDebugActive();
 
   const splitRef = useRef<HTMLDivElement>(null);
   const changedPathRef = useRef<string | null>(null);
@@ -459,6 +462,18 @@ export default function Studio() {
               onClick={() => setInserterOpen((o) => !o)}
             >
               ⚡ Sensor / Aktion
+            </button>
+            <button
+              type="button"
+              className={`rd-studio__btn ${authorDebug ? 'is-active' : ''}`}
+              title={
+                debugActive
+                  ? 'db.log-Ausgabe aktiv (dein Toggle)'
+                  : 'db.log aus — Toggle an, oder in Integration-Optionen Debug-Logs aktivieren'
+              }
+              onClick={() => setAuthorDebug(!authorDebug)}
+            >
+              🐞 Debug
             </button>
             <span
               className={`rd-studio__status ${error ? 'is-error' : 'is-ok'}`}

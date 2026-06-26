@@ -15,7 +15,7 @@ from .const import (
     WS_TYPE_SAVE_WORKSPACE,
     WS_TYPE_SUBSCRIBE_WORKSPACE,
 )
-from .reset import workspace_message
+from .integration_options import workspace_message
 from .panels import async_sync_sidebar_panels
 
 
