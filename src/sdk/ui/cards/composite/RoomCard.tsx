@@ -1,5 +1,5 @@
-import { callService, useEntity } from '../../../hass/hooks';
-import { isAvailable, num } from '../../../format';
+import { useEntity, useEntityActions } from '../../../hass/hooks';
+import { num } from '../../../format';
 
 /** A climate card for one room. Sensor IDs follow the `sensor_<key>_*` pattern. */
 export function RoomCard({
@@ -15,11 +15,11 @@ export function RoomCard({
   const humidity = useEntity(`sensor.sensor_${sensorKey}_humidity`);
   const lux = useEntity(`sensor.sensor_${sensorKey}_illuminance`);
   const presence = useEntity(`binary_sensor.sensor_${sensorKey}_presence`);
-  const light = useEntity(lightId ?? '');
+  const light = useEntityActions(lightId ?? '');
 
   const occupied = presence?.state === 'on';
-  const lightOn = light?.state === 'on';
-  const lightUsable = isAvailable(light);
+  const lightOn = light.isOn;
+  const lightUsable = light.isAvailable;
 
   return (
     <div className="rd-card rd-room">
@@ -42,7 +42,7 @@ export function RoomCard({
         <button
           className={`rd-pill ${lightOn ? 'is-on' : ''}`}
           disabled={!lightUsable}
-          onClick={() => callService('light', 'toggle', { entity_id: lightId })}
+          onClick={() => light.toggle()}
         >
           {lightUsable ? (lightOn ? 'Licht an' : 'Licht aus') : 'nicht verfügbar'}
         </button>

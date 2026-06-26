@@ -1,4 +1,4 @@
-import { callService, useEntity } from '../../../hass/hooks';
+import { callService, useEntity, useEntityActions } from '../../../hass/hooks';
 import type { CSSProperties } from 'react';
 import { entityDomain } from '../../../entityActions';
 import { entityDisplayName, isAvailable, stateNumber } from '../../../format';
@@ -10,22 +10,18 @@ export function InputBooleanTile({
   entityId: string;
   label?: string;
 }) {
-  const input = useEntity(entityId);
-  const name = label ?? entityDisplayName(input, entityId);
-  const on = input?.state === 'on';
-  const usable = isAvailable(input);
+  const actions = useEntityActions(entityId);
+  const name = label ?? entityDisplayName(actions.entity, entityId);
 
   return (
     <button
       type="button"
-      className={`rd-card rd-bool-tile ${on ? 'is-on' : ''}`}
-      disabled={!usable}
-      onClick={() =>
-        callService('input_boolean', 'toggle', { entity_id: entityId })
-      }
+      className={`rd-card rd-bool-tile ${actions.isOn ? 'is-on' : ''}`}
+      disabled={!actions.isAvailable}
+      onClick={() => actions.toggle()}
     >
       <span className="rd-bool-tile__name">{name}</span>
-      <span className="rd-bool-tile__state">{on ? 'An' : 'Aus'}</span>
+      <span className="rd-bool-tile__state">{actions.isOn ? 'An' : 'Aus'}</span>
     </button>
   );
 }
