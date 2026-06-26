@@ -676,14 +676,37 @@
 }
 .rd-studio__modules {
   flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 6px 12px;
   font-size: 0.72rem;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   color: #9aa0b4;
   background: #181818;
   border-top: 1px solid #2a2a2a;
+}
+.rd-studio__modules-hint {
+  flex: 1 1 auto;
   white-space: nowrap;
   overflow-x: auto;
+  min-width: 0;
+}
+.rd-studio__freeze {
+  flex: 0 0 auto;
+  padding: 3px 9px;
+  border: 1px solid #3a4358;
+  border-radius: 6px;
+  background: #232838;
+  color: #cfe0ff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rd-studio__freeze:hover {
+  border-color: #5a688f;
+  background: #2b3146;
 }
 .rd-studio__divider {
   flex: 0 0 6px;

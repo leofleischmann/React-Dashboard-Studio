@@ -135,33 +135,98 @@ function lastImportEnd(doc: string): number {
   return end;
 }
 
-/** Import lines for symbols the document does not already import, grouped by module. */
-function missingImportLines(eject: EjectInsert, existing: Set<string>): string {
+const parseNames = (inner: string): string[] =>
+  inner.split(',').map((s) => s.trim().replace(/^type\s+/, '')).filter(Boolean);
+
+const addTo = (map: Map<string, Set<string>>, key: string, val: string) => {
+  if (!map.has(key)) map.set(key, new Set());
+  map.get(key)!.add(val);
+};
+
+/** Group import lines into value/type maps by module. */
+function importsByModule(lines: string[]) {
   const value = new Map<string, Set<string>>();
   const type = new Map<string, Set<string>>();
-  for (const line of eject.imports) {
-    const m = line.match(/^import\s+(type\s+)?\{([^}]*)\}\s+from\s+'([^']+)'/);
-    if (!m) continue;
-    const target = m[1] ? type : value;
-    const mod = m[3];
-    for (let n of m[2].split(',')) {
-      n = n.trim().replace(/^type\s+/, '');
-      if (!n || existing.has(n)) continue;
-      if (!target.has(mod)) target.set(mod, new Set());
-      target.get(mod)!.add(n);
-    }
+  for (const line of lines) {
+    const p = parseImportLine(line);
+    if (!p) continue;
+    for (const n of p.names) addTo(p.isType ? type : value, p.module, n);
   }
-  const lines: string[] = [];
-  for (const [mod, names] of value) lines.push(`import { ${[...names].sort().join(', ')} } from '${mod}';`);
-  for (const [mod, names] of type) lines.push(`import type { ${[...names].sort().join(', ')} } from '${mod}';`);
-  return lines.join('\n');
+  return { value, type };
+}
+
+/**
+ * Add missing imports, merging names into an existing same-module import (brace
+ * insertion, preserving multi-line style) instead of appending separate lines.
+ */
+function addMissingImports(
+  doc: string,
+  value: Map<string, Set<string>>,
+  type: Map<string, Set<string>>,
+): string {
+  const existing = existingImportedNames(doc);
+  const stmts: { isType: boolean; module: string; namesStart: number; namesEnd: number }[] = [];
+  for (const m of doc.matchAll(/import\s+(type\s+)?\{([^}]*)\}\s+from\s+'([^']+)';?/g)) {
+    const idx = m.index ?? 0;
+    stmts.push({
+      isType: Boolean(m[1]),
+      module: m[3],
+      namesStart: idx + m[0].indexOf('{') + 1,
+      namesEnd: idx + m[0].lastIndexOf('}'),
+    });
+  }
+  const edits: { start: number; end: number; replacement: string }[] = [];
+  const newLines: string[] = [];
+  const handle = (byMod: Map<string, Set<string>>, isType: boolean) => {
+    for (const [mod, names] of byMod) {
+      const missing = [...names].filter((n) => !existing.has(n));
+      if (missing.length === 0) continue;
+      missing.forEach((n) => existing.add(n));
+      const stmt = stmts.find((s) => s.module === mod && s.isType === isType);
+      if (!stmt) {
+        newLines.push(`import ${isType ? 'type ' : ''}{ ${missing.sort().join(', ')} } from '${mod}';`);
+        continue;
+      }
+      const inner = doc.slice(stmt.namesStart, stmt.namesEnd);
+      if (inner.includes('\n')) {
+        const indent = inner.match(/\n([ \t]+)\S/)?.[1] ?? '  ';
+        const trimmed = inner.replace(/\s*$/, '');
+        const comma = trimmed.endsWith(',') ? '' : ',';
+        edits.push({
+          start: stmt.namesStart,
+          end: stmt.namesEnd,
+          replacement: `${trimmed}${comma}\n${missing.map((n) => indent + n + ',').join('\n')}\n`,
+        });
+      } else {
+        const trimmed = inner.replace(/\s*$/, '').replace(/,$/, '');
+        edits.push({
+          start: stmt.namesStart,
+          end: stmt.namesEnd,
+          replacement: `${trimmed}, ${missing.join(', ')} `,
+        });
+      }
+    }
+  };
+  handle(value, false);
+  handle(type, true);
+
+  let out = doc;
+  for (const e of edits.sort((a, b) => b.start - a.start)) {
+    out = out.slice(0, e.start) + e.replacement + out.slice(e.end);
+  }
+  if (newLines.length) {
+    const pos = lastImportEnd(out);
+    out = out.slice(0, pos) + '\n' + newLines.join('\n') + out.slice(pos);
+  }
+  return out;
 }
 
 export type EjectChange = { from: number; to: number; insert: string };
 
 /**
- * Pure: compute the document edits for an eject insertion at selection [from,to].
- * Returns the change set plus the resulting cursor position (after the usage).
+ * Compute a single full-document replacement for an eject insertion: imports
+ * merged into existing module lines, `<Tag/>` at the cursor, definitions appended
+ * as folded regions (deduped). Returns the change + new cursor position.
  */
 export function computeEjectChanges(
   doc: string,
@@ -169,27 +234,105 @@ export function computeEjectChanges(
   to: number,
   eject: EjectInsert,
 ): { changes: EjectChange[]; selection: number } {
-  const changes: EjectChange[] = [];
+  const { value, type } = importsByModule(eject.imports);
+  const merged = addMissingImports(doc, value, type);
+  const delta = merged.length - doc.length;
 
-  const missing = missingImportLines(eject, existingImportedNames(doc));
-  const importPos = lastImportEnd(doc);
-  let importInsert = '';
-  if (missing) importInsert = importPos > 0 ? `\n${missing}` : `${missing}\n`;
-  if (importInsert) changes.push({ from: importPos, to: importPos, insert: importInsert });
+  const cursor = from + delta;
+  let out = merged.slice(0, cursor) + eject.usage + merged.slice(to + delta);
 
-  // usage replaces the current selection at the cursor
-  changes.push({ from, to, insert: eject.usage });
-
-  // definition regions (primary + cascaded) — skip any already ejected in the file
-  let regionBlock = '';
   for (const def of eject.definitions) {
-    const regionKey = REGION_PREFIX + def.name + REGION_SUFFIX;
-    if (doc.includes(regionKey)) continue;
-    regionBlock += `\n\n${regionKey}\n${def.body.trimEnd()}\n${REGION_END}\n`;
+    const key = REGION_PREFIX + def.name + REGION_SUFFIX;
+    if (out.includes(key)) continue;
+    out = out.replace(/\s*$/, '\n') + `\n${key}\n${def.body.trimEnd()}\n${REGION_END}\n`;
   }
-  if (regionBlock) changes.push({ from: doc.length, to: doc.length, insert: regionBlock });
 
-  const shift = importInsert && importPos <= from ? importInsert.length : 0;
-  const selection = from + shift + eject.usage.length;
-  return { changes, selection };
+  return {
+    changes: [{ from: 0, to: doc.length, insert: out }],
+    selection: cursor + eject.usage.length,
+  };
+}
+
+/** Nested catalog widgets a widget's source imports. */
+function nestedWidgetsOf(name: string): string[] {
+  const out: string[] = [];
+  for (const line of EJECT_SOURCES[name].imports) {
+    const p = parseImportLine(line);
+    if (!p) continue;
+    for (const n of p.names) if (EJECT_SOURCES[n] && n !== name) out.push(n);
+  }
+  return out;
+}
+
+function ejectClosure(seeds: string[]): Set<string> {
+  const S = new Set<string>();
+  const stack = [...seeds];
+  while (stack.length) {
+    const w = stack.pop()!;
+    if (S.has(w) || !EJECT_SOURCES[w]) continue;
+    S.add(w);
+    for (const n of nestedWidgetsOf(w)) if (!S.has(n)) stack.push(n);
+  }
+  return S;
+}
+
+/** Catalog-widget names imported from `@ha/ui` in this file. */
+export function ejectableWidgetsInText(text: string): string[] {
+  const set = new Set<string>();
+  for (const m of text.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+'@ha\/ui';?/g)) {
+    for (const n of parseNames(m[1])) if (EJECT_SOURCES[n]) set.add(n);
+  }
+  return [...set];
+}
+
+function stripHaUiNames(text: string, remove: Set<string>): string {
+  return text.replace(
+    /[ \t]*import\s+(type\s+)?\{([^}]*)\}\s+from\s+'@ha\/ui';?\n?/g,
+    (full, typeKw, inner) => {
+      const names = parseNames(inner);
+      const keep = names.filter((n) => !remove.has(n));
+      if (keep.length === 0) return '';
+      if (keep.length === names.length) return full;
+      return `import ${typeKw ? 'type ' : ''}{ ${keep.join(', ')} } from '@ha/ui';\n`;
+    },
+  );
+}
+
+/**
+ * Freeze a whole file: rewrite every `@ha/ui` widget import into an ejected
+ * #region (full cascade), merging the needed imports. Returns null if the file
+ * has no ejectable `@ha/ui` widgets.
+ */
+export function freezeImports(text: string): { text: string; ejected: string[] } | null {
+  const imported = ejectableWidgetsInText(text);
+  if (imported.length === 0) return null;
+  const S = ejectClosure(imported);
+
+  const value = new Map<string, Set<string>>();
+  const type = new Map<string, Set<string>>();
+  for (const w of S) {
+    for (const line of EJECT_SOURCES[w].imports) {
+      const p = parseImportLine(line);
+      if (!p) continue;
+      for (const n of p.names) {
+        if (EJECT_SOURCES[n]) {
+          if (!S.has(n)) addTo(value, '@ha/ui', n);
+        } else {
+          addTo(p.isType ? type : value, p.module, n);
+        }
+      }
+    }
+  }
+
+  let out = stripHaUiNames(text, S);
+  out = addMissingImports(out, value, type);
+
+  let regions = '';
+  for (const w of S) {
+    const key = REGION_PREFIX + w + REGION_SUFFIX;
+    if (out.includes(key)) continue;
+    regions += `\n\n${key}\n${EJECT_SOURCES[w].body.trimEnd()}\n${REGION_END}\n`;
+  }
+  out = out.replace(/\s*$/, '\n') + regions;
+  return { text: out.replace(/\n{3,}/g, '\n\n'), ejected: [...S] };
 }

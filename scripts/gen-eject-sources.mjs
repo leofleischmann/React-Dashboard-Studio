@@ -96,16 +96,22 @@ function buildNameToFile(files) {
 
 function importedNames(decl) {
   const clause = decl.importClause;
-  if (!clause) return { names: [], hasNamespace: false };
-  const names = [];
+  if (!clause) return { valueNames: [], typeNames: [], hasNamespace: false };
+  const valueNames = [];
+  const typeNames = [];
   let hasNamespace = false;
-  if (clause.name) names.push(clause.name.text); // default import
+  const clauseType = Boolean(clause.isTypeOnly);
+  if (clause.name) valueNames.push(clause.name.text); // default import
   const b = clause.namedBindings;
   if (b) {
     if (ts.isNamespaceImport(b)) hasNamespace = true;
-    else for (const el of b.elements) names.push(el.name.text);
+    else
+      for (const el of b.elements) {
+        // honour per-specifier `type` (e.g. `import { foo, type Bar }`)
+        (el.isTypeOnly || clauseType ? typeNames : valueNames).push(el.name.text);
+      }
   }
-  return { names, hasNamespace, isTypeOnly: Boolean(clause.isTypeOnly) };
+  return { valueNames, typeNames, hasNamespace };
 }
 
 /** All identifier names referenced anywhere inside a node. */
@@ -213,16 +219,20 @@ function ejectComponent(analysis, name, symbolIndex) {
       continue;
     }
     const relative = imp.spec.startsWith('.');
-    for (const n of imp.names) {
-      if (!used.has(n)) continue;
-      const target = imp.isTypeOnly ? typeImports : valueImports;
-      if (!relative) {
-        addImport(target, imp.spec, n);
-        continue;
+    for (const [list, target] of [
+      [imp.valueNames, valueImports],
+      [imp.typeNames, typeImports],
+    ]) {
+      for (const n of list) {
+        if (!used.has(n)) continue;
+        if (!relative) {
+          addImport(target, imp.spec, n);
+          continue;
+        }
+        const alias = symbolIndex.get(n);
+        if (!alias) return { error: `unmapped symbol "${n}" from ${imp.spec}` };
+        addImport(target, alias, n);
       }
-      const alias = symbolIndex.get(n);
-      if (!alias) return { error: `unmapped symbol "${n}" from ${imp.spec}` };
-      addImport(target, alias, n);
     }
   }
 
