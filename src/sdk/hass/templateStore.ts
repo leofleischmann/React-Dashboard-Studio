@@ -51,9 +51,6 @@ class TemplateStore {
       const hadConnection = this.lastConnection !== undefined;
       this.lastConnection = connection;
       if (hadConnection && this.buckets.size > 0) {
-        console.log(
-          '[Debug templateStore]: connection changed, resubscribing active templates',
-        );
         this.resubscribeAll();
       }
     });
@@ -102,30 +99,14 @@ class TemplateStore {
     }
 
     bucket.reactListeners.add(listener);
-    console.log(
-      '[Debug templateStore]: subscribe',
-      key.slice(0, 48),
-      'refs=',
-      bucket.reactListeners.size,
-    );
 
     void this.ensureWsSubscribe(bucket);
 
     return () => {
       bucket!.reactListeners.delete(listener);
-      console.log(
-        '[Debug templateStore]: unsubscribe',
-        key.slice(0, 48),
-        'refs=',
-        bucket!.reactListeners.size,
-      );
       if (bucket!.reactListeners.size === 0) {
         bucket!.wsUnsub?.();
         this.buckets.delete(key);
-        console.log(
-          '[Debug templateStore]: active buckets=',
-          this.buckets.size,
-        );
       }
     };
   }
@@ -191,14 +172,9 @@ class TemplateStore {
 
       bucket.wsUnsub = unsub;
       this.lastConnection = connection;
-      console.log(
-        '[Debug templateStore]: ws subscribed',
-        bucket.key.slice(0, 48),
-      );
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Template-Subscription fehlgeschlagen';
-      console.log('[Debug templateStore]: ws error', message);
       setBucketSnapshot(bucket, {
         status: 'error',
         error: { message, level: 'ERROR' },
@@ -213,19 +189,12 @@ class TemplateStore {
     msg: RenderTemplateMessage,
   ): void {
     if ('error' in msg) {
-      console.log('[Debug templateStore]: template error', msg.error);
       setBucketSnapshot(bucket, {
         status: 'error',
         error: { message: msg.error, level: msg.level },
       });
     } else {
       const value = normalizeTemplateResult(msg.result);
-      console.log(
-        '[Debug templateStore]: template result',
-        value.slice(0, 80),
-        'entities=',
-        msg.listeners?.entities?.length ?? 0,
-      );
       setBucketSnapshot(bucket, {
         status: 'ready',
         result: {

@@ -1,10 +1,17 @@
-import { useRef, type ComponentType, type RefObject } from 'react';
+import { useMemo, useRef, type ComponentType, type RefObject } from 'react';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { availableModules } from '../sdk/runtime';
 import { Editor } from './Editor';
 import { EntityInserter } from './EntityInserter';
 import { FilePanel } from './FilePanel';
 import { Preview } from './Preview';
+import {
+  computeEjectChanges,
+  freezableWidgets,
+  freezeImports,
+  type EjectInsert,
+} from './ejectInsert';
+import { foldAllRegions } from './regionFold';
 import type { Project } from './project';
 
 export type StudioEditorLayoutProps = {
@@ -58,6 +65,47 @@ export default function StudioEditorLayout({
     view.focus();
   };
 
+  // Eject: copy the widget's real source into a folded #region block, drop the
+  // usage tag at the cursor and merge the imports — then collapse the region.
+  const ejectInsert = (eject: EjectInsert) => {
+    const view = cmRef.current?.view;
+    if (!view) return;
+    const { from, to } = view.state.selection.main;
+    const { changes, selection } = computeEjectChanges(
+      view.state.doc.toString(),
+      from,
+      to,
+      eject,
+    );
+    view.dispatch({ changes, selection: { anchor: selection } });
+    foldAllRegions(view);
+    view.focus();
+  };
+
+  // Freeze this file: turn every @ha/ui widget import into an editable eject.
+  const freezable = useMemo(
+    () => freezableWidgets(project.files[activePath] ?? ''),
+    [project.files, activePath],
+  );
+
+  const freezeFile = () => {
+    const view = cmRef.current?.view;
+    if (!view) return;
+    const text = view.state.doc.toString();
+    const result = freezeImports(text);
+    if (!result) return;
+    const ok = window.confirm(
+      `${result.ejected.length} Widget(s) in „${activePath}" einfrieren?\n\n` +
+        `Der Quelltext (${result.ejected.join(', ')}) wird als editierbare ` +
+        `#region-Blöcke eingefügt und die @ha/ui-Importe entfernt. ` +
+        `Nicht automatisch umkehrbar.`,
+    );
+    if (!ok) return;
+    view.dispatch({ changes: { from: 0, to: text.length, insert: result.text } });
+    foldAllRegions(view);
+    view.focus();
+  };
+
   return (
     <div className="rd-studio__split" ref={splitRef}>
       <FilePanel
@@ -74,10 +122,23 @@ export default function StudioEditorLayout({
           ref={cmRef}
           value={project.files[activePath] ?? ''}
           onChange={onContentChange}
+          foldKey={activePath}
         />
         <div className="rd-studio__modules">
-          <code>{activePath}</code> · import aus:{' '}
-          {availableModules.map((m) => `'${m}'`).join(', ')} · oder eigene Dateien (./…)
+          <span className="rd-studio__modules-hint">
+            <code>{activePath}</code> · import aus:{' '}
+            {availableModules.map((m) => `'${m}'`).join(', ')} · oder eigene Dateien (./…)
+          </span>
+          {freezable.length > 0 && (
+            <button
+              type="button"
+              className="rd-studio__freeze"
+              onClick={freezeFile}
+              title={`In editierbare Ejects umwandeln (inkl. verschachtelter): ${freezable.join(', ')}`}
+            >
+              ❄️ {freezable.length} Widget{freezable.length > 1 ? 's' : ''} einfrieren
+            </button>
+          )}
         </div>
       </div>
 
@@ -93,7 +154,11 @@ export default function StudioEditorLayout({
       </div>
 
       {inserterOpen && (
-        <EntityInserter onInsert={insertSnippet} onClose={onCloseInserter} />
+        <EntityInserter
+          onInsert={insertSnippet}
+          onEject={ejectInsert}
+          onClose={onCloseInserter}
+        />
       )}
     </div>
   );

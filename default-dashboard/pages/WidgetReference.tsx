@@ -44,7 +44,9 @@ export function WidgetReference() {
     <>
       <PageHead icon="🧩" module="@ha/ui" title="Widget-Galerie">
         Domain-, Featured- und Composite-Widgets — live mit Entities deiner Installation.
-        Im Studio unter <strong>⚡ Entities → Galerie</strong> zum Kopieren.
+        Im Studio unter <strong>⚡ Entities → Galerie</strong> per <strong>Eject</strong>{' '}
+        einfügen: der Quelltext wird in dein Dashboard kopiert (eingeklappter
+        <code>#region</code>-Block, frei bearbeitbar) — kein Import nötig.
       </PageHead>
 
       <Section title="Domain-Widgets">

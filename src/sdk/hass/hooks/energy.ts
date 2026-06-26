@@ -62,13 +62,6 @@ export function useEnergy(
 
   useEffect(() => {
     if (pending || kwh === undefined) return;
-    console.log(
-      '[Debug useEnergy]:',
-      entityId,
-      period,
-      `${kwh.toFixed(3)} kWh`,
-      `(${points.length} points)`,
-    );
   }, [entityId, period, kwh, pending, points.length]);
 
   return {

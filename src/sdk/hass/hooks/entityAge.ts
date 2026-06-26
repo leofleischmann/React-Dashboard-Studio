@@ -43,12 +43,6 @@ export function useEntityAge(
   useEffect(() => {
     const state = entity?.state;
     if (state === prevStateRef.current) return;
-    console.log(
-      '[Debug useEntityAge]: state changed',
-      entityId,
-      state ?? '–',
-      entity?.last_changed ?? '–',
-    );
     prevStateRef.current = state;
   }, [entityId, entity?.state, entity?.last_changed]);
 

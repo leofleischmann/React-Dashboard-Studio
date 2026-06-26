@@ -57,11 +57,8 @@ export async function fetchWeatherForecast(
 ): Promise<WeatherForecastEntry[]> {
   const connection = hassStore.getHass()?.connection;
   if (!connection) {
-    console.log('[Debug weather]: WebSocket nicht verfügbar');
     return [];
   }
-
-  console.log('[Debug weather]: get_forecasts', entityId, type);
 
   const result = (await connection.sendMessagePromise({
     type: 'call_service',
@@ -74,7 +71,6 @@ export async function fetchWeatherForecast(
 
   const rows = result.response?.[entityId]?.forecast;
   const parsed = parseForecastRows(rows);
-  console.log('[Debug weather]: forecast entries', entityId, parsed.length);
   return parsed;
 }
 

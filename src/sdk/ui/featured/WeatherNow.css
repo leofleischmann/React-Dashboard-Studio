@@ -1,0 +1,80 @@
+.rd-wxn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 20px;
+}
+.rd-wxn--empty {
+  justify-content: center;
+  padding: 18px;
+  color: var(--rd-text-2);
+}
+.rd-wxn__main {
+  flex: 1 1 190px;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rd-wxn__forecast {
+  flex: 2 1 240px;
+  min-width: 0;
+}
+.rd-wxn__hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.rd-wxn__glyph {
+  font-size: 3.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+}
+.rd-wxn__temp {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.rd-wxn__temp small {
+  font-size: 1.2rem;
+  color: var(--rd-text-2);
+}
+.rd-wxn__cond {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  color: var(--rd-text-2);
+  font-weight: 600;
+}
+.rd-wxn__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 8px;
+}
+.rd-wxn__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rd-text) 6%, var(--rd-card-bg));
+  border: 1px solid var(--rd-border);
+}
+.rd-wxn__metric-ico { font-size: 0.9rem; }
+.rd-wxn__metric-val {
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.rd-wxn__metric-label {
+  font-size: 0.66rem;
+  color: var(--rd-text-2);
+}
+
+/* Compact — tighter hero for narrow tiles. */
+.rd-wxn--compact { gap: 12px 14px; }
+.rd-wxn--compact .rd-wxn__main { gap: 10px; }
+.rd-wxn--compact .rd-wxn__glyph { font-size: 2.6rem; }
+.rd-wxn--compact .rd-wxn__temp { font-size: 2.1rem; }
+.rd-wxn--compact .rd-wxn__temp small { font-size: 1rem; }
+.rd-wxn--compact .rd-wxn__metric { padding: 7px 9px; }

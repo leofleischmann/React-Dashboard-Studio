@@ -134,7 +134,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'list_widgets',
-      description: 'List all dashboard widgets with domains and example snippets.',
+      description:
+        'List all dashboard widgets with domains and usage tags. Widgets are added by ejecting their source into the dashboard (no @ha/ui import); the snippet is the usage tag.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -148,7 +149,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'get_widget_snippet',
-      description: 'Get JSX snippet for a widget name or entity_id.',
+      description:
+        'Get the usage tag (<Widget … />) for a widget name or entity_id. In the editor this widget is inserted via eject (its source is copied into the dashboard, no import).',
       inputSchema: {
         type: 'object',
         properties: {

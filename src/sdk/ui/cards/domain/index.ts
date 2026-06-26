@@ -12,7 +12,6 @@ export { ClimateCard, HumidifierCard, WaterHeaterCard, type ClimateCardProps } f
 export { MediaPlayerCard } from './media';
 export { CameraTile } from './camera';
 export { CoverCard } from './cover';
-export { WeatherCard } from './weather';
 export { PersonChip, DeviceTrackerChip } from './presence';
 export { LockCard, AlarmPanel, SirenCard } from './security';
 export { FanCard } from './fan';

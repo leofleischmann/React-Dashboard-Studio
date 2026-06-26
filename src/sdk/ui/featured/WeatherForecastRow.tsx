@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useWeatherForecast } from '../../hass/hooks';
 import { forecastDayLabel, num, temp, weatherIcon } from '../../format';
 
@@ -37,18 +36,6 @@ export function WeatherForecastRow({
 }: WeatherForecastRowProps) {
   const { forecast, loading } = useWeatherForecast(entityId, { days, type });
   const now = new Date();
-
-  useEffect(() => {
-    console.log('[Debug WeatherForecastRow]:', {
-      entityId,
-      days,
-      type,
-      locale,
-      showPrecipitation,
-      compact,
-      count: forecast.length,
-    });
-  }, [entityId, days, type, locale, showPrecipitation, compact, forecast.length]);
 
   if (loading && forecast.length === 0) {
     return (

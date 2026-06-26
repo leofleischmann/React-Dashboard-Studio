@@ -10,6 +10,7 @@ import {
   entityValueSnippet,
 } from '../sdk/entityActions';
 import { entityWidgetSnippet, widgetForDomain } from '../lib/entityWidgets';
+import { ejectForEntity, ejectToText, type EjectInsert } from './ejectInsert';
 import type { HassEntity } from '../sdk/hass/types';
 
 import { WidgetGallery } from './WidgetGallery';
@@ -114,11 +115,14 @@ function EntityRow({
 
 export function EntityInserter({
   onInsert,
+  onEject,
   onClose,
   copyToClipboard = false,
   className = '',
 }: {
   onInsert?: (snippet: string) => void;
+  /** Widget picks eject editable source into the dashboard instead of importing. */
+  onEject?: (eject: EjectInsert) => void;
   onClose: () => void;
   /** Dev preview: copy snippet to clipboard instead of inserting into the editor. */
   copyToClipboard?: boolean;
@@ -158,6 +162,33 @@ export function EntityInserter({
       onInsert?.(snippet);
     },
     [copyToClipboard, onInsert],
+  );
+
+  const handleEject = useCallback(
+    (eject: EjectInsert | null, key: string) => {
+      if (!eject) return;
+      if (copyToClipboard) {
+        const text = ejectToText(eject);
+        void navigator.clipboard.writeText(text).catch(() => {
+          window.prompt('Code manuell kopieren:', text);
+        });
+        if (key.includes('.')) {
+          setCopiedId(key);
+          setCopiedGalleryKey(null);
+        } else {
+          setCopiedGalleryKey(key);
+          setCopiedId(null);
+        }
+        if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = setTimeout(() => {
+          setCopiedId(null);
+          setCopiedGalleryKey(null);
+        }, 1600);
+        return;
+      }
+      onEject?.(eject);
+    },
+    [copyToClipboard, onEject],
   );
 
   useEffect(
@@ -256,7 +287,7 @@ export function EntityInserter({
           copyToClipboard={copyToClipboard}
           copiedKey={copiedGalleryKey}
           pickLabel={pickLabel}
-          onPick={handlePick}
+          onEject={handleEject}
         />
       ) : (
         <>
@@ -288,10 +319,10 @@ export function EntityInserter({
         </p>
       )}
 
-      {mode === 'widget' && !copyToClipboard && (
+      {mode === 'widget' && (
         <p className="rd-inserter__hint">
-          Fügt JSX ein — ggf.{' '}
-          <code>{`import { … } from '@ha/ui'`}</code> ergänzen.
+          Kopiert den Widget-Code in dein Dashboard (eingeklappt, frei
+          bearbeitbar) und setzt das Tag an den Cursor — kein Import nötig.
         </p>
       )}
 
@@ -330,7 +361,11 @@ export function EntityInserter({
                   <EntityRow
                     entity={entity}
                     mode={mode}
-                    onPick={(snippet) => handlePick(snippet, entity.entity_id)}
+                    onPick={(snippet) =>
+                      mode === 'widget'
+                        ? handleEject(ejectForEntity(entity.entity_id), entity.entity_id)
+                        : handlePick(snippet, entity.entity_id)
+                    }
                     copied={copiedId === entity.entity_id}
                     pickLabel={pickLabel}
                   />

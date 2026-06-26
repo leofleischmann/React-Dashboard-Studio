@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type CSSProperties } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import { useDarkMode, useEntity } from '../../hass/hooks';
 import { useTheme } from '../../hass/theme';
 import type { HassEntity } from '../../hass/types';
@@ -142,25 +142,7 @@ export function ValueOrb3D({
   );
   const label = entityDisplayName(entity, entityId);
   const level = intensityLevelLabel(intensity);
-  const rawValue = stateNumber(entity);
   const innerScale = lavaScale(intensity);
-
-  useEffect(() => {
-    console.log('[Debug ValueOrb3D]:', {
-      entityId,
-      raw: rawValue,
-      min,
-      max,
-      curve,
-      color,
-      colors,
-      size,
-      intensity: intensity.toFixed(2),
-      lavaScale: innerScale.toFixed(2),
-      level,
-      renderer: 'css-glass-lava',
-    });
-  }, [entityId, rawValue, min, max, curve, color, colors, size, intensity, innerScale, level]);
 
   const lavaCore = colors?.core ?? color;
   const style = {
