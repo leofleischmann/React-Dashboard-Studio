@@ -45,8 +45,10 @@ export default function Dashboard() {
 > changes or removes can break it. Both work; eject is the update-safe default.
 >
 > Developing with imports and want to *freeze* a file later (e.g. a widget got deprecated)?
-> `npm run eject:imports -- path/to/Page.tsx` rewrites every `@ha/ui` widget import in the
-> given files into editable `#region` blocks (nested widgets cascade). One-way by design.
+> `npm run eject:imports -- <file…>` rewrites `@ha/ui` widget imports in the given files into
+> editable `#region` blocks (imports merged in place, results validated). Pick exactly what
+> to freeze: `--only A,B` / `--except A,B` choose widgets, `--list` shows what's ejectable per
+> file, `--dry` previews. Unselected (nested) widgets stay imports. One-way by design.
 
 | Topic | Notes |
 | --- | --- |
