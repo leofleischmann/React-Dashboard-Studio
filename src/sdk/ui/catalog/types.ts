@@ -10,6 +10,12 @@ export type WidgetCatalogEntry = {
   category?: WidgetCategory;
   domains: string[];
   snippet: string | ((entityId: string) => string);
+  /**
+   * Optional editable source — a complete, self-contained component the user can
+   * drop into their dashboard instead of importing the widget. Powers the
+   * "Quelltext einfügen" (eject) action: full design freedom, no black box.
+   */
+  source?: string | ((entityId: string) => string);
   Demo: ComponentType<{ entityId: string }>;
   pickExample?: (entities: readonly HassEntity[]) => string | undefined;
   /** Standard-Widget im Entity-Inserter für diese Domain. */

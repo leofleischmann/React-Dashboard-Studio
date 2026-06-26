@@ -411,63 +411,6 @@
   cursor: not-allowed;
 }
 
-/* ── Weather card ────────────────────────────────────────── */
-.rd-weather-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.rd-weather-card__name {
-  font-size: 0.82rem;
-  color: var(--rd-text-2);
-}
-.rd-weather-card__main {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.rd-weather-card__icon {
-  font-size: 2.2rem;
-  line-height: 1;
-}
-.rd-weather-card__temp {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-}
-.rd-weather-card__temp small {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--rd-text-2);
-}
-.rd-weather-card__meta {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.82rem;
-  color: var(--rd-text-2);
-  text-transform: capitalize;
-}
-.rd-weather-card--compact {
-  gap: 6px;
-  padding: 10px 12px;
-}
-.rd-weather-card--compact .rd-weather-card__main {
-  gap: 8px;
-}
-.rd-weather-card--compact .rd-weather-card__icon {
-  font-size: 1.4rem;
-}
-.rd-weather-card--compact .rd-weather-card__temp {
-  font-size: 1.25rem;
-}
-.rd-weather-card--compact .rd-weather-card__name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: auto;
-}
-
 /* ── Weather forecast row ─────────────────────────────────── */
 .rd-weather-forecast {
   display: flex;
