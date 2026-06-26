@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useSun, useTime } from '../../hass/hooks';
 import { num } from '../../format';
 import './SunArc.css';
@@ -62,8 +62,10 @@ function clamp01(value: number): number {
 
 const MS_PER_DAY = 86_400_000;
 
+type ArcWindow = { start: Date; end: Date };
+
 /**
- * Today's sunrise/sunset from HA `next_*` attributes.
+ * Today's daylight window (sunrise → sunset) from HA `next_*` attributes.
  * While the sun is up, `next_rising` is tomorrow and `next_setting` is this evening.
  */
 function daylightWindow(
@@ -71,23 +73,48 @@ function daylightWindow(
   rising: Date | undefined,
   setting: Date | undefined,
   isDay: boolean,
-): { rise: Date; set: Date } | null {
-  if (!rising || !setting) return null;
+): ArcWindow | null {
+  if (!isDay || !rising || !setting) return null;
 
   const nowMs = now.getTime();
   let riseMs = rising.getTime();
   let setMs = setting.getTime();
 
-  if (!isDay) return null;
-
   if (riseMs > nowMs) riseMs -= MS_PER_DAY;
   if (setMs < nowMs) setMs += MS_PER_DAY;
   if (setMs <= riseMs) return null;
 
-  return { rise: new Date(riseMs), set: new Date(setMs) };
+  return { start: new Date(riseMs), end: new Date(setMs) };
 }
 
-/** 0 = sunrise (east), 0.5 ≈ noon, 1 = sunset (west) — from time, not azimuth. */
+/**
+ * Tonight's window (last sunset → next sunrise). After sunset HA reports both
+ * `next_rising` and `next_setting` in the future, with the rising first; the
+ * sunset that began this night is therefore one period before `next_setting`.
+ */
+function nightWindow(
+  now: Date,
+  rising: Date | undefined,
+  setting: Date | undefined,
+  isDay: boolean,
+): ArcWindow | null {
+  if (isDay || !rising || !setting) return null;
+
+  const nowMs = now.getTime();
+  const riseMs = rising.getTime();
+  let setMs = setting.getTime();
+
+  // Walk the setting back to the most recent one before now (start of this night).
+  while (setMs > nowMs) setMs -= MS_PER_DAY;
+  if (riseMs <= setMs) return null;
+
+  return { start: new Date(setMs), end: new Date(riseMs) };
+}
+
+/**
+ * 0 = rise (east/left), 0.5 ≈ peak, 1 = set (west/right) — driven by time within
+ * the active daylight or night window, with azimuth as a last-resort fallback.
+ */
 function arcProgress(
   now: Date,
   rising: Date | undefined,
@@ -95,11 +122,13 @@ function arcProgress(
   isDay: boolean,
   azimuth: number,
 ): number {
-  const window = daylightWindow(now, rising, setting, isDay);
+  const window = isDay
+    ? daylightWindow(now, rising, setting, isDay)
+    : nightWindow(now, rising, setting, isDay);
   if (window) {
-    const span = window.set.getTime() - window.rise.getTime();
+    const span = window.end.getTime() - window.start.getTime();
     if (span > 0) {
-      return clamp01((now.getTime() - window.rise.getTime()) / span);
+      return clamp01((now.getTime() - window.start.getTime()) / span);
     }
   }
   return clamp01((azimuth - 90) / 180);
@@ -124,15 +153,29 @@ const STARS: ReadonlyArray<readonly [number, number, number]> = [
   [0.92, 0.28, 0.7],
 ];
 
-function MoonDisc({ phase, r }: { phase: number; r: number }) {
-  const illum = phase <= 0.5 ? phase * 2 : (1 - phase) * 2;
-  const waxing = phase <= 0.5;
-  const offset = (1 - illum) * r * 1.35 * (waxing ? 1 : -1);
+/**
+ * Geometrically faithful moon phase: a dark disc with the lit portion drawn as
+ * a limb semicircle joined to the terminator (a semi-ellipse whose width tracks
+ * the illuminated fraction). `phase` runs 0 (new) → 0.5 (full) → 1 (new again).
+ */
+function MoonDisc({ phase, r, flip = false }: { phase: number; r: number; flip?: boolean }) {
+  const angle = 2 * Math.PI * phase;
+  const cos = Math.cos(angle);
+  const rx = r * Math.abs(cos); // terminator half-width: r at new/full, 0 at quarters
+  // Northern hemisphere is lit on the right while waxing; southern is mirrored.
+  const waxing = flip ? phase >= 0.5 : phase < 0.5;
+  const gibbous = cos < 0; // illuminated fraction > 0.5
+
+  const limbSweep = waxing ? 1 : 0;
+  const termSweep = gibbous ? limbSweep : 1 - limbSweep;
+
+  const lit = `M 0 ${-r} A ${r} ${r} 0 0 ${limbSweep} 0 ${r} A ${rx} ${r} 0 0 ${termSweep} 0 ${-r} Z`;
 
   return (
     <g className="rd-sunarc__moon">
-      <circle r={r} className="rd-sunarc__moon-body" />
-      <circle r={r} cx={offset} className="rd-sunarc__moon-shadow" />
+      <circle r={r} className="rd-sunarc__moon-shadow" />
+      <path d={lit} className="rd-sunarc__moon-body" />
+      <circle r={r} className="rd-sunarc__moon-rim" />
     </g>
   );
 }
@@ -184,23 +227,6 @@ export function SunArc({
   const golden = isGoldenHour(elevation, isDay);
   const phase = moonPhase(now);
 
-  useEffect(() => {
-    const window = daylightWindow(now, sun.rising, sun.setting, isDay);
-    const tAzimuth = clamp01((azimuth - 90) / 180);
-    console.log('[Debug SunArc]:', {
-      elevation,
-      azimuth,
-      isDay,
-      arcT: t.toFixed(3),
-      arcTAzimuth: tAzimuth.toFixed(3),
-      arcTTime: window
-        ? clamp01((now.getTime() - window.rise.getTime()) / (window.set.getTime() - window.rise.getTime())).toFixed(3)
-        : null,
-      rising: sun.rising?.toISOString(),
-      setting: sun.setting?.toISOString(),
-    });
-  }, [elevation, azimuth, isDay, t, now, sun.rising, sun.setting]);
-
   const arc =
     hemisphere === 'south'
       ? `M ${cx - r} ${cy} A ${r} ${r} 0 0 0 ${cx + r} ${cy}`
@@ -220,18 +246,6 @@ export function SunArc({
     if (h > 0) return `Aufgang in ${h}h ${m}min`;
     return `Aufgang in ${m} min`;
   }, [isDay, sun.rising, now]);
-
-  useEffect(() => {
-    console.log('[Debug SunArc]:', {
-      entityId,
-      size,
-      isDay,
-      elevation,
-      showStars,
-      showMoon,
-      showRemaining,
-    });
-  }, [entityId, size, isDay, elevation, showStars, showMoon, showRemaining]);
 
   const footer = daylightLeft ?? nightUntilRise;
 
@@ -290,6 +304,7 @@ export function SunArc({
                 cy={y * H}
                 r={size}
                 className="rd-sunarc__star"
+                style={{ animationDelay: `${(i % 5) * 0.7}s` }}
               />
             ))}
 
@@ -335,7 +350,7 @@ export function SunArc({
                 )}
               </>
             ) : showMoon ? (
-              <MoonDisc phase={phase} r={8} />
+              <MoonDisc phase={phase} r={8} flip={hemisphere === 'south'} />
             ) : (
               <circle r={6} className="rd-sunarc__body" />
             )}
