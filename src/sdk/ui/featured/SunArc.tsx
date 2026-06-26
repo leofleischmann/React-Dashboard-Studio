@@ -28,6 +28,12 @@ export type SunArcProps = {
   size?: 'compact' | 'default';
   /** Highlight the portion of the arc already travelled (default true). */
   showProgress?: boolean;
+  /** Master switch for the whole data row below the arc (default true). */
+  showLabels?: boolean;
+  /** Show the sunrise read-out in the data row (default true). */
+  showRise?: boolean;
+  /** Show the sunset read-out in the data row (default true). */
+  showSet?: boolean;
   /** Show the central elevation read-out (default true). */
   showElevation?: boolean;
   /** Master switch for subtle motion — twinkle, ray spin, glides (default true). */
@@ -202,6 +208,9 @@ export function SunArc({
   showRemaining = true,
   size = 'default',
   showProgress = true,
+  showLabels = true,
+  showRise = true,
+  showSet = true,
   showElevation = true,
   animated = true,
   accentColor,
@@ -263,6 +272,7 @@ export function SunArc({
   }, [isDay, sun.rising, now]);
 
   const footer = daylightLeft ?? nightUntilRise;
+  const labelCols = [showRise, showElevation, showSet].filter(Boolean).length;
 
   const rootClass = [
     'rd-sunarc',
@@ -397,26 +407,32 @@ export function SunArc({
         </g>
       </svg>
 
-      <div className="rd-sunarc__labels">
-        <div>
-          <span className="rd-sunarc__ico">↑</span>
-          <strong>{formatSunEvent(sun.rising, now, locale)}</strong>
-          <small>{riseLabel}</small>
+      {showLabels && labelCols > 0 && (
+        <div className={`rd-sunarc__labels${labelCols === 1 ? ' rd-sunarc__labels--single' : ''}`}>
+          {showRise && (
+            <div>
+              <span className="rd-sunarc__ico">↑</span>
+              <strong>{formatSunEvent(sun.rising, now, locale)}</strong>
+              <small>{riseLabel}</small>
+            </div>
+          )}
+          {showElevation && (
+            <div className="rd-sunarc__elev">
+              <strong>{num(sun.elevation)}°</strong>
+              <small title={`Azimut ${num(sun.azimuth)}°`}>
+                {isDay ? elevDayLabel : elevNightLabel}
+              </small>
+            </div>
+          )}
+          {showSet && (
+            <div>
+              <span className="rd-sunarc__ico">↓</span>
+              <strong>{formatSunEvent(sun.setting, now, locale)}</strong>
+              <small>{setLabel}</small>
+            </div>
+          )}
         </div>
-        {showElevation && (
-          <div className="rd-sunarc__elev">
-            <strong>{num(sun.elevation)}°</strong>
-            <small title={`Azimut ${num(sun.azimuth)}°`}>
-              {isDay ? elevDayLabel : elevNightLabel}
-            </small>
-          </div>
-        )}
-        <div>
-          <span className="rd-sunarc__ico">↓</span>
-          <strong>{formatSunEvent(sun.setting, now, locale)}</strong>
-          <small>{setLabel}</small>
-        </div>
-      </div>
+      )}
 
       {showRemaining && footer && <p className="rd-sunarc__remaining">{footer}</p>}
     </div>

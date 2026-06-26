@@ -81,6 +81,7 @@
   gap: 6px;
   margin-top: 4px;
 }
+.rd-sunarc__labels--single { justify-content: center; }
 .rd-sunarc__labels > div {
   display: flex;
   flex-direction: column;
