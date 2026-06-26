@@ -7,6 +7,7 @@ import * as hassApi from './hass/hooks';
 import * as ui from './ui/index';
 import * as layout from './ui/layout';
 import * as format from './format';
+import * as debug from './debug';
 
 export const registry: Record<string, unknown> = {
   react: React,
@@ -15,6 +16,7 @@ export const registry: Record<string, unknown> = {
   '@ha/ui': ui,
   '@ha/layout': layout,
   '@ha/format': format,
+  '@ha/debug': debug,
 };
 
 /** Names available to `import` — surfaced in the editor UI as a cheat sheet. */

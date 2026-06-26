@@ -14,6 +14,21 @@
   "options": {
     "step": {
       "init": {
+        "title": "Dashboard Studio",
+        "description": "Debug logging for dashboard authors or a full factory reset.",
+        "menu_options": {
+          "debug": "Debug logs",
+          "reset": "Factory reset"
+        }
+      },
+      "debug": {
+        "title": "Debug logs",
+        "description": "Allows `db.log` / `db.warn` from dashboard code in the browser console. Each author can also use the 🐞 toggle in the editor.\n\nWithout this option the console stays quiet in production (even if `db.*` is in the code).",
+        "data": {
+          "debug_logs": "Enable debug logs for dashboards"
+        }
+      },
+      "reset": {
         "title": "Reset integration (factory defaults)",
         "description": "Resets **everything** as if the integration were freshly installed:\n\n- All saved dashboards and code (global, all users)\n- Extra sidebar entries\n- Browser data for this integration (e.g. `usePersistentState`)\n\nYou keep **one** default dashboard with the bundled example. The integration itself stays configured.\n\n**Note:** Unsaved editor changes are lost. Open dashboard tabs reload automatically afterwards.",
         "data": {

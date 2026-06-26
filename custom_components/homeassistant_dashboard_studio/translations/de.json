@@ -14,6 +14,21 @@
   "options": {
     "step": {
       "init": {
+        "title": "Dashboard Studio",
+        "description": "Debug-Logs für Dashboard-Entwickler oder komplette Werkseinstellung.",
+        "menu_options": {
+          "debug": "Debug-Logs",
+          "reset": "Werkseinstellung"
+        }
+      },
+      "debug": {
+        "title": "Debug-Logs",
+        "description": "Erlaubt `db.log` / `db.warn` aus Dashboard-Code in der Browser-Konsole. Jeder Entwickler kann zusätzlich im Editor den 🐞-Toggle nutzen.\n\nOhne diese Option bleibt die Konsole in Produktion stumm (auch wenn `db.*` im Code steht).",
+        "data": {
+          "debug_logs": "Debug-Logs für Dashboards aktivieren"
+        }
+      },
+      "reset": {
         "title": "Integration zurücksetzen (Werkseinstellung)",
         "description": "Setzt **alles** zurück, als wäre die Integration frisch installiert:\n\n- Alle gespeicherten Dashboards und Code (global, für alle Nutzer)\n- Zusätzliche Sidebar-Einträge\n- Browser-Daten der Integration (z. B. `usePersistentState`)\n\nEs bleibt **ein** Standard-Dashboard mit dem mitgelieferten Beispiel. Die Integration selbst bleibt eingerichtet.\n\n**Hinweis:** Nicht gespeicherte Editor-Änderungen gehen verloren. Offene Dashboard-Tabs laden danach automatisch neu.",
         "data": {
