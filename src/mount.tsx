@@ -20,12 +20,10 @@ export function syncDefaultDashboardStyles(shadow: ShadowRoot, enabled: boolean)
     style.id = DEFAULT_DASHBOARD_STYLE_ID;
     style.textContent = defaultDashboardCss;
     shadow.appendChild(style);
-    console.log('[Debug mount]: default-dashboard CSS injected');
     return;
   }
   existing?.remove();
   if (existing) {
-    console.log('[Debug mount]: default-dashboard CSS removed');
   }
 }
 

@@ -221,10 +221,6 @@ function CameraTile({
 
   const src = cameraProxyUrl(entityId, tick);
 
-  useEffect(() => {
-    console.log('[Debug CameraTile]:', { entityId, refreshSec, fit, enlargeOnClick });
-  }, [entityId, refreshSec, fit, enlargeOnClick]);
-
   const img = (
     <img
       className="rd-camera__img"
@@ -252,7 +248,7 @@ function CameraTile({
       )}
     </div>
   );
-}`},CircularProgress:{imports:["import { pct } from '@ha/format';","import { useEffect } from 'react';"],body:`type CircularProgressProps = {
+}`},CircularProgress:{imports:["import { pct } from '@ha/format';"],body:`type CircularProgressProps = {
   value: number;
   max?: number;
   size?: number;
@@ -299,16 +295,6 @@ function CircularProgress({
   const ratio = Math.min(1, Math.max(0, value / span));
   const ringColor = resolveRingColor(value, color, warningBelow, criticalBelow);
 
-  useEffect(() => {
-    console.log('[Debug CircularProgress]:', {
-      value,
-      max,
-      ratio: ratio.toFixed(2),
-      ringColor,
-      warningBelow,
-      criticalBelow,
-    });
-  }, [value, max, ratio, ringColor, warningBelow, criticalBelow]);
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
   const dash = ratio * circumference;
@@ -353,7 +339,7 @@ function CircularProgress({
       {label ? <span className="rd-circular__label">{label}</span> : null}
     </div>
   );
-}`},ClimateCard:{imports:["import { callService, useEntity } from '@ha';","import { isAvailable, num } from '@ha/format';","import { useEffect } from 'react';"],body:`type ClimateCardProps = {
+}`},ClimateCard:{imports:["import { callService, useEntity } from '@ha';","import { isAvailable, num } from '@ha/format';"],body:`type ClimateCardProps = {
   entityId: string;
   label?: string;
   /** Show target temperature (default true). */
@@ -379,19 +365,6 @@ function ClimateCard({
   const current = climate?.attributes.current_temperature;
   const target = climate?.attributes.temperature;
   const mode = climate?.attributes.hvac_mode ?? climate?.state;
-
-  useEffect(() => {
-    console.log('[Debug ClimateCard]:', {
-      entityId,
-      showTarget,
-      showMode,
-      showToggle,
-      compact,
-      current,
-      target,
-      mode,
-    });
-  }, [entityId, showTarget, showMode, showToggle, compact, current, target, mode]);
 
   return (
     <div className={\`rd-card rd-climate\${compact ? ' rd-climate--compact' : ''}\`}>
@@ -979,7 +952,7 @@ function LightTile({
       )}
     </button>
   );
-}`},LiveClock:{imports:["import { useEffect, useMemo } from 'react';","import { useTime } from '@ha';"],body:`type LiveClockProps = {
+}`},LiveClock:{imports:["import { useMemo } from 'react';","import { useTime } from '@ha';"],body:`type LiveClockProps = {
   /** IANA timezone, e.g. \`Europe/Berlin\` (default: browser local). */
   timeZone?: string;
   /** BCP 47 locale (default \`de-DE\`). */
@@ -1036,10 +1009,6 @@ function LiveClock({
   const time = now.toLocaleTimeString(locale, timeOpts);
   const sec = now.toLocaleTimeString(locale, secOpts);
   const date = now.toLocaleDateString(locale, dateOpts);
-
-  useEffect(() => {
-    console.log('[Debug LiveClock]:', { timeZone, locale, showSeconds, hour12, showDate, size });
-  }, [timeZone, locale, showSeconds, hour12, showDate, size]);
 
   return (
     <div className={\`rd-clock\${size === 'compact' ? ' rd-clock--compact' : ''}\`}>
@@ -1152,7 +1121,7 @@ function LockCard({
       )}
     </div>
   );
-}`},Minitimeline:{imports:["import { entityDisplayNameForId, relativeTime, stateLabel } from '@ha/format';","import { useEffect } from 'react';","import { useLogbook } from '@ha';"],body:`type MinitimelineProps = {
+}`},Minitimeline:{imports:["import { entityDisplayNameForId, relativeTime, stateLabel } from '@ha/format';","import { useLogbook } from '@ha';"],body:`type MinitimelineProps = {
   /** Filter to one entity. */
   entityId?: string;
   /** Filter to a domain, e.g. \`binary_sensor\`. */
@@ -1212,18 +1181,6 @@ function Minitimeline({
     hours,
     limit,
   });
-
-  useEffect(() => {
-    console.log('[Debug Minitimeline]:', {
-      entityId,
-      domain,
-      hours,
-      limit,
-      timeFormat,
-      showRelativeHint,
-      count: entries.length,
-    });
-  }, [entityId, domain, hours, limit, timeFormat, showRelativeHint, entries.length]);
 
   return (
     <div className="rd-card rd-minitimeline">
@@ -2680,7 +2637,7 @@ function VacuumCard({
       </div>
     </div>
   );
-}`},ValueOrb3D:{imports:["import type { HassEntity } from '@ha';","import { CSSProperties, useEffect, useMemo } from 'react';","import { entityDisplayName, num, power, stateNumber } from '@ha/format';","import { useDarkMode, useEntity, useTheme } from '@ha';"],body:`type OrbCurve = 'linear' | 'sqrt';
+}`},ValueOrb3D:{imports:["import type { HassEntity } from '@ha';","import { CSSProperties, useMemo } from 'react';","import { entityDisplayName, num, power, stateNumber } from '@ha/format';","import { useDarkMode, useEntity, useTheme } from '@ha';"],body:`type OrbCurve = 'linear' | 'sqrt';
 
 /** Map a numeric reading to orb intensity 0…1 (with a small floor for visibility). */
 function mapToIntensity(
@@ -2786,25 +2743,7 @@ function ValueOrb3D({
   );
   const label = entityDisplayName(entity, entityId);
   const level = intensityLevelLabel(intensity);
-  const rawValue = stateNumber(entity);
   const innerScale = lavaScale(intensity);
-
-  useEffect(() => {
-    console.log('[Debug ValueOrb3D]:', {
-      entityId,
-      raw: rawValue,
-      min,
-      max,
-      curve,
-      color,
-      colors,
-      size,
-      intensity: intensity.toFixed(2),
-      lavaScale: innerScale.toFixed(2),
-      level,
-      renderer: 'css-glass-lava',
-    });
-  }, [entityId, rawValue, min, max, curve, color, colors, size, intensity, innerScale, level]);
 
   const lavaCore = colors?.core ?? color;
   const style = {

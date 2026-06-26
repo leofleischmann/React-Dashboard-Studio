@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { callService, useEntity } from '../../../hass/hooks';
 import { entityDisplayName, isAvailable, num, pct, stateLabel, temp } from '../../../format';
 
@@ -28,19 +27,6 @@ export function ClimateCard({
   const current = climate?.attributes.current_temperature;
   const target = climate?.attributes.temperature;
   const mode = climate?.attributes.hvac_mode ?? climate?.state;
-
-  useEffect(() => {
-    console.log('[Debug ClimateCard]:', {
-      entityId,
-      showTarget,
-      showMode,
-      showToggle,
-      compact,
-      current,
-      target,
-      mode,
-    });
-  }, [entityId, showTarget, showMode, showToggle, compact, current, target, mode]);
 
   return (
     <div className={`rd-card rd-climate${compact ? ' rd-climate--compact' : ''}`}>

@@ -24,6 +24,14 @@ jobs:
 
       - run: npm ci
 
+      - name: No leftover debug logs
+        shell: bash
+        run: |
+          if grep -rn "\[Debug" src/ default-dashboard/; then
+            echo "::error::Leftover [Debug ...] logging found. Remove it before release."
+            exit 1
+          fi
+
       - name: Verify committed bundle filenames match manifest version
         shell: bash
         run: |
@@ -57,6 +65,16 @@ jobs:
             echo "::error::defaultProject.generated.ts is stale."
             echo "Run 'npm run embed:default' and commit the result."
             git --no-pager diff --stat -- src/studio/defaultProject.generated.ts
+            exit 1
+          fi
+
+      - name: Verify generated eject sources are up to date
+        shell: bash
+        run: |
+          if ! git diff --quiet -- src/sdk/ui/catalog/eject.generated.ts; then
+            echo "::error::eject.generated.ts is stale."
+            echo "Run 'npm run gen:eject-sources' and commit the result."
+            git --no-pager diff --stat -- src/sdk/ui/catalog/eject.generated.ts
             exit 1
           fi
 

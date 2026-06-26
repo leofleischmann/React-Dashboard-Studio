@@ -78,12 +78,6 @@ export function useLogbook(options: UseLogbookOptions = {}): UseLogbookResult {
 
   useEffect(() => {
     if (loading) return;
-    console.log(
-      '[Debug useLogbook]:',
-      queryKey,
-      entries.length,
-      'entries',
-    );
   }, [queryKey, entries.length, loading]);
 
   return { entries, loading };

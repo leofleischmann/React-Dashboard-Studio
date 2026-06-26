@@ -37,10 +37,6 @@ export function CameraTile({
 
   const src = cameraProxyUrl(entityId, tick);
 
-  useEffect(() => {
-    console.log('[Debug CameraTile]:', { entityId, refreshSec, fit, enlargeOnClick });
-  }, [entityId, refreshSec, fit, enlargeOnClick]);
-
   const img = (
     <img
       className="rd-camera__img"

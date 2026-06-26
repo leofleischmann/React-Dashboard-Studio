@@ -56,7 +56,6 @@ export async function fetchLogbook(query: LogbookQuery = {}): Promise<LogbookEnt
 
   const callApi = hassStore.getHass()?.callApi;
   if (typeof callApi !== 'function') {
-    console.log('[Debug logbook]: callApi nicht verfügbar');
     return [];
   }
 
@@ -66,7 +65,6 @@ export async function fetchLogbook(query: LogbookQuery = {}): Promise<LogbookEnt
   if (query.entityId) params.set('entity', query.entityId);
 
   const path = `logbook/${encodeURIComponent(start.toISOString())}?${params.toString()}`;
-  console.log('[Debug logbook]: fetch', path, query.domain ? `domain=${query.domain}` : '');
 
   const data = await callApi('GET', path);
   let entries = parseLogbookRows(data);

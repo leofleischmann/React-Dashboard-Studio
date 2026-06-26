@@ -80,13 +80,6 @@ export function useWeatherForecast(
 
   useEffect(() => {
     if (loading || !entityId) return;
-    console.log(
-      '[Debug useWeatherForecast]:',
-      entityId,
-      type,
-      forecast.length,
-      'entries shown',
-    );
   }, [entityId, type, forecast.length, loading]);
 
   return { forecast, loading, type };

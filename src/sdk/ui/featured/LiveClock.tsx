@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTime } from '../../hass/hooks';
 import './LiveClock.css';
 
@@ -59,10 +59,6 @@ export function LiveClock({
   const time = now.toLocaleTimeString(locale, timeOpts);
   const sec = now.toLocaleTimeString(locale, secOpts);
   const date = now.toLocaleDateString(locale, dateOpts);
-
-  useEffect(() => {
-    console.log('[Debug LiveClock]:', { timeZone, locale, showSeconds, hour12, showDate, size });
-  }, [timeZone, locale, showSeconds, hour12, showDate, size]);
 
   return (
     <div className={`rd-clock${size === 'compact' ? ' rd-clock--compact' : ''}`}>

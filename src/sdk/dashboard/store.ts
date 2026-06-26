@@ -13,7 +13,6 @@ function readStorage<T>(scope: string, key: string): T | undefined {
     if (raw === null) return undefined;
     return JSON.parse(raw) as T;
   } catch (err) {
-    console.log('[Debug dashboardStore]: localStorage parse failed', key, err);
     return undefined;
   }
 }
@@ -23,7 +22,6 @@ function writeStorage(scope: string, key: string, value: unknown): void {
   try {
     localStorage.setItem(storageKey(scope, key), JSON.stringify(value));
   } catch (err) {
-    console.log('[Debug dashboardStore]: localStorage write failed', key, err);
   }
 }
 
@@ -48,7 +46,6 @@ class DashboardStore {
 
   setScope(scope: string): void {
     if (scope === this.scope) return;
-    console.log('[Debug dashboardStore]: scope changed', this.scope, '->', scope);
     this.scope = scope;
     this.memory.clear();
     this.persistentLoaded.clear();
@@ -130,12 +127,6 @@ class DashboardStore {
       this.persistentLoaded.add(key);
       writeStorage(this.scope, key, value);
     }
-    console.log(
-      '[Debug dashboardStore]: set',
-      key,
-      persistent ? '(persistent)' : '(memory)',
-      value,
-    );
     this.notify(key);
   }
 
