@@ -6,6 +6,7 @@ import { CameraTile } from '../cards/domain';
 import { ValueOrb3D, suggestOrbRange } from '../featured/ValueOrb3D';
 import { LiveClock } from '../featured/LiveClock';
 import { WeatherForecastRow } from '../featured/WeatherForecastRow';
+import { WeatherNow } from '../featured/WeatherNow';
 import { Minitimeline } from '../featured/Minitimeline';
 import { SparkChart } from '../charts';
 import { CircularProgress } from '../CircularProgress';
@@ -99,6 +100,10 @@ export function WeatherForecastRowDemo({ entityId }: { entityId: string }) {
       showPrecipitation
     />
   );
+}
+
+export function WeatherNowDemo({ entityId }: { entityId: string }) {
+  return <WeatherNow entityId={entityId} locale="de-DE" forecastDays={5} />;
 }
 
 export function MinitimelineDemo({ entityId }: { entityId: string }) {

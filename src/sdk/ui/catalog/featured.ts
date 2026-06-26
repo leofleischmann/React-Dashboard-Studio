@@ -5,6 +5,7 @@ import {
   pickNumericSensorEntity,
   ValueOrb3DDemo,
   WeatherForecastRowDemo,
+  WeatherNowDemo,
 } from './demos';
 import { SunArc } from '../featured/SunArc';
 
@@ -37,6 +38,16 @@ export const FEATURED_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     optionalEntity: true,
     snippet: '<LiveClock showSeconds locale="de-DE" size="default" />',
     Demo: LiveClockDemo,
+  },
+  {
+    name: 'WeatherNow',
+    label: 'Wetter aktuell',
+    category: 'featured',
+    domains: ['weather'],
+    inserterDefault: true,
+    snippet: (id) =>
+      `<WeatherNow entityId="${id}" locale="de-DE" forecastDays={5} showMetrics showForecast />`,
+    Demo: WeatherNowDemo,
   },
   {
     name: 'WeatherForecastRow',
