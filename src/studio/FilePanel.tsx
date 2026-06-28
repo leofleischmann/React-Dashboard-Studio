@@ -1,67 +1,8 @@
 import { useState, type DragEvent as ReactDragEvent } from 'react';
 import { blankProject, newFileTemplate } from './project';
 import { downloadZip } from './zip';
-
-function normalize(input: string): string {
-  let p = input.trim().replace(/^\/+/, '');
-  if (!/\.(tsx?|jsx?)$/.test(p)) p += '.tsx';
-  return p;
-}
-
-const basename = (p: string) => p.split('/').pop() ?? p;
-
-const folderPrefix = (dir: string) => `${dir}/`;
-
-function pathsInFolder(files: Record<string, string>, dirPath: string): string[] {
-  const prefix = folderPrefix(dirPath);
-  return Object.keys(files).filter((p) => p.startsWith(prefix));
-}
-
-function remapDirPath(path: string, oldDir: string, newDir: string): string {
-  const prefix = folderPrefix(oldDir);
-  if (path === oldDir || path.startsWith(prefix)) {
-    return newDir + path.slice(oldDir.length);
-  }
-  return path;
-}
-
-// ── Folder tree from flat paths ──────────────────────────────────────────────
-type FileNode = { kind: 'file'; name: string; path: string };
-type DirNode = { kind: 'dir'; name: string; path: string; children: TreeNode[] };
-type TreeNode = FileNode | DirNode;
-
-function buildTree(paths: string[]): TreeNode[] {
-  const root: TreeNode[] = [];
-  const dirs = new Map<string, DirNode>();
-  for (const full of paths) {
-    const segs = full.split('/');
-    let level = root;
-    let prefix = '';
-    for (let i = 0; i < segs.length; i++) {
-      const seg = segs[i];
-      prefix = prefix ? `${prefix}/${seg}` : seg;
-      if (i === segs.length - 1) {
-        level.push({ kind: 'file', name: seg, path: full });
-      } else {
-        let dir = dirs.get(prefix);
-        if (!dir) {
-          dir = { kind: 'dir', name: seg, path: prefix, children: [] };
-          dirs.set(prefix, dir);
-          level.push(dir);
-        }
-        level = dir.children;
-      }
-    }
-  }
-  const sort = (nodes: TreeNode[]) => {
-    nodes.sort((a, b) =>
-      a.kind === b.kind ? a.name.localeCompare(b.name) : a.kind === 'dir' ? -1 : 1,
-    );
-    for (const n of nodes) if (n.kind === 'dir') sort(n.children);
-  };
-  sort(root);
-  return root;
-}
+import { basename, folderPrefix, normalize, pathsInFolder, remapDirPath } from './filePaths';
+import { buildTree, type TreeNode } from './fileTree';
 
 export function FilePanel({
   files,
