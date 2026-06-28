@@ -1,6 +1,7 @@
 // Shared Sucrase compile check for virtual dashboard projects (CI + sync:pull).
 
 import { transform } from 'sucrase';
+import { extractImports, resolveModule } from '../src/studio/moduleResolve.mjs';
 
 // Mirror of the module manifest (src/sdk/modules.ts). Kept in sync by
 // tests/sdk-modules.test.ts, which fails if this set drifts from the manifest.
@@ -14,40 +15,12 @@ const REGISTRY = new Set([
   '@ha/debug',
 ]);
 
-const RESOLVE_EXTS = ['', '.tsx', '.ts', '.jsx', '.js', '/index.tsx', '/index.ts'];
-
-function dirname(path) {
-  const i = path.lastIndexOf('/');
-  return i === -1 ? '' : path.slice(0, i);
-}
-
-function joinPath(base, rel) {
-  const parts = base ? base.split('/') : [];
-  for (const seg of rel.split('/')) {
-    if (seg === '' || seg === '.') continue;
-    if (seg === '..') parts.pop();
-    else parts.push(seg);
-  }
-  return parts.join('/');
-}
-
 function resolve(files, importer, request) {
-  if (REGISTRY.has(request)) return request;
-  const base = request.startsWith('.')
-    ? joinPath(dirname(importer), request)
-    : request;
-  for (const ext of RESOLVE_EXTS) {
-    if (base + ext in files) return base + ext;
+  const resolved = resolveModule(files, importer, request, (r) => REGISTRY.has(r));
+  if (resolved === null) {
+    throw new Error(`Unresolved import '${request}' in ${importer}`);
   }
-  throw new Error(`Unresolved import '${request}' in ${importer}`);
-}
-
-function extractImports(source) {
-  const re = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
-  const out = [];
-  let m;
-  while ((m = re.exec(source)) !== null) out.push(m[1]);
-  return out;
+  return resolved;
 }
 
 /**
