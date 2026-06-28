@@ -17,10 +17,11 @@
   flex-direction: column;
   min-height: 100%;
   height: 100%;
-  /* Edge-to-edge shell; content gutter lives on .rd-page-shell__main (layout.css).
-     Optional inset: --rd-shell-pad-y/x on .rd-root or .rd-root--inset */
+  /* Edge-to-edge shell; content gutter via --rd-content-pad-* (layout.css).
+     Override on .rd-root / .hm-root / .rd-dd — or use .rd-root--inset for outer inset. */
   --rd-shell-pad-y: 0px;
   --rd-shell-pad-x: 0px;
+  --rd-content-pad: 12px;
   padding:
     max(var(--rd-shell-pad-y), env(safe-area-inset-top, 0px))
     max(var(--rd-shell-pad-x), env(safe-area-inset-right, 0px))

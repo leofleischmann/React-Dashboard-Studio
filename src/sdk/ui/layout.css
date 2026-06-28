@@ -15,10 +15,10 @@
   min-height: 0;
   overflow: auto;
   padding:
-    max(12px, env(safe-area-inset-top, 0px))
-    max(12px, env(safe-area-inset-right, 0px))
-    12px
-    max(12px, env(safe-area-inset-left, 0px));
+    max(var(--rd-content-pad, 12px), env(safe-area-inset-top, 0px))
+    max(var(--rd-content-pad, 12px), env(safe-area-inset-right, 0px))
+    var(--rd-content-pad, 12px)
+    max(var(--rd-content-pad, 12px), env(safe-area-inset-left, 0px));
 }
 .rd-tabs {
   display: grid;
