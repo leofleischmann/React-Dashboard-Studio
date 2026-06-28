@@ -2,7 +2,7 @@
 
 /* ── Shell (dashboard.tsx root) ──────────────────────────── */
 .rd-dd .rd-page-shell__main {
-  padding: 16px clamp(12px, 3vw, 28px) 88px;
+  padding: 16px clamp(12px, 3vw, 28px) 16px;
 }
 .rd-dd > .rd-page-shell > .rd-tabs {
   overflow-x: auto;

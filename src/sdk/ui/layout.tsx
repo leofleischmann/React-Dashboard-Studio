@@ -76,7 +76,7 @@ export function Tabs<const T extends string>({
   value: T;
   onChange: (id: T) => void;
   ariaLabel?: string;
-  /** `bar` = fixed bottom nav (default), `segment` = inline pill tabs inside page content */
+  /** `bar` = bottom nav pinned in PageShell (default), `segment` = inline pill tabs inside page content */
   variant?: 'bar' | 'segment';
 }) {
   return (

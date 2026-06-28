@@ -28,9 +28,11 @@ export function Preview({
         </div>
       )}
     >
-      <DashboardProvider>
-        <Dashboard />
-      </DashboardProvider>
+      <div className="rd-preview-host">
+        <DashboardProvider>
+          <Dashboard />
+        </DashboardProvider>
+      </div>
     </ErrorBoundary>
   );
 }

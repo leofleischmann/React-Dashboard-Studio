@@ -724,10 +724,24 @@
 .rd-studio__preview {
   position: relative;
   min-width: 0;
-  overflow: auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .rd-studio__preview--full {
   flex: 1;
+}
+.rd-preview-host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rd-preview-host > .rd-root {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Errors */
