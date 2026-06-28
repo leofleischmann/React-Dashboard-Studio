@@ -27,6 +27,7 @@
     "sync:pull": "node scripts/sync.mjs pull",
     "sync:push": "node scripts/sync.mjs push",
     "sync:watch": "node scripts/sync.mjs watch",
+    "restore:default": "node scripts/restore-default-dashboard.mjs",
     "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
