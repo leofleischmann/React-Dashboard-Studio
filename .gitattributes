@@ -1,2 +1,3 @@
 * text=auto eol=lf
 *.{ts,tsx,js,mjs,cjs,json,yml,yaml,md,css,html} text eol=lf
+studio.bat text eol=crlf

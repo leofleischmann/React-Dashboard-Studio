@@ -1,5 +1,5 @@
 import { callService, useEntity, useEntityActions } from '../../../hass/hooks';
-import type { CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { entityDomain } from '../../../entityActions';
 import { entityDisplayName, isAvailable, stateNumber } from '../../../format';
 
@@ -70,12 +70,15 @@ export function NumberSlider({
   min,
   max,
   step,
+  debounceMs = 300,
 }: {
   entityId: string;
   label?: string;
   min?: number;
   max?: number;
   step?: number;
+  /** HA service delay while dragging (default 300ms). Sends immediately on release. */
+  debounceMs?: number;
 }) {
   const entity = useEntity(entityId);
   const domain = entityDomain(entityId);
@@ -91,29 +94,87 @@ export function NumberSlider({
   const stepVal =
     step ?? (entity?.attributes.step as number | undefined) ?? (domain === 'light' ? 1 : 1);
 
-  let value = minVal;
-  if (domain === 'light') {
-    const b = entity?.attributes.brightness;
-    value =
-      entity?.state === 'on' && typeof b === 'number'
+  const entityValue = useMemo(() => {
+    if (domain === 'light') {
+      const b = entity?.attributes.brightness;
+      return entity?.state === 'on' && typeof b === 'number'
         ? Math.round((b / 255) * 100)
         : 0;
-  } else {
-    value = stateNumber(entity) ?? minVal;
-  }
-
-  const setValue = (next: number) => {
-    if (domain === 'light') {
-      void callService('light', 'turn_on', {
-        entity_id: entityId,
-        brightness_pct: next,
-      });
-    } else {
-      void callService('input_number', 'set_value', {
-        entity_id: entityId,
-        value: next,
-      });
     }
+    return stateNumber(entity) ?? minVal;
+  }, [domain, entity, minVal]);
+
+  const [draft, setDraft] = useState<number | null>(null);
+  const draggingRef = useRef(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const value = draft ?? entityValue;
+
+  const commitToHa = useCallback(
+    (next: number) => {
+      if (domain === 'light') {
+        void callService('light', 'turn_on', {
+          entity_id: entityId,
+          brightness_pct: next,
+        });
+      } else {
+        void callService('input_number', 'set_value', {
+          entity_id: entityId,
+          value: next,
+        });
+      }
+    },
+    [domain, entityId],
+  );
+
+  const clearDebounce = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleCommit = useCallback(
+    (next: number) => {
+      clearDebounce();
+      debounceTimerRef.current = setTimeout(() => {
+        debounceTimerRef.current = null;
+        commitToHa(next);
+      }, debounceMs);
+    },
+    [clearDebounce, commitToHa, debounceMs],
+  );
+
+  const flushCommit = useCallback(
+    (next: number) => {
+      clearDebounce();
+      commitToHa(next);
+    },
+    [clearDebounce, commitToHa],
+  );
+
+  useEffect(() => {
+    if (!draggingRef.current) setDraft(null);
+  }, [entityValue]);
+
+  useEffect(() => () => clearDebounce(), [clearDebounce]);
+
+  const onPointerDown = (e: PointerEvent<HTMLInputElement>) => {
+    draggingRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerUp = (e: PointerEvent<HTMLInputElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    const next = Number(e.currentTarget.value);
+    flushCommit(next);
+    setDraft(null);
   };
 
   const pctFill =
@@ -141,7 +202,14 @@ export function NumberSlider({
           step={stepVal}
           value={value}
           disabled={!usable}
-          onChange={(e) => setValue(Number(e.target.value))}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onChange={(e) => {
+            const next = Number(e.target.value);
+            setDraft(next);
+            scheduleCommit(next);
+          }}
         />
       </div>
     </div>
