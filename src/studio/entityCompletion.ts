@@ -4,12 +4,12 @@ import {
   type CompletionContext,
   type CompletionResult,
 } from '@codemirror/autocomplete';
-import { hassStore } from '../sdk/hass/store';
+import { hassStore } from '../sdk/hass/stores/hassStore';
 import {
   ENTITY_ID_RE,
   isEntityIdContext,
   searchEntities,
-} from '../sdk/hass/entitySearch';
+} from '../sdk/hass/sources/entitySearch';
 
 const COMPLETION_LIMIT = 50;
 

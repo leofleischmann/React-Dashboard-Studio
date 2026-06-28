@@ -8,7 +8,7 @@ import {
   type HassEntities,
   type HassServiceTarget,
 } from 'home-assistant-js-websocket';
-import { hassStore } from './sdk/hass/store';
+import { hassStore } from './sdk/hass/stores/hassStore';
 import type { AppHass } from './sdk/hass/types';
 import Studio from './studio/Studio';
 

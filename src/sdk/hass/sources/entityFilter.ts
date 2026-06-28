@@ -1,5 +1,5 @@
-import type { HassEntity } from './types';
-import { registryStore } from './registryStore';
+import type { HassEntity } from '../types';
+import { registryStore } from '../stores/registryStore';
 
 /** Domains to watch for `useEntities` — `*` when any entity may affect the filter. */
 export function subscriptionDomainsForFilter(

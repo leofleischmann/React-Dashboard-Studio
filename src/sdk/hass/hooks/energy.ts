@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react';
 import type { KnownEntityId } from '../entityId';
-import type { HistoryPoint } from '../history';
-import type { EnergyPeriod } from '../energy';
+import type { HistoryPoint } from '../sources/history';
+import type { EnergyPeriod } from '../sources/energy';
 import {
   computeEnergyKwh,
   energyDailySeries,
   energyPeriodHours,
-} from '../energy';
+} from '../sources/energy';
 import { useTime } from './app';
 import { useEntityHistory, useEntityHistoryPending } from './rest';
 
@@ -80,4 +80,4 @@ export {
   energyPeriodHours,
   energyPeriodLabel,
   energyPeriodStartMs,
-} from '../energy';
+} from '../sources/energy';

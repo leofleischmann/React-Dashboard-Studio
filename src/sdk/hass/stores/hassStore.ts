@@ -1,9 +1,9 @@
-import type { AppHass, HassEntity } from './types';
+import type { AppHass, HassEntity } from '../types';
 import {
   createKeyedListeners,
   createListenerSet,
   type Listener,
-} from '../internal/listeners';
+} from '../../internal/listeners';
 
 const EMPTY_ENTITIES: HassEntity[] = [];
 

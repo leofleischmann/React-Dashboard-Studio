@@ -1,4 +1,4 @@
-import { templateStore } from './templateStore';
+import { templateStore } from '../stores/templateStore';
 import type {
   TemplateSnapshot,
   TemplateSubscriptionOptions,

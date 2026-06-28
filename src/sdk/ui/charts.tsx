@@ -8,7 +8,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react';
-import type { HistoryPoint } from '../hass/history';
+import type { HistoryPoint } from '../hass/sources/history';
 import './charts.css';
 
 export type ChartSeries = {

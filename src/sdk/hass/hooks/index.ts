@@ -1,16 +1,16 @@
 export type { HassEntity } from '../types';
-export type { EntityFilter } from '../entityFilter';
-export type { EntityStatistics } from '../statistics';
-export type { CalendarEvent } from '../calendar';
-export type { LogbookEntry } from '../logbook';
-export { fetchLogbook, logbookCacheMarker } from '../logbook';
-export type { WeatherForecastEntry, WeatherForecastType } from '../weather';
-export { fetchWeatherForecast, FORECAST_TYPE_PARAM } from '../weather';
-export type { EntityRegistryEntry, AreaEntry, LabelEntry } from '../registryStore';
-export { fetchEntityHistory, aggregateHistory, aggregateHistoryByDay, aggregateHistoryDelta } from '../history';
-export { fetchEntityStatistics } from '../statistics';
-export { fetchCalendarEvents } from '../calendar';
-export type { HistoryPoint } from '../history';
+export type { EntityFilter } from '../sources/entityFilter';
+export type { EntityStatistics } from '../sources/statistics';
+export type { CalendarEvent } from '../sources/calendar';
+export type { LogbookEntry } from '../sources/logbook';
+export { fetchLogbook, logbookCacheMarker } from '../sources/logbook';
+export type { WeatherForecastEntry, WeatherForecastType } from '../sources/weather';
+export { fetchWeatherForecast, FORECAST_TYPE_PARAM } from '../sources/weather';
+export type { EntityRegistryEntry, AreaEntry, LabelEntry } from '../stores/registryStore';
+export { fetchEntityHistory, aggregateHistory, aggregateHistoryByDay, aggregateHistoryDelta } from '../sources/history';
+export { fetchEntityStatistics } from '../sources/statistics';
+export { fetchCalendarEvents } from '../sources/calendar';
+export type { HistoryPoint } from '../sources/history';
 export { useTheme, useDarkMode, applyThemeVars } from '../theme';
 export {
   DashboardProvider,

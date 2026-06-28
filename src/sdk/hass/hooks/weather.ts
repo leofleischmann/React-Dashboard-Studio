@@ -3,13 +3,13 @@ import {
   getWeatherForecastSnapshot,
   isWeatherForecastPending,
   subscribeWeatherForecast,
-} from '../cachedWeather';
+} from '../sources/cachedWeather';
 import {
   FORECAST_TYPE_PARAM,
   type WeatherForecastEntry,
   type WeatherForecastType,
-} from '../weather';
-import { normalizeIds } from '../restCache';
+} from '../sources/weather';
+import { normalizeIds } from '../sources/restCache';
 import { useHassReady } from './ready';
 import { entityIdsFromKey } from './shared';
 import { useSharedRestQuery } from './restStore';

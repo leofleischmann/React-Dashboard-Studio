@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
-import { hassStore } from '../sdk/hass/store';
+import { hassStore } from '../sdk/hass/stores/hassStore';
 import type { HassEntity } from '../sdk/hass/types';
 import {
   WIDGET_CATALOG,

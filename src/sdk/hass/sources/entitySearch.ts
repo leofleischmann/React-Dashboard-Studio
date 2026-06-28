@@ -1,4 +1,4 @@
-import type { HassEntity } from './types';
+import type { HassEntity } from '../types';
 
 const ENTITY_ID_RE = /^[\w.]+$/;
 

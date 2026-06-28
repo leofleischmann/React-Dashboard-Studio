@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
-import { hassStore } from '../store';
+import { hassStore } from '../stores/hassStore';
 import type { HassEntity } from '../types';
 import type { KnownEntityId } from '../entityId';
-import { filterEntities, subscriptionDomainsForFilter, type EntityFilter } from '../entityFilter';
+import { filterEntities, subscriptionDomainsForFilter, type EntityFilter } from '../sources/entityFilter';
 import {
   registryStore,
   type EntityRegistryEntry,
   type AreaEntry,
   type LabelEntry,
-} from '../registryStore';
+} from '../stores/registryStore';
 import { useHassReady } from './ready';
 import { stableArraySnapshot, stableEntitySnapshot } from './shared';
 import { useTime } from './app';

@@ -3,12 +3,12 @@ import {
   getLogbookSnapshot,
   isLogbookPending,
   subscribeLogbook,
-} from '../cachedLogbook';
+} from '../sources/cachedLogbook';
 import {
   logbookCacheMarker,
   EMPTY_LOGBOOK_ENTRIES,
   type LogbookEntry,
-} from '../logbook';
+} from '../sources/logbook';
 import { useHassReady } from './ready';
 import { stableArraySnapshot } from './shared';
 import { useSharedRestQuery } from './restStore';

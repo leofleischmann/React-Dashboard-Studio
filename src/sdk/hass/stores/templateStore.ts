@@ -1,16 +1,16 @@
-import { hassStore } from './store';
-import type { HassConnection } from './types';
+import { hassStore } from './hassStore';
+import type { HassConnection } from '../types';
 import type {
   RenderTemplateMessage,
   TemplateSnapshot,
   TemplateSubscriptionOptions,
-} from './templateTypes';
+} from '../sources/templateTypes';
 import {
   IDLE_TEMPLATE_SNAPSHOT,
   LOADING_TEMPLATE_SNAPSHOT,
   normalizeTemplateResult,
   templateSnapshotsEqual,
-} from './templateTypes';
+} from '../sources/templateTypes';
 
 type Listener = () => void;
 
