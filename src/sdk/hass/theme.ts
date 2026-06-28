@@ -191,10 +191,10 @@ export async function fetchHaThemes(
       darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
   } catch {
-    console.log('[Debug fetchHaThemes]: frontend/get_user_data nicht verfügbar');
+    console.warn('[Debug fetchHaThemes]: frontend/get_user_data nicht verfügbar');
   }
 
-  console.log('[Debug fetchHaThemes]:', {
+  console.warn('[Debug fetchHaThemes]:', {
     theme,
     darkMode,
     defaultTheme: data.default_theme,

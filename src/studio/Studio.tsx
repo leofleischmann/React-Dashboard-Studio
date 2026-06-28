@@ -132,7 +132,7 @@ export default function Studio() {
     } catch {
       /* ignore */
     }
-    console.log('[Debug Studio]: preview dark mode', dark);
+    console.warn('[Debug Studio]: preview dark mode', dark);
   }, []);
 
   useEffect(() => {
