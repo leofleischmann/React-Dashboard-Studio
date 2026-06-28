@@ -17,9 +17,10 @@
   flex-direction: column;
   min-height: 100%;
   height: 100%;
-  /* Override --rd-shell-pad-* on .rd-root for edge-to-edge dashboards (e.g. .hm-root). */
-  --rd-shell-pad-y: 28px;
-  --rd-shell-pad-x: clamp(16px, 4vw, 48px);
+  /* Edge-to-edge shell; content gutter lives on .rd-page-shell__main (layout.css).
+     Optional inset: --rd-shell-pad-y/x on .rd-root or .rd-root--inset */
+  --rd-shell-pad-y: 0px;
+  --rd-shell-pad-x: 0px;
   padding:
     max(var(--rd-shell-pad-y), env(safe-area-inset-top, 0px))
     max(var(--rd-shell-pad-x), env(safe-area-inset-right, 0px))
@@ -44,4 +45,10 @@
 .rd-root > .rd-page-shell {
   flex: 1;
   min-height: 0;
+}
+
+/* Optional outer inset for docs / blank starters — not the default panel look. */
+.rd-root--inset {
+  --rd-shell-pad-y: 28px;
+  --rd-shell-pad-x: clamp(16px, 4vw, 48px);
 }

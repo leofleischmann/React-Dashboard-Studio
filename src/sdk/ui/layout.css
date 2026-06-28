@@ -14,13 +14,18 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+  padding:
+    max(12px, env(safe-area-inset-top, 0px))
+    max(12px, env(safe-area-inset-right, 0px))
+    12px
+    max(12px, env(safe-area-inset-left, 0px));
 }
 .rd-tabs {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   gap: 4px;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
+  padding: 8px max(10px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-right, 0px));
   background: color-mix(in srgb, var(--rd-card-bg) 92%, transparent);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--rd-border);

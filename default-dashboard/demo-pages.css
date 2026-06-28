@@ -1,9 +1,6 @@
 /* Default-dashboard SDK reference tabs (Widgets, Charts, Hooks, Layout, Format) */
 
-/* ── Shell (dashboard.tsx root) ──────────────────────────── */
-.rd-dd .rd-page-shell__main {
-  padding: 16px clamp(12px, 3vw, 28px) 16px;
-}
+/* ── Shell (dashboard.tsx root) — gutter via @ha/layout .rd-page-shell__main ── */
 .rd-dd > .rd-page-shell > .rd-tabs {
   overflow-x: auto;
   scrollbar-width: none;
