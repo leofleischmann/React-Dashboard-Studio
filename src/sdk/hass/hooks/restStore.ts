@@ -6,6 +6,7 @@ export const EMPTY_REST_RECORD = Object.freeze({}) as Record<string, never>;
 /**
  * Shared useSyncExternalStore wrapper for REST-backed hooks.
  * Returns a stable `inactiveSnapshot` while `active` is false.
+ * @internal helper for the rest/logbook/weather hooks — not part of `@ha`.
  */
 export function useSharedRestSubscribe<T>(
   active: boolean,
@@ -25,7 +26,10 @@ export function useSharedRestSubscribe<T>(
   return useSyncExternalStore(sub, get, () => serverSnapshot);
 }
 
-/** Data + pending flag from the same REST subscription. */
+/**
+ * Data + pending flag from the same REST subscription.
+ * @internal helper for the rest/logbook/weather hooks — not part of `@ha`.
+ */
 export function useSharedRestQuery<TData>(
   active: boolean,
   subscribe: (listener: () => void) => () => void,

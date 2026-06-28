@@ -27,10 +27,10 @@ function readEntityActions() {
 }
 
 function readAvailableModules() {
-  const text = readFileSync(join(ROOT, 'src/sdk/runtime.ts'), 'utf8');
-  const registry = text.match(/export const registry[^=]*=\s*\{([\s\S]*?)\};/);
-  if (!registry) return [];
-  return [...registry[1].matchAll(/'(@ha[^']*)':/g)].map((m) => m[1]);
+  // The module surface is declared in the manifest (src/sdk/modules.ts); the
+  // public `@ha/*` entries are exactly the ones authors can import.
+  const text = readFileSync(join(ROOT, 'src/sdk/modules.ts'), 'utf8');
+  return [...text.matchAll(/name:\s*'(@ha[^']*)'/g)].map((m) => m[1]);
 }
 
 function widgetImportStatement(widgetNames) {

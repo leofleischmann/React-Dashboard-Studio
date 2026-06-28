@@ -9,7 +9,7 @@
 //
 // CLI: npm run gen:eject-sources
 
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -176,68 +176,137 @@ function analyzeFile(file) {
   return { text, decls, imports };
 }
 
+const SIBLING_EXTS = ['', '.tsx', '.ts', '.jsx', '.js', '/index.tsx', '/index.ts'];
+
+/** Resolve a relative import spec from `fromFile` to an actual file, or null. */
+function resolveRelativeFile(fromFile, spec) {
+  const base = join(dirname(fromFile), spec);
+  for (const ext of SIBLING_EXTS) {
+    const cand = base + ext;
+    if (existsSync(cand) && statSync(cand).isFile()) return cand;
+  }
+  return null;
+}
+
 /**
  * Tree-shaken eject: the requested component plus only the local declarations it
- * transitively references, with internal imports rewritten to public aliases.
- * Returns { code } or { error }.
+ * transitively references — following relative imports of *non-public* symbols
+ * into sibling files and inlining them, so a widget split across several files
+ * ejects exactly as if it lived in one. Public (@ha*) imports are rewritten to
+ * their aliases; nothing changes for a widget whose closure is single-file.
+ * Returns { imports, body } or { error }.
  */
-function ejectComponent(analysis, name, symbolIndex) {
-  const { text, decls, imports } = analysis;
-  const byName = new Map();
-  for (const d of decls) for (const n of d.names) byName.set(n, d);
-  if (!byName.has(name)) return { error: 'declaration not found in file' };
+function ejectComponent(entryFile, name, symbolIndex, getAnalysis) {
+  const byNameCache = new Map();
+  const byNameFor = (file) => {
+    let m = byNameCache.get(file);
+    if (!m) {
+      m = new Map();
+      for (const d of getAnalysis(file).decls) for (const n of d.names) m.set(n, d);
+      byNameCache.set(file, m);
+    }
+    return m;
+  };
 
-  // transitive closure over local declaration names
+  const declFile = new Map(); // decl object → file it is declared in
+
+  // Is `ref` (used inside `file`) a local declaration we should inline? Either
+  // declared in `file`, or imported from a sibling via a relative path with no
+  // public alias (i.e. a split-out helper, not an @ha export).
+  const localDeclFor = (file, ref) => {
+    const here = byNameFor(file).get(ref);
+    if (here) {
+      if (!declFile.has(here)) declFile.set(here, file);
+      return here;
+    }
+    if (symbolIndex.has(ref)) return null; // public symbol → stays an import
+    for (const imp of getAnalysis(file).imports) {
+      if (!imp.spec.startsWith('.') || imp.hasNamespace) continue;
+      if (!imp.valueNames.includes(ref) && !imp.typeNames.includes(ref)) continue;
+      const sib = resolveRelativeFile(file, imp.spec);
+      if (!sib) continue;
+      const sd = byNameFor(sib).get(ref);
+      if (sd) {
+        if (!declFile.has(sd)) declFile.set(sd, sib);
+        return sd;
+      }
+    }
+    return null;
+  };
+
+  const root = byNameFor(entryFile).get(name);
+  if (!root) return { error: 'declaration not found in file' };
+  declFile.set(root, entryFile);
+
+  // transitive closure over local declarations (across inlined sibling files)
   const keep = new Set();
-  const stack = [byName.get(name)];
+  const stack = [root];
   while (stack.length) {
     const d = stack.pop();
     if (keep.has(d)) continue;
     keep.add(d);
+    const file = declFile.get(d);
     for (const ref of d.refs) {
-      const dep = byName.get(ref);
+      const dep = localDeclFor(file, ref);
       if (dep && !keep.has(dep)) stack.push(dep);
     }
   }
-  const kept = [...keep].sort((a, b) => a.start - b.start);
+
+  // Order: entry-file declarations first (source order), then any sibling file's
+  // declarations grouped by path. Identical to the old single-file ordering when
+  // nothing was split out.
+  const fileRank = (f) => (f === entryFile ? '' : f);
+  const kept = [...keep].sort((a, b) => {
+    const fa = fileRank(declFile.get(a));
+    const fb = fileRank(declFile.get(b));
+    if (fa !== fb) return fa < fb ? -1 : 1;
+    return a.start - b.start;
+  });
 
   // symbols actually used by the kept declarations
   const used = new Set();
   for (const d of kept) for (const r of d.refs) used.add(r);
+  // names now declared locally (inlined) must not be re-imported
+  const inlined = new Set();
+  for (const d of kept) for (const n of d.names) inlined.add(n);
 
-  // resolve imports → public aliases, restricted to used symbols
+  // resolve imports → public aliases, restricted to used (non-inlined) symbols
   const valueImports = new Map();
   const typeImports = new Map();
   const addImport = (map, alias, n) => {
     if (!map.has(alias)) map.set(alias, new Set());
     map.get(alias).add(n);
   };
-  for (const imp of imports) {
-    if (imp.spec.endsWith('.css')) continue;
-    if (imp.hasNamespace) {
-      if (imp.spec.startsWith('.')) return { error: `namespace import from ${imp.spec}` };
-      continue;
-    }
-    const relative = imp.spec.startsWith('.');
-    for (const [list, target] of [
-      [imp.valueNames, valueImports],
-      [imp.typeNames, typeImports],
-    ]) {
-      for (const n of list) {
-        if (!used.has(n)) continue;
-        if (!relative) {
-          addImport(target, imp.spec, n);
-          continue;
+  const filesInvolved = new Set([...kept].map((d) => declFile.get(d)));
+  for (const file of filesInvolved) {
+    for (const imp of getAnalysis(file).imports) {
+      if (imp.spec.endsWith('.css')) continue;
+      if (imp.hasNamespace) {
+        if (imp.spec.startsWith('.')) return { error: `namespace import from ${imp.spec}` };
+        continue;
+      }
+      const relative = imp.spec.startsWith('.');
+      for (const [list, target] of [
+        [imp.valueNames, valueImports],
+        [imp.typeNames, typeImports],
+      ]) {
+        for (const n of list) {
+          if (!used.has(n) || inlined.has(n)) continue;
+          if (!relative) {
+            addImport(target, imp.spec, n);
+            continue;
+          }
+          const alias = symbolIndex.get(n);
+          if (!alias) return { error: `unmapped symbol "${n}" from ${imp.spec}` };
+          addImport(target, alias, n);
         }
-        const alias = symbolIndex.get(n);
-        if (!alias) return { error: `unmapped symbol "${n}" from ${imp.spec}` };
-        addImport(target, alias, n);
       }
     }
   }
 
-  // assemble body: kept declarations in source order, export keyword removed
+  // assemble body: kept declarations, export keyword removed
   const blocks = kept.map((d) => {
+    const text = getAnalysis(declFile.get(d)).text;
     let slice = text.slice(d.start, d.end);
     if (d.exportAt >= 0) {
       const rel = d.exportAt - d.start;
@@ -281,8 +350,11 @@ export function generateEjectSources(options = {}) {
       skipped.push([name, 'no source file found']);
       continue;
     }
-    if (!analysisCache.has(file)) analysisCache.set(file, analyzeFile(file));
-    const result = ejectComponent(analysisCache.get(file), name, symbolIndex);
+    const getAnalysis = (f) => {
+      if (!analysisCache.has(f)) analysisCache.set(f, analyzeFile(f));
+      return analysisCache.get(f);
+    };
+    const result = ejectComponent(file, name, symbolIndex, getAnalysis);
     if (result.error) {
       skipped.push([name, result.error]);
       continue;

@@ -3,6 +3,7 @@ import type { WidgetCatalogEntry, WidgetCategory } from './types';
 import { COMPOSITE_WIDGET_CATALOG } from './composite';
 import { DOMAIN_WIDGET_CATALOG } from './domain';
 import { FEATURED_WIDGET_CATALOG } from './featured';
+import { resolveDomainDefault } from './domainDefault';
 
 export type { WidgetCatalogEntry, WidgetCategory } from './types';
 
@@ -50,20 +51,12 @@ export function catalogSourceOverride(
   return entry.source;
 }
 
-/** Entity-Inserter: domain → default widget name (from catalog `inserterDefault`). */
+/**
+ * Entity-Inserter: domain → default widget name. Shared with the build-time SDK
+ * reference (see catalog/domainDefault) so the inserter and the docs agree.
+ */
 export function widgetNameForDomain(domain: string): string {
-  const featured = FEATURED_WIDGET_CATALOG.find(
-    (e) => e.inserterDefault && e.domains.includes(domain),
-  );
-  if (featured) return featured.name;
-
-  const domainEntry = DOMAIN_WIDGET_CATALOG.find(
-    (e) => e.inserterDefault && e.domains.includes(domain),
-  );
-  if (domainEntry) return domainEntry.name;
-
-  const fallback = DOMAIN_WIDGET_CATALOG.find((e) => e.domains.includes(domain));
-  return fallback?.name ?? 'EntityRow';
+  return resolveDomainDefault(WIDGET_CATALOG, domain);
 }
 
 export function catalogByCategory(

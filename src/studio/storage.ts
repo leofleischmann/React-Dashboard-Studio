@@ -1,4 +1,4 @@
-import { hassStore } from '../sdk/hass/store';
+import { hassStore } from '../sdk/hass/stores/hassStore';
 import { applyFactoryResetCount } from '../sdk/dashboard/store';
 import { applyIntegrationSettings } from '../sdk/debug/store';
 import { DEFAULT_PROJECT, blankProject, type Project } from './project';

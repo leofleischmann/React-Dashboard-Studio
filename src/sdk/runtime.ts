@@ -1,25 +1,16 @@
 // The "standard library" available to dashboard code in the in-HA editor.
 // User code resolves `import ... from '<name>'` against this registry.
+//
+// The module list itself lives in ./modules (the single source of truth);
+// here we only derive the runtime shapes from it.
 
-import * as React from 'react';
-import * as ReactJsxRuntime from 'react/jsx-runtime';
-import * as hassApi from './hass/hooks';
-import * as ui from './ui/index';
-import * as layout from './ui/layout';
-import * as format from './format';
-import * as debug from './debug';
+import { sdkModules } from './modules';
 
-export const registry: Record<string, unknown> = {
-  react: React,
-  'react/jsx-runtime': ReactJsxRuntime,
-  '@ha': hassApi,
-  '@ha/ui': ui,
-  '@ha/layout': layout,
-  '@ha/format': format,
-  '@ha/debug': debug,
-};
+export const registry: Record<string, unknown> = Object.fromEntries(
+  sdkModules.map((m) => [m.name, m.module]),
+);
 
 /** Names available to `import` — surfaced in the editor UI as a cheat sheet. */
-export const availableModules = Object.keys(registry).filter(
-  (n) => !n.startsWith('react'),
-);
+export const availableModules = sdkModules
+  .filter((m) => m.public)
+  .map((m) => m.name);

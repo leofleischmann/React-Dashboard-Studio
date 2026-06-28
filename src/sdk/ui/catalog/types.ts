@@ -23,3 +23,13 @@ export type WidgetCatalogEntry = {
   /** Galerie-Demo auch ohne passende Entity (Composite). */
   optionalEntity?: boolean;
 };
+
+/**
+ * Identity helper that gives a widget descriptor its full `WidgetCatalogEntry`
+ * type (autocomplete + checking) at the definition site. Descriptors live next
+ * to their component (`cards/domain/<x>.widget.ts`) and are assembled into the
+ * catalog — there is no separate metadata tree to keep in sync.
+ */
+export function defineWidget(entry: WidgetCatalogEntry): WidgetCatalogEntry {
+  return entry;
+}

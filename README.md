@@ -107,9 +107,20 @@ npm run lint    # ESLint — no-console, no-debugger, react-hooks rules
 npm test        # Vitest — eject generator, freeze logic, CLI⇄studio consistency
 ```
 
-Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). New widgets get an
-eject source automatically via `npm run gen:eject-sources` (run by `build`) — no per-widget
-maintenance. Starter dashboard: [`default-dashboard/`](default-dashboard/).
+Add a new importable module (`@ha/…`) in [`src/sdk/modules.ts`](src/sdk/modules.ts) — the
+single manifest that the runtime registry, `tsconfig` paths, the compile-check and the SDK
+reference all derive from (a test fails if they drift). New domain widgets ship their catalog
+metadata in a `defineWidget()` descriptor right next to the component
+(`cards/domain/<x>.widget.ts`), assembled in [`catalog/domain.ts`](src/sdk/ui/catalog/domain.ts) —
+no separate metadata tree. Eject sources are generated automatically via
+`npm run gen:eject-sources` (run by `build`) — no per-widget maintenance.
+Starter dashboard: [`default-dashboard/`](default-dashboard/).
+
+The `@ha` data layer is split by concern: `hass/sources/` (framework-agnostic
+fetchers + caches), `hass/stores/` (reactive state singletons), and `hass/hooks/`
+(the React bindings — the only layer that imports `react`; a test enforces this).
+Stores share the `createListenerSet` / `createKeyedListeners` primitives in
+[`src/sdk/internal/listeners.ts`](src/sdk/internal/listeners.ts).
 
 CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
 lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.

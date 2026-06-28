@@ -1,9 +1,8 @@
 import type { ComponentType } from 'react';
 import { transform } from 'sucrase';
 import { registry } from '../sdk/runtime';
-import { dirname, joinPath, type Project } from './project';
-
-const RESOLVE_EXTS = ['', '.tsx', '.ts', '.jsx', '.js', '/index.tsx', '/index.ts'];
+import type { Project } from './project';
+import { extractImports, resolveModule } from './moduleResolve';
 
 interface ModuleEntry {
   exports: Record<string, unknown>;
@@ -23,16 +22,13 @@ const moduleCache = new Map<string, ModuleEntry>();
 const dependents = new Map<string, Set<string>>();
 
 function resolve(files: Record<string, string>, importer: string, request: string): string {
-  if (request in registry) return request;
-  const base = request.startsWith('.')
-    ? joinPath(dirname(importer), request)
-    : request;
-  for (const ext of RESOLVE_EXTS) {
-    if (base + ext in files) return base + ext;
+  const resolved = resolveModule(files, importer, request, (r) => r in registry);
+  if (resolved === null) {
+    throw new Error(
+      `Datei nicht gefunden: '${request}' (importiert in ${importer})`,
+    );
   }
-  throw new Error(
-    `Datei nicht gefunden: '${request}' (importiert in ${importer})`,
-  );
+  return resolved;
 }
 
 function transpile(path: string, source: string): string {
@@ -74,16 +70,6 @@ function registerDependency(importer: string, imported: string): void {
     dependents.set(imported, set);
   }
   set.add(importer);
-}
-
-function extractImports(source: string): string[] {
-  const imports: string[] = [];
-  const re = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
-  let match: RegExpExecArray | null;
-  while ((match = re.exec(source)) !== null) {
-    imports.push(match[1]);
-  }
-  return imports;
 }
 
 /**

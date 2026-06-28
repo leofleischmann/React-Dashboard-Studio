@@ -1,4 +1,4 @@
-type Listener = () => void;
+import { createKeyedListeners } from '../internal/listeners';
 
 /** Prefix for usePersistentState keys in the browser (cleared on integration factory reset). */
 export const DASHBOARD_STATE_STORAGE_PREFIX = 'homeassistant_dashboard_studio:state:';
@@ -45,7 +45,7 @@ class DashboardStore {
   private scope = 'default';
   private memory = new Map<string, unknown>();
   private persistentLoaded = new Set<string>();
-  private listeners = new Map<string, Set<Listener>>();
+  private listeners = createKeyedListeners();
 
   setScope(scope: string): void {
     if (scope === this.scope) return;
@@ -61,28 +61,15 @@ class DashboardStore {
   }
 
   private notify(key: string): void {
-    const set = this.listeners.get(key);
-    if (!set) return;
-    for (const listener of set) listener();
+    this.listeners.notify(key);
   }
 
   private notifyAll(): void {
-    for (const set of this.listeners.values()) {
-      for (const listener of set) listener();
-    }
+    this.listeners.notifyAll();
   }
 
-  subscribe(key: string, listener: Listener): () => void {
-    let set = this.listeners.get(key);
-    if (!set) {
-      set = new Set();
-      this.listeners.set(key, set);
-    }
-    set.add(listener);
-    return () => {
-      set!.delete(listener);
-      if (set!.size === 0) this.listeners.delete(key);
-    };
+  subscribe(key: string, listener: () => void): () => void {
+    return this.listeners.subscribe(key, listener);
   }
 
   ensureKey<T>(key: string, initialValue: T, persistent: boolean): void {

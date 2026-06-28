@@ -2,7 +2,7 @@ import type { HassEntity } from '../../hass/types';
 import { entityDisplayName } from '../../format';
 import { BatteryRow, DeviceCard, EnergyDeviceCard, RoomCard } from '../cards/composite';
 import { Grid, Stat } from '../primitives';
-import type { WidgetCatalogEntry } from './types';
+import { defineWidget, type WidgetCatalogEntry } from './types';
 
 function pickRoomSensorKey(entities: readonly HassEntity[]): string | undefined {
   const match = entities.find((e) =>
@@ -98,7 +98,7 @@ function GridDemo(_props: { entityId: string }) {
 
 /** Multi-entity pattern widgets (implementations in `cards/composite/`). */
 export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
-  {
+  defineWidget({
     name: 'RoomCard',
     label: 'Raum',
     category: 'composite',
@@ -110,8 +110,8 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     },
     snippet: '<RoomCard name="Wohnzimmer" sensorKey="wohnzimmer" lightId="light.…" />',
     Demo: RoomCardDemo,
-  },
-  {
+  }),
+  defineWidget({
     name: 'EnergyDeviceCard',
     label: 'Energie-Gerät',
     category: 'composite',
@@ -121,8 +121,8 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     snippet:
       '<EnergyDeviceCard name="…" energyId="sensor.…_energy" powerId="sensor.…_power" switchId="switch.…" />',
     Demo: EnergyDeviceCardDemo,
-  },
-  {
+  }),
+  defineWidget({
     name: 'DeviceCard',
     label: 'Gerät (Energie)',
     category: 'composite',
@@ -132,8 +132,8 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     snippet:
       '<DeviceCard name="…" powerId="…" kwhId="…" costId="…" switchId="…" />',
     Demo: DeviceCardDemo,
-  },
-  {
+  }),
+  defineWidget({
     name: 'BatteryRow',
     label: 'Batterie',
     category: 'composite',
@@ -141,8 +141,8 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     pickExample: pickBatteryEntity,
     snippet: '<BatteryRow name="…" entityId="sensor.…" />',
     Demo: BatteryRowDemo,
-  },
-  {
+  }),
+  defineWidget({
     name: 'Grid',
     label: 'Grid',
     category: 'composite',
@@ -150,5 +150,5 @@ export const COMPOSITE_WIDGET_CATALOG: WidgetCatalogEntry[] = [
     optionalEntity: true,
     snippet: '<Grid min={180}>…</Grid>',
     Demo: GridDemo,
-  },
+  }),
 ];
