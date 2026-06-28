@@ -1,4 +1,4 @@
-type Listener = () => void;
+import { createListenerSet } from '../internal/listeners';
 
 const AUTHOR_DEBUG_KEY = 'homeassistant_dashboard_studio:author_debug';
 
@@ -44,10 +44,10 @@ function writeAuthorEnabled(enabled: boolean): void {
 class DebugStore {
   private integrationEnabled = false;
   private authorEnabled = readAuthorEnabled();
-  private stateListeners = new Set<Listener>();
+  private stateListeners = createListenerSet();
 
   private entries: readonly DebugEntry[] = [];
-  private entryListeners = new Set<Listener>();
+  private entryListeners = createListenerSet();
   private nextId = 1;
 
   // --- gates -------------------------------------------------------------
@@ -79,9 +79,8 @@ class DebugStore {
     return this.integrationEnabled;
   }
 
-  subscribe(listener: Listener): () => void {
-    this.stateListeners.add(listener);
-    return () => this.stateListeners.delete(listener);
+  subscribe(listener: () => void): () => void {
+    return this.stateListeners.subscribe(listener);
   }
 
   // --- log buffer --------------------------------------------------------
@@ -105,19 +104,18 @@ class DebugStore {
     this.notifyEntries();
   }
 
-  subscribeEntries(listener: Listener): () => void {
-    this.entryListeners.add(listener);
-    return () => this.entryListeners.delete(listener);
+  subscribeEntries(listener: () => void): () => void {
+    return this.entryListeners.subscribe(listener);
   }
 
   // --- internals ---------------------------------------------------------
 
   private notifyState(): void {
-    for (const listener of this.stateListeners) listener();
+    this.stateListeners.notify();
   }
 
   private notifyEntries(): void {
-    for (const listener of this.entryListeners) listener();
+    this.entryListeners.notify();
   }
 }
 
