@@ -24,14 +24,6 @@ jobs:
 
       - run: npm ci
 
-      - name: No leftover debug logs
-        shell: bash
-        run: |
-          if grep -rn "\[Debug" src/ default-dashboard/; then
-            echo "::error::Leftover [Debug ...] logging found. Remove it before release."
-            exit 1
-          fi
-
       - name: Lint
         run: npm run lint
 

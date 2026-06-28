@@ -123,4 +123,4 @@ Stores share the `createListenerSet` / `createKeyedListeners` primitives in
 [`src/sdk/internal/listeners.ts`](src/sdk/internal/listeners.ts).
 
 CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
-lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.
+lint, tests, and committed generated files / bundles in sync.

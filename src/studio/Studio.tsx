@@ -11,7 +11,7 @@ import {
 import { clearAllClientIntegrationData } from '../sdk/dashboard/store';
 import { useAuthorDebugEnabled, useDebugActive } from '../sdk/debug/hooks';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
-import { readDarkMode } from '../sdk/hass/theme';
+import { readDarkMode, applyThemeVars, useTheme } from '../sdk/hass/theme';
 import { hassStore } from '../sdk/hass/stores/hassStore';
 import { projectUsesDefaultDashboardStyles } from '../lib/projectUsesDefaultStyles';
 import { syncDefaultDashboardStyles } from '../mount';
@@ -94,6 +94,8 @@ export default function Studio() {
   const { splitRef, splitPct, startDrag } = useSplitDrag(46);
   const [authorDebug, setAuthorDebug] = useAuthorDebugEnabled();
   const debugActive = useDebugActive();
+  const previewTheme = useTheme();
+  const devPreviewRef = useRef<HTMLDivElement>(null);
 
   const changedPathRef = useRef<string | null>(null);
   const fullRebuildRef = useRef(false);
@@ -111,6 +113,11 @@ export default function Studio() {
     hassStore.setPreviewDarkModeOverride(previewDark);
     return () => hassStore.setPreviewDarkModeOverride(null);
   }, [previewDark]);
+
+  useEffect(() => {
+    if (!isDevPreview || !devPreviewRef.current) return;
+    return applyThemeVars(devPreviewRef.current, previewTheme);
+  }, [previewTheme]);
 
   useEffect(() => {
     if (!isDevPreview || storedPreviewDarkRef.current !== null || !ready) return;
@@ -378,7 +385,11 @@ export default function Studio() {
 
   if (isDevPreview) {
     return (
-      <div className="rd-studio is-viewing is-dev-preview" onKeyDown={stopShortcutsWhileTyping}>
+      <div
+        ref={devPreviewRef}
+        className="rd-studio is-viewing is-dev-preview"
+        onKeyDown={stopShortcutsWhileTyping}
+      >
         <div className="rd-studio__bar">
           <span className="rd-studio__title">Dev-Vorschau</span>
           {localMode && (

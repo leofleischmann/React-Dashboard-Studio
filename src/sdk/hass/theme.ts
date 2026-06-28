@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { hassStore } from './stores/hassStore';
-import type { AppHass } from './types';
+import type { AppHass, HassThemes } from './types';
 
 export type ThemeVars = Record<string, string> & {
   primary: string;
@@ -15,7 +15,7 @@ function activeThemeName(hass: AppHass | null): string {
     return selected.theme;
   }
   if (typeof selected === 'string') return selected;
-  return 'default';
+  return hass.themes?.default_theme ?? 'default';
 }
 
 /** Effective dark mode — HA stores this on `hass.themes.darkMode`, not `hass.darkMode`. */
@@ -31,17 +31,77 @@ export function readDarkMode(): boolean {
   return theme.includes('dark') || theme === 'midnight' || theme === 'ios-dark';
 }
 
+function flattenHaTheme(raw: Record<string, unknown>, dark: boolean): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (key === 'modes') continue;
+    if (typeof value === 'string') out[key] = value;
+  }
+
+  const modes = raw.modes;
+  if (modes && typeof modes === 'object' && !Array.isArray(modes)) {
+    const block = dark
+      ? (modes as Record<string, unknown>).dark
+      : (modes as Record<string, unknown>).light;
+    if (block && typeof block === 'object' && !Array.isArray(block)) {
+      for (const [key, value] of Object.entries(block as Record<string, unknown>)) {
+        if (typeof value === 'string') out[key] = value;
+      }
+    }
+  }
+
+  return out;
+}
+
+function themeHasDarkMode(raw: Record<string, unknown> | undefined): boolean {
+  if (!raw) return false;
+  const modes = raw.modes;
+  if (!modes || typeof modes !== 'object' || Array.isArray(modes)) return false;
+  const dark = (modes as Record<string, unknown>).dark;
+  return Boolean(dark && typeof dark === 'object' && !Array.isArray(dark));
+}
+
+function themeNameForMode(hass: AppHass | null, dark: boolean): string {
+  const name = activeThemeName(hass);
+  if (!dark) return name;
+
+  const catalog = hass?.themes?.themes;
+  if (!catalog) return name;
+
+  const current = catalog[name];
+  if (themeHasDarkMode(current as Record<string, unknown> | undefined)) {
+    return name;
+  }
+
+  const defaultDark = hass?.themes?.default_dark_theme;
+  if (defaultDark && catalog[defaultDark]) {
+    return defaultDark;
+  }
+
+  return name;
+}
+
+function resolveThemeVars(hass: AppHass | null, dark: boolean): Record<string, string> {
+  const catalog = hass?.themes?.themes;
+  if (!catalog) return {};
+
+  const themeName = themeNameForMode(hass, dark);
+  const raw = catalog[themeName] ?? catalog.default ?? catalog[Object.keys(catalog)[0] ?? ''];
+  if (!raw || typeof raw !== 'object') return {};
+
+  return flattenHaTheme(raw as Record<string, unknown>, dark);
+}
+
 // useSyncExternalStore requires getSnapshot to return a referentially stable
 // value while nothing changed — otherwise React re-renders in an infinite loop.
-// We cache the computed object and only hand out a new reference when the
-// effective theme actually changes.
 let cachedTheme: ThemeVars | null = null;
 let cachedThemeSig = '';
 
 function readTheme(): ThemeVars {
   const hass = hassStore.getHass();
-  const themeName = activeThemeName(hass);
-  const themeVars = hass?.themes?.themes?.[themeName] ?? {};
+  const dark = readDarkMode();
+  const themeName = themeNameForMode(hass, dark);
+  const themeVars = resolveThemeVars(hass, dark);
 
   const primary =
     themeVars['primary-color'] ??
@@ -60,7 +120,7 @@ function readTheme(): ThemeVars {
     accent: accent.trim() || primary.trim() || '#03a9f4',
   };
 
-  const sig = `${themeName}\0${JSON.stringify(next)}`;
+  const sig = `${themeName}\0${dark ? '1' : '0'}\0${JSON.stringify(next)}`;
   if (sig === cachedThemeSig && cachedTheme) return cachedTheme;
   cachedThemeSig = sig;
   cachedTheme = next;
@@ -99,5 +159,54 @@ export function applyThemeVars(
       if (value) element.style.setProperty(cssVar, value);
       else element.style.removeProperty(cssVar);
     }
+  };
+}
+
+/** Load HA frontend themes for dev preview (websocket). */
+export async function fetchHaThemes(
+  connection: { sendMessagePromise: (msg: { type: string; [key: string]: unknown }) => Promise<unknown> },
+): Promise<HassThemes> {
+  const data = (await connection.sendMessagePromise({
+    type: 'frontend/get_themes',
+  })) as {
+    themes: Record<string, Record<string, unknown>>;
+    default_theme: string;
+    default_dark_theme?: string | null;
+  };
+
+  let theme = data.default_theme;
+  let darkMode = false;
+
+  try {
+    const core = (await connection.sendMessagePromise({
+      type: 'frontend/get_user_data',
+      key: 'core',
+    })) as { value?: { theme?: string; darkMode?: boolean | 'auto' } };
+    const prefs = core?.value;
+    if (typeof prefs?.theme === 'string') theme = prefs.theme;
+    const dm = prefs?.darkMode;
+    if (dm === true || dm === false) {
+      darkMode = dm;
+    } else if (dm === 'auto' && typeof window !== 'undefined') {
+      darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+  } catch {
+    console.log('[Debug fetchHaThemes]: frontend/get_user_data nicht verfügbar');
+  }
+
+  console.log('[Debug fetchHaThemes]:', {
+    theme,
+    darkMode,
+    defaultTheme: data.default_theme,
+    defaultDarkTheme: data.default_dark_theme,
+    themeCount: Object.keys(data.themes ?? {}).length,
+  });
+
+  return {
+    theme,
+    darkMode,
+    default_theme: data.default_theme,
+    default_dark_theme: data.default_dark_theme ?? undefined,
+    themes: data.themes,
   };
 }

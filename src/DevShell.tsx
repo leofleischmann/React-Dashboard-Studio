@@ -8,8 +8,9 @@ import {
   type HassEntities,
   type HassServiceTarget,
 } from 'home-assistant-js-websocket';
+import { fetchHaThemes } from './sdk/hass/theme';
 import { hassStore } from './sdk/hass/stores/hassStore';
-import type { AppHass } from './sdk/hass/types';
+import type { AppHass, HassThemes } from './sdk/hass/types';
 import Studio from './studio/Studio';
 
 const hassUrl = import.meta.env.VITE_HASS_URL as string | undefined;
@@ -22,6 +23,7 @@ async function connectToHass(): Promise<void> {
 
   const auth = createLongLivedTokenAuth(hassUrl.replace(/\/+$/, ''), token);
   const connection: Connection = await createConnection({ auth });
+  const themes: HassThemes = await fetchHaThemes(connection);
 
   const callService: AppHass['callService'] = (
     domain,
@@ -40,6 +42,7 @@ async function connectToHass(): Promise<void> {
   subscribeEntities(connection, (entities: HassEntities) => {
     const hass: AppHass = {
       states: entities as unknown as AppHass['states'],
+      themes,
       callService,
       connection,
       callApi: async (method, path) => {

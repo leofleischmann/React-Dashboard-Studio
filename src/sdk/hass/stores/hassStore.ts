@@ -57,7 +57,8 @@ class HassStore {
         : hass.selectedTheme) ??
       '';
     const dark = hass.themes?.darkMode ?? hass.darkMode ?? '';
-    return `${String(themeName)}\0${String(dark)}`;
+    const preview = this.previewDarkModeOverride;
+    return `${String(themeName)}\0${String(dark)}\0${preview ?? ''}`;
   }
 
   private collectEntityChanges(

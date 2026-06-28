@@ -36,7 +36,9 @@ export interface HassConnection {
 export interface HassThemes {
   theme?: string;
   darkMode?: boolean;
-  themes?: Record<string, Record<string, string>>;
+  default_theme?: string;
+  default_dark_theme?: string;
+  themes?: Record<string, Record<string, unknown>>;
 }
 
 export interface AppHass {
