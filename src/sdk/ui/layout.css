@@ -11,11 +11,9 @@
 .rd-page-shell__main {
   flex: 1;
   overflow: auto;
-  padding-bottom: 88px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0));
 }
 .rd-tabs {
-  position: sticky;
-  bottom: 0;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -24,7 +22,15 @@
   background: color-mix(in srgb, var(--rd-card-bg) 92%, transparent);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--rd-border);
-  z-index: 10;
+}
+/* Bottom nav: fixed to viewport (PageShell), not end of scrollable content */
+.rd-tabs:not(.rd-tabs--segment) {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 20;
 }
 .rd-tabs__item {
   display: flex;
