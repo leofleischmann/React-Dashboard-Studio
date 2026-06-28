@@ -117,33 +117,6 @@ export function parseWidgetCatalog(catalogRoot) {
   return entries;
 }
 
-/** Mirrors widgetNameForDomain() from catalog/index.ts */
-export function domainDefaultWidgets(entries) {
-  const featured = entries.filter((e) => e.inserterDefault && e.category === 'featured');
-  const domain = entries.filter((e) => e.inserterDefault && e.category === 'domain');
-  const byDomain = new Map();
-
-  for (const entry of entries) {
-    for (const d of entry.domains) {
-      if (!byDomain.has(d)) byDomain.set(d, []);
-      byDomain.get(d).push(entry.name);
-    }
-  }
-
-  const defaults = {};
-  for (const [d, widgets] of byDomain) {
-    const feat = featured.find((e) => e.domains.includes(d));
-    if (feat) {
-      defaults[d] = feat.name;
-      continue;
-    }
-    const dom = domain.find((e) => e.domains.includes(d));
-    if (dom) {
-      defaults[d] = dom.name;
-      continue;
-    }
-    defaults[d] = widgets[0] ?? 'EntityRow';
-  }
-
-  return defaults;
-}
+// The domain → default-widget logic is the single source shared with the
+// runtime entity inserter (catalog/index.ts), so the docs and the inserter agree.
+export { domainDefaultWidgets } from '../../src/sdk/ui/catalog/domainDefault.mjs';

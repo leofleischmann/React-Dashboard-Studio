@@ -6,6 +6,7 @@ import {
   parseWidgetCatalog,
   domainDefaultWidgets,
 } from '../scripts/lib/parse-widget-catalog.mjs';
+import { resolveDomainDefault } from '../src/sdk/ui/catalog/domainDefault.mjs';
 
 // Guards the widget-descriptor contract: each domain widget's metadata lives in
 // a `defineWidget()` descriptor next to its component (cards/domain/<x>.widget.ts),
@@ -47,5 +48,20 @@ describe('widget catalog descriptors', () => {
     const defaults = domainDefaultWidgets(parseWidgetCatalog(CATALOG));
     expect(defaults.light).toBe('LightTile');
     expect(defaults.weather).toBe('WeatherNow');
+  });
+
+  it('uses one shared domain-default resolver for inserter and docs', () => {
+    const entries = parseWidgetCatalog(CATALOG);
+    // inserterDefault widgets win
+    expect(resolveDomainDefault(entries, 'light')).toBe('LightTile');
+    // a featured viz that targets the domain serves as the default when no card
+    // is marked inserterDefault (the `number` case that used to differ between
+    // the runtime inserter and the build-time SDK reference)
+    expect(resolveDomainDefault(entries, 'number')).toBe('ValueOrb3D');
+    // the full map is built from the same resolver
+    const map = domainDefaultWidgets(entries);
+    for (const domain of Object.keys(map)) {
+      expect(map[domain]).toBe(resolveDomainDefault(entries, domain));
+    }
   });
 });
