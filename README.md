@@ -107,9 +107,11 @@ npm run lint    # ESLint — no-console, no-debugger, react-hooks rules
 npm test        # Vitest — eject generator, freeze logic, CLI⇄studio consistency
 ```
 
-Register new SDK exports in [`src/sdk/runtime.ts`](src/sdk/runtime.ts). New widgets get an
-eject source automatically via `npm run gen:eject-sources` (run by `build`) — no per-widget
-maintenance. Starter dashboard: [`default-dashboard/`](default-dashboard/).
+Add a new importable module (`@ha/…`) in [`src/sdk/modules.ts`](src/sdk/modules.ts) — the
+single manifest that the runtime registry, `tsconfig` paths, the compile-check and the SDK
+reference all derive from (a test fails if they drift). New widgets get an eject source
+automatically via `npm run gen:eject-sources` (run by `build`) — no per-widget maintenance.
+Starter dashboard: [`default-dashboard/`](default-dashboard/).
 
 CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
 lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.

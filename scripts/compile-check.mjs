@@ -2,6 +2,8 @@
 
 import { transform } from 'sucrase';
 
+// Mirror of the module manifest (src/sdk/modules.ts). Kept in sync by
+// tests/sdk-modules.test.ts, which fails if this set drifts from the manifest.
 const REGISTRY = new Set([
   'react',
   'react/jsx-runtime',
