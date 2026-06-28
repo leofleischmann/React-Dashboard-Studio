@@ -32,10 +32,11 @@ import {
   withActiveProject,
   type Workspace,
 } from './workspace';
-import { DashboardActions } from './DashboardActions';
 import { navigateToProjectPanel } from './panelNav';
 import { panelStore } from './panelStore';
 import { Preview } from './Preview';
+import { StudioToolbar } from './StudioToolbar';
+import { useSplitDrag } from './useSplitDrag';
 
 const loadEditorModule = () => import('./studio-editor-module');
 const StudioEditorLayout = lazy(() => loadEditorModule());
@@ -49,12 +50,6 @@ const serialize = (p: Project) => JSON.stringify({ e: p.entry, f: p.files });
 
 /** `npm run dev` — preview only; code is edited in VS Code (./dashboard/). */
 const isDevPreview = import.meta.env.DEV;
-
-function toggleHaSidebar(target: EventTarget): void {
-  target.dispatchEvent(
-    new CustomEvent('hass-toggle-menu', { bubbles: true, composed: true }),
-  );
-}
 
 export default function Studio() {
   const ready = useHassReady();
@@ -77,11 +72,10 @@ export default function Studio() {
   const [Dashboard, setDashboard] = useState<ComponentType | null>(null);
   const [version, setVersion] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [splitPct, setSplitPct] = useState(46);
+  const { splitRef, splitPct, startDrag } = useSplitDrag(46);
   const [authorDebug, setAuthorDebug] = useAuthorDebugEnabled();
   const debugActive = useDebugActive();
 
-  const splitRef = useRef<HTMLDivElement>(null);
   const changedPathRef = useRef<string | null>(null);
   const fullRebuildRef = useRef(false);
   const hasCompiledRef = useRef(false);
@@ -291,24 +285,6 @@ export default function Studio() {
     return () => window.removeEventListener('keydown', onKey);
   }, [save, mode]);
 
-  const dragging = useRef(false);
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      if (!dragging.current) return;
-      const rect = splitRef.current?.getBoundingClientRect();
-      if (!rect || rect.width === 0) return;
-      const pct = ((e.clientX - rect.left) / rect.width) * 100;
-      setSplitPct(Math.min(75, Math.max(25, pct)));
-    };
-    const onUp = () => (dragging.current = false);
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-  }, []);
-
   const setActiveContent = useCallback(
     (content: string) => {
       changedPathRef.current = activePath;
@@ -411,103 +387,27 @@ export default function Studio() {
       className={`rd-studio ${editing ? 'is-editing' : 'is-viewing'}`}
       onKeyDown={stopShortcutsWhileTyping}
     >
-      <div className="rd-studio__bar">
-        {mobile && (
-          <button
-            className="rd-studio__menu"
-            title="Seitenleiste ein-/ausblenden"
-            aria-label="Seitenleiste ein-/ausblenden"
-            onClick={(e) => toggleHaSidebar(e.currentTarget)}
-          >
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"
-              />
-            </svg>
-          </button>
-        )}
-
-        <span className="rd-studio__title">{projectName}</span>
-
-        {workspace && !mobile && !isDevPreview && (
-          <DashboardActions
-            projectName={projectName}
-            canDelete={canDelete}
-            disabled={editing && dirty}
-            onCreate={(name) => void createProject(name)}
-            onRename={(name) => void renameProject(name)}
-            onDelete={() => void removeProject()}
-          />
-        )}
-
-        {localMode && (
-          <span className="rd-studio__local" title="Projekt aus ./dashboard/ (VS Code)">
-            📁 dashboard/
-          </span>
-        )}
-
-        {editing && (
-          <>
-            <button
-              className="rd-studio__btn is-primary"
-              onClick={() => void save()}
-              disabled={!dirty}
-            >
-              {dirty ? 'Speichern' : 'Gespeichert ✓'}
-            </button>
-            <span className="rd-studio__hint">Strg/⌘ + S</span>
-            <button
-              className={`rd-studio__btn ${inserterOpen ? 'is-active' : ''}`}
-              onClick={() => setInserterOpen((o) => !o)}
-            >
-              ⚡ Sensor / Aktion
-            </button>
-            <button
-              type="button"
-              className={`rd-studio__btn ${authorDebug ? 'is-active' : ''}`}
-              title={
-                debugActive
-                  ? 'db.log-Ausgabe aktiv (dein Toggle)'
-                  : 'db.log aus — Toggle an, oder in Integration-Optionen Debug-Logs aktivieren'
-              }
-              onClick={() => setAuthorDebug(!authorDebug)}
-            >
-              🐞 Debug
-            </button>
-            <span
-              className={`rd-studio__status ${error ? 'is-error' : 'is-ok'}`}
-              title={error ?? 'Vorschau aktuell'}
-            >
-              {error ? '● Fehler' : '● Live'}
-            </span>
-          </>
-        )}
-
-        <span className="rd-studio__spacer" />
-
-        {editing ? (
-          <button className="rd-studio__btn" onClick={() => setMode('view')}>
-            ◀ Ansicht
-          </button>
-        ) : (
-          !mobile && (
-            <button
-              className="rd-studio__edit"
-              title="Dashboard bearbeiten"
-              onClick={openEditMode}
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Z"
-                />
-              </svg>
-              <span>Bearbeiten</span>
-            </button>
-          )
-        )}
-      </div>
+      <StudioToolbar
+        mobile={mobile}
+        projectName={projectName}
+        hasWorkspace={Boolean(workspace)}
+        canDelete={canDelete}
+        editing={editing}
+        dirty={dirty}
+        localMode={localMode}
+        error={error}
+        inserterOpen={inserterOpen}
+        authorDebug={authorDebug}
+        debugActive={debugActive}
+        onCreate={(name) => void createProject(name)}
+        onRename={(name) => void renameProject(name)}
+        onDelete={() => void removeProject()}
+        onSave={() => void save()}
+        onToggleInserter={() => setInserterOpen((o) => !o)}
+        onToggleDebug={() => setAuthorDebug(!authorDebug)}
+        onView={() => setMode('view')}
+        onEdit={openEditMode}
+      />
 
       {mode === 'view' ? (
         <div className="rd-studio__preview rd-studio__preview--full">
@@ -542,7 +442,7 @@ export default function Studio() {
             onChangeFiles={changeFiles}
             onSetEntry={setEntry}
             onContentChange={setActiveContent}
-            onDividerPointerDown={() => (dragging.current = true)}
+            onDividerPointerDown={startDrag}
           />
         </Suspense>
       )}
