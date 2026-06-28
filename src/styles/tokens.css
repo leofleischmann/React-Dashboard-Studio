@@ -17,7 +17,14 @@
   flex-direction: column;
   min-height: 100%;
   height: 100%;
-  padding: 28px clamp(16px, 4vw, 48px);
+  /* Override --rd-shell-pad-* on .rd-root for edge-to-edge dashboards (e.g. .hm-root). */
+  --rd-shell-pad-y: 28px;
+  --rd-shell-pad-x: clamp(16px, 4vw, 48px);
+  padding:
+    max(var(--rd-shell-pad-y), env(safe-area-inset-top, 0px))
+    max(var(--rd-shell-pad-x), env(safe-area-inset-right, 0px))
+    max(var(--rd-shell-pad-y), env(safe-area-inset-bottom, 0px))
+    max(var(--rd-shell-pad-x), env(safe-area-inset-left, 0px));
   background: var(--rd-bg);
   color: var(--rd-text);
   font-family: var(
