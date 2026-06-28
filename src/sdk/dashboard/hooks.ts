@@ -7,7 +7,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
-import { hassStore } from '../hass/store';
+import { hassStore } from '../hass/stores/hassStore';
 import { dashboardStore } from './store';
 
 function useHassUserScope(fallback = 'default'): string {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { hassStore } from '../store';
+import { hassStore } from '../stores/hassStore';
 import type { HassEntity } from '../types';
 import { useHassReady } from './ready';
 

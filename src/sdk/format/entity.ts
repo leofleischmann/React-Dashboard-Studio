@@ -1,6 +1,6 @@
 import type { HassEntity } from '../hass/types';
-import { registryStore } from '../hass/registryStore';
-import { hassStore } from '../hass/store';
+import { registryStore } from '../hass/stores/registryStore';
+import { hassStore } from '../hass/stores/hassStore';
 import { UNAVAILABLE } from './internal';
 
 /** Is the entity present and reporting a usable value? */

@@ -1,5 +1,5 @@
 import type { Root } from 'react-dom/client';
-import { hassStore } from './sdk/hass/store';
+import { hassStore } from './sdk/hass/stores/hassStore';
 import type { AppHass } from './sdk/hass/types';
 import { mountStudio } from './mount';
 import { panelStore } from './studio/panelStore';

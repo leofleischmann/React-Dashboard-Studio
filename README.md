@@ -116,5 +116,11 @@ no separate metadata tree. Eject sources are generated automatically via
 `npm run gen:eject-sources` (run by `build`) — no per-widget maintenance.
 Starter dashboard: [`default-dashboard/`](default-dashboard/).
 
+The `@ha` data layer is split by concern: `hass/sources/` (framework-agnostic
+fetchers + caches), `hass/stores/` (reactive state singletons), and `hass/hooks/`
+(the React bindings — the only layer that imports `react`; a test enforces this).
+Stores share the `createListenerSet` / `createKeyedListeners` primitives in
+[`src/sdk/internal/listeners.ts`](src/sdk/internal/listeners.ts).
+
 CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) mirrors these: build,
 lint, tests, no stray `[Debug …]` logs, and committed generated files / bundles in sync.

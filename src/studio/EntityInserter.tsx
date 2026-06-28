@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { hassStore } from '../sdk/hass/store';
-import { searchEntities } from '../sdk/hass/entitySearch';
+import { hassStore } from '../sdk/hass/stores/hassStore';
+import { searchEntities } from '../sdk/hass/sources/entitySearch';
 import {
   entityActionSnippet,
   entityDomain,

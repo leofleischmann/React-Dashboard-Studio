@@ -1,5 +1,5 @@
-import { hassStore } from './store';
-import { createListenerSet, type Listener } from '../internal/listeners';
+import { hassStore } from './hassStore';
+import { createListenerSet, type Listener } from '../../internal/listeners';
 
 export type EntityRegistryEntry = {
   entity_id: string;

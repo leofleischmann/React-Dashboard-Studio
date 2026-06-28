@@ -1,4 +1,4 @@
-import { hassStore } from './store';
+import { hassStore } from '../stores/hassStore';
 
 export type WeatherForecastType = 'daily' | 'hourly' | 'twice_daily';
 

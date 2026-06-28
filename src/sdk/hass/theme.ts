@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { hassStore } from './store';
+import { hassStore } from './stores/hassStore';
 import type { AppHass } from './types';
 
 export type ThemeVars = Record<string, string> & {

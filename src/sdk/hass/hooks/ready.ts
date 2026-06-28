@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { hassStore } from '../store';
+import { hassStore } from '../stores/hassStore';
 
 /** True once Home Assistant has handed us a hass object (connected). */
 export function useHassReady(): boolean {

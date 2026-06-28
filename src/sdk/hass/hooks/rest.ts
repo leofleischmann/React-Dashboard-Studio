@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { HistoryPoint } from '../history';
-import type { EntityStatistics } from '../statistics';
+import type { HistoryPoint } from '../sources/history';
+import type { EntityStatistics } from '../sources/statistics';
 import {
   getEntityHistorySnapshot,
   getEntityStatisticsSnapshot,
   isEntityHistoryPending,
   subscribeEntityHistory,
   subscribeEntityStatistics,
-} from '../cachedRest';
-import { normalizeIds } from '../restCache';
-import { fetchCalendarEvents, type CalendarEvent } from '../calendar';
+} from '../sources/cachedRest';
+import { normalizeIds } from '../sources/restCache';
+import { fetchCalendarEvents, type CalendarEvent } from '../sources/calendar';
 import { useHassReady } from './ready';
 import { entityIdsFromKey } from './shared';
 import { EMPTY_REST_RECORD, useSharedRestSubscribe } from './restStore';

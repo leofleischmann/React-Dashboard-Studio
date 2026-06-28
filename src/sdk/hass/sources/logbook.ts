@@ -1,4 +1,4 @@
-import { hassStore } from './store';
+import { hassStore } from '../stores/hassStore';
 
 export interface LogbookEntry {
   when: Date;

@@ -7,15 +7,15 @@ import {
 import {
   getTemplateSnapshot,
   subscribeTemplate,
-} from '../cachedTemplates';
+} from '../sources/cachedTemplates';
 import type {
   TemplateListeners,
   TemplateSnapshot,
-} from '../templateTypes';
+} from '../sources/templateTypes';
 import {
   IDLE_TEMPLATE_SNAPSHOT,
   templateSnapshotsEqual,
-} from '../templateTypes';
+} from '../sources/templateTypes';
 import { useHassReady } from './ready';
 
 export interface UseTemplateOptions {
