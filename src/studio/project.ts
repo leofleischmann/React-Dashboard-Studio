@@ -5,20 +5,8 @@ export interface Project {
 }
 
 // ── Virtual path helpers (posix-style, no leading slash) ─────────────────────
-export function dirname(path: string): string {
-  const i = path.lastIndexOf('/');
-  return i === -1 ? '' : path.slice(0, i);
-}
-
-export function joinPath(base: string, rel: string): string {
-  const parts = base ? base.split('/') : [];
-  for (const seg of rel.split('/')) {
-    if (seg === '' || seg === '.') continue;
-    if (seg === '..') parts.pop();
-    else parts.push(seg);
-  }
-  return parts.join('/');
-}
+// Defined once in moduleResolve (shared with the Node-side compile check).
+export { dirname, joinPath } from './moduleResolve';
 
 export { DEFAULT_PROJECT } from './defaultProject.generated';
 
