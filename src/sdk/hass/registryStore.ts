@@ -1,6 +1,5 @@
 import { hassStore } from './store';
-
-type Listener = () => void;
+import { createListenerSet, type Listener } from '../internal/listeners';
 
 export type EntityRegistryEntry = {
   entity_id: string;
@@ -51,17 +50,13 @@ class RegistryStore {
   private labels = new Map<string, LabelEntry>();
   private status: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
   private loadPromise: Promise<void> | null = null;
-  private listeners = new Set<Listener>();
+  private listeners = createListenerSet();
 
-  subscribe = (listener: Listener): (() => void) => {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
-  };
+  subscribe = (listener: Listener): (() => void) =>
+    this.listeners.subscribe(listener);
 
   private notify = (): void => {
-    for (const listener of this.listeners) listener();
+    this.listeners.notify();
   };
 
   getStatus = (): 'idle' | 'loading' | 'ready' | 'error' => this.status;
