@@ -11,6 +11,8 @@ import {
 import { clearAllClientIntegrationData } from '../sdk/dashboard/store';
 import { useAuthorDebugEnabled, useDebugActive } from '../sdk/debug/hooks';
 import { useHassReady, useIsMobile } from '../sdk/hass/hooks';
+import { readDarkMode } from '../sdk/hass/theme';
+import { hassStore } from '../sdk/hass/stores/hassStore';
 import { projectUsesDefaultDashboardStyles } from '../lib/projectUsesDefaultStyles';
 import { syncDefaultDashboardStyles } from '../mount';
 import { useRenderRoot } from './shadowRoot';
@@ -48,6 +50,19 @@ type Mode = 'view' | 'edit';
 
 const serialize = (p: Project) => JSON.stringify({ e: p.entry, f: p.files });
 
+const DEV_PREVIEW_DARK_KEY = 'rd-dev-preview-dark';
+
+function readStoredPreviewDark(): boolean | null {
+  try {
+    const value = localStorage.getItem(DEV_PREVIEW_DARK_KEY);
+    if (value === '1') return true;
+    if (value === '0') return false;
+  } catch {
+    /* private mode / blocked storage */
+  }
+  return null;
+}
+
 /** `npm run dev` — preview only; code is edited in VS Code (./dashboard/). */
 const isDevPreview = import.meta.env.DEV;
 
@@ -68,6 +83,10 @@ export default function Studio() {
   const [mode, setMode] = useState<Mode>('view');
   const [inserterOpen, setInserterOpen] = useState(false);
   const [entityBrowserOpen, setEntityBrowserOpen] = useState(false);
+  const storedPreviewDarkRef = useRef(readStoredPreviewDark());
+  const [previewDark, setPreviewDark] = useState(
+    () => storedPreviewDarkRef.current ?? false,
+  );
 
   const [Dashboard, setDashboard] = useState<ComponentType | null>(null);
   const [version, setVersion] = useState(0);
@@ -86,6 +105,28 @@ export default function Studio() {
     const needs = projectUsesDefaultDashboardStyles(project);
     syncDefaultDashboardStyles(renderRoot, needs);
   }, [loaded, project, renderRoot]);
+
+  useEffect(() => {
+    if (!isDevPreview) return;
+    hassStore.setPreviewDarkModeOverride(previewDark);
+    return () => hassStore.setPreviewDarkModeOverride(null);
+  }, [previewDark]);
+
+  useEffect(() => {
+    if (!isDevPreview || storedPreviewDarkRef.current !== null || !ready) return;
+    setPreviewDark(readDarkMode());
+  }, [ready]);
+
+  const setPreviewDarkMode = useCallback((dark: boolean) => {
+    setPreviewDark(dark);
+    storedPreviewDarkRef.current = dark;
+    try {
+      localStorage.setItem(DEV_PREVIEW_DARK_KEY, dark ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+    console.log('[Debug Studio]: preview dark mode', dark);
+  }, []);
 
   useEffect(() => {
     return panelStore.subscribe(() => {
@@ -351,6 +392,28 @@ export default function Studio() {
           >
             ⚡ Entities
           </button>
+          <div
+            className="rd-studio__theme-toggle"
+            role="group"
+            aria-label="Vorschau Light/Dark"
+          >
+            <button
+              type="button"
+              className={`rd-studio__btn ${!previewDark ? 'is-active' : ''}`}
+              aria-pressed={!previewDark}
+              onClick={() => setPreviewDarkMode(false)}
+            >
+              ☀ Light
+            </button>
+            <button
+              type="button"
+              className={`rd-studio__btn ${previewDark ? 'is-active' : ''}`}
+              aria-pressed={previewDark}
+              onClick={() => setPreviewDarkMode(true)}
+            >
+              🌙 Dark
+            </button>
+          </div>
           <span
             className={`rd-studio__status ${error ? 'is-error' : 'is-ok'}`}
             title={error ?? 'Vorschau aktuell'}

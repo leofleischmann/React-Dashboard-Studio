@@ -20,6 +20,8 @@ function domainOf(entityId: string): string {
 class HassStore {
   private hass: AppHass | null = null;
   private narrow = false;
+  /** Dev live preview only — overrides HA dark mode for `useDarkMode()`. */
+  private previewDarkModeOverride: boolean | null = null;
   private domainIndex = new Map<string, HassEntity[]>();
 
   /** Theme, dark mode, hass connection — not entity states. */
@@ -163,6 +165,15 @@ class HassStore {
   };
 
   getNarrow = (): boolean => this.narrow;
+
+  /** Dev preview (`npm run dev`) — null restores HA theme. */
+  setPreviewDarkModeOverride = (dark: boolean | null): void => {
+    if (this.previewDarkModeOverride === dark) return;
+    this.previewDarkModeOverride = dark;
+    this.hassMetaListeners.notify();
+  };
+
+  getPreviewDarkModeOverride = (): boolean | null => this.previewDarkModeOverride;
 
   getEntity = (entityId: string): HassEntity | undefined =>
     this.hass?.states?.[entityId];

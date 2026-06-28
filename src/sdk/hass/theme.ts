@@ -20,6 +20,9 @@ function activeThemeName(hass: AppHass | null): string {
 
 /** Effective dark mode — HA stores this on `hass.themes.darkMode`, not `hass.darkMode`. */
 export function readDarkMode(): boolean {
+  const previewOverride = hassStore.getPreviewDarkModeOverride();
+  if (previewOverride !== null) return previewOverride;
+
   const hass = hassStore.getHass();
   if (typeof hass?.themes?.darkMode === 'boolean') return hass.themes.darkMode;
   if (typeof hass?.darkMode === 'boolean') return hass.darkMode;

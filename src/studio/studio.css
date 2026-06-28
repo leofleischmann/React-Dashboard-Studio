@@ -526,6 +526,11 @@
   border-color: var(--primary-color, #2f7bf6);
   color: #fff;
 }
+.is-dev-preview .rd-studio__theme-toggle {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+}
 .rd-dev-banner {
   padding: 10px 16px;
   font-size: 0.84rem;
